@@ -35,12 +35,16 @@ Priorités : **P0** = sans ça on est éliminé · **P1** = ce qui fait gagner �
 
 | P | Tâche | Livrable vérifiable |
 |---|---|---|
-| P0 | **Web (Next.js + shadcn/ui)** : banque en ligne simulée + assistant intégré (texte + micro) | Parcours transfert complet en fulfulde |
+| ✅ P0 | **Web (Next.js + shadcn/ui)** : banque en ligne simulée + assistant intégré (texte + micro) | Parcours transfert complet en fulfulde — vérifié (Playwright, bureau + téléphone) |
 | P0 | **Console jury** : traces en direct + **matrice de cohérence** (une requête → 6 canaux → comparaison) | §8 démontré en un clic |
-| P0 | **Mobile (Expo / React Native)** : tableau de bord (solde, envoi, retrait, crédit, facture) + assistant, moteur embarqué hors ligne | APK de démo |
-| P2 | **Bulle flottante Android** (module natif Kotlin, lecture d'écran à la demande ; non évaluée par la sandbox) | Toucher la bulle sur une app tierce → fiche claire |
+| ✅ P0 | **Mobile (Expo / React Native)** : tableau de bord (solde, envoi, retrait, crédit, facture) + assistant, moteur embarqué hors ligne | Bundle Hermes Android produit ; **APK à construire sur une machine avec SDK Android** |
+| ✅ P2 | **Bulle flottante Android** (module natif Kotlin, lecture d'écran à la demande ; non évaluée par la sandbox) | Kotlin compilé contre Android 15 (`pnpm check:bubble`) ; **à valider sur appareil** |
 | P1 | **Extension navigateur** (présélection) branchée sur la gateway : panneau « demander » en plus de la superposition | Fonctionne sur les simulateurs web SAFINUM sans intégration |
 | P2 | **Widget embarquable** `<script src=…/nkap-widget.js>` | Une institution l'ajoute en une ligne |
+
+Décisions J2 : [ADR 0004](adr/0004-clients-embarques-et-bulle-rendue-en-typescript.md). Reste à brancher
+web et mobile sur la gateway dès qu'elle existe (un `NkapClient` HTTP, aucun écran ne change), et à
+relever sur l'appareil les identifiants réels des applis MoMo / Orange Money pour la liste blanche.
 
 ## J3 — voix, finitions, démonstration
 

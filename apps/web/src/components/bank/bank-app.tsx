@@ -7,7 +7,7 @@ import { AssistantPanel } from '@/components/assistant/assistant-panel';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetDescription, SheetTitle } from '@/components/ui/sheet';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { NkapProvider, useConversation, useNkap } from '@/lib/nkap';
+import { createLocalRuntime, NkapProvider, useConversation, useNkap, type NkapRuntime } from '@/lib/nkap';
 import { BalanceCard } from './balance-card';
 import { HistoryCard } from './history-card';
 
@@ -56,9 +56,11 @@ function BankScreen(): JSX.Element {
   );
 }
 
+const createWebRuntime = (): NkapRuntime => createLocalRuntime('web', 'amina');
+
 export function BankApp(): JSX.Element {
   return (
-    <NkapProvider>
+    <NkapProvider create={createWebRuntime}>
       <TooltipProvider delayDuration={200}>
         <BankScreen />
       </TooltipProvider>

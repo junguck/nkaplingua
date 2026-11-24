@@ -1,0 +1,17 @@
+{
+  "name": "@nkap/react",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Liaison React (web et React Native) des stores @nkap/client : provider et hooks useSyncExternalStore.",
+  "main": "./src/index.tsx",
+  "types": "./src/index.tsx",
+  "exports": { ".": "./src/index.tsx" },
+  "scripts": { "typecheck": "tsc -p tsconfig.json" },
+  "dependencies": {
+    "@nkap/client": "workspace:*",
+    "@nkap/contracts": "workspace:*"
+  },
+  "peerDependencies": { "react": ">=19" },
+  "devDependencies": { "@types/react": "19.3.0", "react": "19.3.0" }
+}

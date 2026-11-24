@@ -1,0 +1,7 @@
+{
+  "name": "nkap-bubble",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Module natif Android de la bulle NkapLingua (superposition + lecture d'écran à la demande).",
+  "main": "index.ts"
+}

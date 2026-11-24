@@ -8,3 +8,4 @@ export { UI_TEXT, uiText, t, statusLabel, needsReviewBadge, SUPPORTED_LANGUAGES,
 export { formatAmount, formatShortDate } from '@nkap/core';
 export { operationCardRows } from './card-rows';
 export { readScreen, renderScreenCard, type ScreenCard, type ScreenCardRow, type ScreenAlert, type ScreenAlertLevel, type ScreenField } from '@nkap/core';
+export { bubbleCardFor, type BubbleCardPayload, type ScreenReadEvent, type ScreenReadStatus } from './bubble-card';

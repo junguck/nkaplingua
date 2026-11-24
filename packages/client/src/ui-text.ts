@@ -62,6 +62,10 @@ export const UI_TEXT = {
   },
   'ui.bubble.try': { fr: 'Essayer sur un écran exemple', en: 'Try on a sample screen' },
   'ui.bubble.unsupported': { fr: 'La bulle n’existe que sur Android.', en: 'The bubble is Android only.' },
+  'ui.bubble.accessibilityOff': {
+    fr: 'Activez « Lecture d’écran à la demande » de NkapLingua dans les réglages d’accessibilité.',
+    en: 'Turn on NkapLingua “On-demand screen reading” in the accessibility settings.',
+  },
   'ui.granted': { fr: 'Autorisé', en: 'Granted' },
   'ui.grant': { fr: 'Autoriser', en: 'Allow' },
   'status.reference': { fr: 'Référence', en: 'Reference' },

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="nkap_screen_reader_label">NkapLingua — lecture d’écran à la demande</string>
+  <string name="nkap_screen_reader_description">Quand vous touchez la bulle NkapLingua, l’écran visible d’une application financière de votre liste est lu une seule fois pour vous expliquer montant, frais, total et risques dans votre langue. Rien n’est lu en arrière-plan, rien n’est envoyé sur Internet, les champs de code secret ne sont jamais lus.</string>
+  <string name="nkap_bubble_channel">Bulle NkapLingua</string>
+  <string name="nkap_bubble_notification">Touchez la bulle pour comprendre l’écran</string>
+  <string name="nkap_bubble_close">Fermer</string>
+  <string name="nkap_bubble_reading">Lecture…</string>
+</resources>

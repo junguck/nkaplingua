@@ -1,0 +1,35 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+  <!-- Bulle flottante au-dessus des autres applications. -->
+  <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+  <application>
+    <service
+      android:name="cm.nkaplingua.bubble.BubbleService"
+      android:exported="false"
+      android:foregroundServiceType="specialUse">
+      <property
+        android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+        android:value="Floating assistant bubble that explains the visible screen of an allow-listed financial app, only when the user taps it." />
+    </service>
+
+    <!--
+      Lecture d'écran À LA DEMANDE (ADR 0002) : aucun événement n'est traité, l'arbre n'est lu
+      qu'au toucher de la bulle, uniquement pour les applications de la liste blanche.
+    -->
+    <service
+      android:name="cm.nkaplingua.bubble.ScreenReaderService"
+      android:exported="false"
+      android:label="@string/nkap_screen_reader_label"
+      android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+      <intent-filter>
+        <action android:name="android.accessibilityservice.AccessibilityService" />
+      </intent-filter>
+      <meta-data
+        android:name="android.accessibilityservice"
+        android:resource="@xml/nkap_screen_reader" />
+    </service>
+  </application>
+</manifest>

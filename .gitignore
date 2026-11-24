@@ -13,3 +13,8 @@ next-env.d.ts
 # Générés par `expo prebuild` (le module natif de la bulle, lui, est versionné)
 apps/mobile/android/
 apps/mobile/ios/
+apps/mobile/modules/nkap-bubble/jvm-check/build/
+.gradle/
+.kotlin/
+apps/mobile/dist/
+apps/mobile/expo-env.d.ts

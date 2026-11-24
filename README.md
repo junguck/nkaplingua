@@ -25,19 +25,37 @@ altérer un montant, un nom ou un numéro**.
 | **Moteur** `@nkap/core` | compréhension (langue, montants en chiffres et en lettres dans 4 langues, intention, bénéficiaire), dialogue à états (clarification, correction, confirmation, idempotence), rendu multilingue à valeurs verrouillées, mise en forme USSD/SMS |
 | **Contrat** `@nkap/contracts` | intentions canoniques, tours, traces jury (§6.D), port financier, schémas zod |
 | **Banque simulée** `@nkap/banking-sim` | comptes, contacts, grilles de frais, plafonds, historique, codes de retrait |
-| **Tests** | **53/53**, dont les **10 scénarios standardisés du §7** joués de bout en bout |
+| **Tests** | **73/73**, dont les **10 scénarios standardisés du §7** joués de bout en bout |
 
-Prochaines étapes : passerelle NestJS + USSD (J1), web + console jury + mobile + bulle Android (J2),
-voix et démonstration (J3) — voir [`docs/ROADMAP.md`](docs/ROADMAP.md).
+## Ce qui est prêt (J2 — clients)
+
+| | |
+|---|---|
+| **Client partagé** `@nkap/client` + `@nkap/react` | port `NkapClient` (moteur embarqué aujourd'hui, gateway demain), stores observables communs au web et au mobile, actions rapides, libellés d'interface à statut de traduction |
+| **Web** `apps/web` | Next.js 16 + shadcn/ui : banque en ligne simulée + assistant (texte, micro, fiche verrouillée, statut, trace jury) |
+| **Mobile** `apps/mobile` | Expo SDK 58 : tableau de bord, assistant hors ligne, réglages de la bulle |
+| **Bulle Android** `apps/mobile/modules/nkap-bubble` | module natif Kotlin : bulle flottante + lecture d'écran **à la demande** (liste blanche, jamais les champs secrets) → fiche claire rendue par le moteur TypeScript |
+| **Lecture d'écran** `@nkap/core/screen` | montant, frais, total, bénéficiaire, contrôle « montant + frais = total », bouclier anti-arnaque |
+
+Reste : **le middleware SAFINUM (J1, P0, chemin évalué par le jury)**, la console jury, la voix —
+voir [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## Démarrer
 
 ```bash
 corepack enable            # pnpm 10
 pnpm install
-pnpm test                  # 53 tests, < 1 s
-pnpm typecheck             # TypeScript strict, zéro any
+pnpm test                  # 73 tests, < 1 s
+pnpm typecheck             # TypeScript strict, zéro any (paquets + web + mobile)
+
+pnpm dev:web               # http://localhost:3000 — banque en ligne + assistant
+pnpm dev:mobile            # Expo (écrans) ; la bulle exige un build Android :
+pnpm android               # expo prebuild + run:android (SDK Android requis)
+pnpm check:bubble          # compile le Kotlin de la bulle sans SDK Android (Gradle)
 ```
+
+La bulle ne fonctionne pas dans Expo Go (module natif). Sur l'appareil : onglet **Bulle** →
+autoriser la superposition et « Lecture d'écran à la demande » → **Lancer la bulle**.
 
 ## Documentation
 
@@ -61,8 +79,14 @@ packages/
     src/nlu/       langue, entités, intention, interprétation
     src/dialogue/  machine à états, session, fusion des corrections
     src/render/    rendu verrouillé par langue, mise en forme par canal
+    src/screen/    lecture ponctuelle d'un écran tiers (bulle, extension) + anti-arnaque
   banking-sim/   backend financier simulé (remplaçable par l'adaptateur SAFINUM)
+  client/        port NkapClient, client embarqué, stores partagés web/mobile, libellés d'interface
+  react/         provider + hooks React (web et React Native)
 apps/
+  web/           Next.js + shadcn/ui : banque en ligne simulée + assistant
+  mobile/        Expo : tableau de bord, assistant, réglages de la bulle
+    modules/nkap-bubble/  module natif Kotlin de la bulle (+ jvm-check : compilation sans SDK)
   extension/     extension navigateur de la présélection (superposition de pages)
 docs/            brainstorm, roadmap, architecture, ADR
 preselection/    livrables de la phase de sélection

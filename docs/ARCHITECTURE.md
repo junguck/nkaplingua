@@ -23,7 +23,10 @@
 | `@nkap/core` | Le **moteur** : pur TypeScript, sans DOM, sans réseau. Tourne dans Node, le navigateur, React Native | contracts |
 | `@nkap/banking-sim` | Backend simulé conforme au port (comptes, frais, plafonds, idempotence) | contracts |
 | `apps/gateway` *(J1)* | API REST + webhooks USSD/SMS + flux de traces | core |
-| `apps/web`, `apps/mobile` *(J2)* | Clients riches | contracts (+ core embarqué hors ligne) |
+| `@nkap/client` | Port `NkapClient`, client embarqué, stores partagés, fiche de la bulle | core, banking-sim |
+| `@nkap/react` | Provider + hooks (`useSyncExternalStore`) pour le web et React Native | client |
+| `apps/web` | Banque en ligne simulée + assistant (Next.js, shadcn/ui) | react |
+| `apps/mobile` | Tableau de bord + assistant + bulle Android (Expo, module Kotlin `nkap-bubble`) | react |
 | `apps/extension` | Extension de la présélection (superposition de pages) | — puis gateway |
 
 ## 2. Le contrat canonique
@@ -104,7 +107,9 @@ entrées de lexique, validées par deux locuteurs.
 - Aucun montant, nom ou numéro n'est produit par la traduction : ils viennent du système financier.
 - Confirmation explicite + clé d'idempotence par opération.
 - Validation zod à chaque frontière ; le moteur ne reçoit jamais d'entrée non validée.
-- La bulle Android lit l'écran **à la demande uniquement**, sur une liste blanche, sans envoi réseau.
+- La bulle Android lit l'écran **à la demande uniquement**, sur une liste blanche, sans envoi réseau :
+  le service d'accessibilité ne traite aucun événement, ne parcourt pas une appli hors liste et ne lit
+  jamais un champ mot de passe ; le texte passe du service au moteur JS en mémoire, dans le processus.
 
 ## 6. Scalabilité et déploiement
 
