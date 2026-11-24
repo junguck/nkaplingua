@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>NkapLingua</title>
+<link rel="stylesheet" href="../ui/tokens.css">
+<link rel="stylesheet" href="popup.css">
+</head>
+<body>
+<header class="top">
+  <span class="logo">N</span>
+  <b class="brand">NkapLingua</b>
+  <label class="switch" title="Activer ou mettre en pause"><input type="checkbox" id="enabled" aria-label="NkapLingua actif"><span></span></label>
+</header>
+
+<h1>La finance,<br>dans nos langues <svg class="spark" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c.6 4.8 2.6 7.4 8 8-5.4.6-7.4 3.2-8 8-.6-4.8-2.6-7.4-8-8 5.4-.6 7.4-3.2 8-8z" fill="currentColor"/><path d="M19 15c.3 2 1.1 3.1 3 3.4-1.9.3-2.7 1.4-3 3.4-.3-2-1.1-3.1-3-3.4 1.9-.3 2.7-1.4 3-3.4z" fill="currentColor"/></svg></h1>
+
+<section class="current" id="current" aria-live="polite"></section>
+
+<section class="people" aria-label="Choisir la langue">
+  <div class="row" id="langs" role="radiogroup" aria-label="Langue"></div>
+</section>
+
+<section class="acts">
+  <button class="tile t-lav" data-act="factsheet">
+    <svg class="dia" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="tl">Fiche<br>claire</span><span class="go"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+  </button>
+  <button class="tile t-lime" data-act="guide">
+    <svg class="dia" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 7L7 17M15 17H7V9" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="tl">Guide<br>pas à pas</span><span class="go"><svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+  </button>
+  <button class="wide" data-act="readPage">
+    <span>Écouter la page</span>
+    <span class="go"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor"/><path d="M16.5 8.5a5 5 0 0 1 0 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+  </button>
+  <button class="wide sky" id="repondeur" type="button">
+    <span>Répondeur vocal</span>
+    <span class="go"><svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.8 5.2 6.6 6.6l2.2-2.2c.3-.3.7-.4 1.1-.2 1.2.4 2.5.6 3.8.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1C12.4 21 3 11.6 3 3c0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.6.6 3.8.1.4 0 .8-.3 1.1L6.6 10.8z" fill="currentColor"/></svg></span>
+  </button>
+</section>
+
+<section class="block">
+  <h2>Affichage</h2>
+  <div class="seg" role="radiogroup" aria-label="Mode d'affichage">
+    <button data-mode="bilingue" role="radio" title="L'original et l'explication en dessous">Bilingue</button>
+    <button data-mode="immersif" role="radio" title="La langue nationale passe devant">Immersif</button>
+    <button data-mode="survol" role="radio" title="L'explication apparaît au survol">Survol</button>
+  </div>
+</section>
+
+<section class="block card">
+  <label class="opt"><span>Bouclier anti-arnaque</span><span class="switch"><input type="checkbox" data-opt="shield"><span></span></span></label>
+  <label class="opt"><span>Fiche claire automatique</span><span class="switch"><input type="checkbox" data-opt="factsheet"><span></span></span></label>
+  <label class="opt"><span>Lire les alertes à voix haute</span><span class="switch"><input type="checkbox" data-opt="autoSpeak"><span></span></span></label>
+  <label class="opt"><span>Gros caractères</span><span class="switch"><input type="checkbox" data-opt="bigText"><span></span></span></label>
+  <label class="opt"><span>Seulement les traductions vérifiées</span><span class="switch"><input type="checkbox" data-opt="strict"><span></span></span></label>
+  <label class="opt"><span>Actif sur <b id="host">ce site</b></span><span class="switch"><input type="checkbox" id="site"><span></span></span></label>
+</section>
+
+<section class="block stats" id="stats" hidden>
+  <div><b id="s-units">0</b><small>messages expliqués</small></div>
+  <div><b id="s-ent">0</b><small>valeurs verrouillées</small></div>
+  <div><b id="s-scam">0</b><small>arnaques signalées</small></div>
+</section>
+
+<nav class="bar">
+  <a href="#" id="studio"><span class="round lime"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3" fill="currentColor"/><path d="M6 11a6 6 0 0 0 12 0M12 17v4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>Studio linguistique</a>
+  <small>Alt+Shift : N pause · L lire · G guide · F fiche</small>
+</nav>
+<script src="../glossary/bundle.js"></script>
+<script src="../lib/engine.js"></script>
+<script src="popup.js"></script>
+</body>
+</html>

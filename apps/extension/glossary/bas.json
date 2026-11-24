@@ -1,0 +1,18 @@
+{
+  "code": "bas",
+  "name": "Basaa",
+  "native": "Ɓasàa (mbɛnɛ)",
+  "flag": "⛰️",
+  "region": "Centre, Littoral (Sanaga-Maritime, Nyong-et-Kellé)",
+  "tts": "fr-FR",
+  "status_note": "KIT DE DÉMARRAGE : quelques éléments attestés. Vocabulaire financier à compléter par locuteurs natifs dans le Studio linguistique. En attendant : français facile + pictogrammes.",
+  "default_status": "propose",
+  "sources": [
+    "Bassong, P.R. & Zribi-Hertz, A. (2024). Le basaa — fiche LGMEF, CNRS (négation ɓé, verbe tí 'donner')",
+    "SIL Cameroun (2005). Basaa-English-French-German dictionary — référence à consulter"
+  ],
+  "entries": {
+    "term.thanks": "Mayéga",
+    "term.never": {"t": "ɓé (négation, après le verbe)", "s": "atteste", "src": "Fiche LGMEF/CNRS basaa (2024)"}
+  }
+}

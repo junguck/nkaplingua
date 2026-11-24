@@ -1,0 +1,1856 @@
+{
+ "version": "1.0.0",
+ "description": "Couche conceptuelle NkapLingua : chaque concept financier est défini une seule fois (variantes FR/EN reconnues + reformulation en français facile). Chaque langue nationale traduit les identifiants, jamais le texte brut.",
+ "slots": {
+  "AMOUNT": "Montant avec devise (verrouillé, jamais traduit)",
+  "PERCENT": "Pourcentage (verrouillé)",
+  "PHONE": "Numéro de téléphone (verrouillé)",
+  "NAME": "Nom de personne (verrouillé)",
+  "NUM": "Nombre simple (verrouillé)",
+  "DATE": "Date (verrouillée)",
+  "TIME": "Heure (verrouillée)",
+  "REF": "Référence / identifiant de transaction (verrouillé)"
+ },
+ "concepts": [
+  {
+   "id": "term.balance",
+   "type": "term",
+   "cat": "balance",
+   "icon": "💰",
+   "fr": [
+    "solde",
+    "solde disponible",
+    "solde actuel",
+    "mon solde",
+    "consulter le solde",
+    "consulter mon solde"
+   ],
+   "en": [
+    "balance",
+    "available balance",
+    "current balance",
+    "my balance",
+    "check balance"
+   ],
+   "easy": "Solde (l'argent qui reste sur votre compte)"
+  },
+  {
+   "id": "term.money",
+   "type": "term",
+   "cat": "info",
+   "icon": "💵",
+   "fr": [
+    "argent"
+   ],
+   "en": [
+    "money",
+    "cash"
+   ],
+   "easy": "Argent"
+  },
+  {
+   "id": "term.amount",
+   "type": "term",
+   "cat": "transfer",
+   "icon": "🔢",
+   "fr": [
+    "montant",
+    "montant à envoyer",
+    "somme",
+    "montant du transfert"
+   ],
+   "en": [
+    "amount",
+    "amount to send",
+    "sum",
+    "transfer amount"
+   ],
+   "easy": "Montant (combien d'argent)"
+  },
+  {
+   "id": "term.fees",
+   "type": "term",
+   "cat": "fees",
+   "icon": "🧾",
+   "fr": [
+    "frais",
+    "frais de transfert",
+    "frais de transaction",
+    "commission",
+    "frais de service",
+    "frais d'envoi",
+    "frais de retrait",
+    "grille tarifaire",
+    "tarifs",
+    "consulter les frais"
+   ],
+   "en": [
+    "fee",
+    "fees",
+    "transfer fee",
+    "transaction fee",
+    "charges",
+    "commission",
+    "service fee",
+    "fee schedule",
+    "pricing",
+    "check fees"
+   ],
+   "easy": "Frais (l'argent que le service prend)"
+  },
+  {
+   "id": "term.total",
+   "type": "term",
+   "cat": "confirm",
+   "icon": "➕",
+   "fr": [
+    "total",
+    "montant total",
+    "total à débiter",
+    "total à payer",
+    "montant débité"
+   ],
+   "en": [
+    "total",
+    "total amount",
+    "total to pay",
+    "total debited",
+    "amount debited"
+   ],
+   "easy": "Total (montant + frais, tout ensemble)"
+  },
+  {
+   "id": "term.beneficiary",
+   "type": "term",
+   "cat": "transfer",
+   "icon": "👤",
+   "fr": [
+    "bénéficiaire",
+    "destinataire",
+    "nom du bénéficiaire"
+   ],
+   "en": [
+    "beneficiary",
+    "recipient",
+    "receiver",
+    "recipient name"
+   ],
+   "easy": "Bénéficiaire (la personne qui reçoit l'argent)"
+  },
+  {
+   "id": "term.sender",
+   "type": "term",
+   "cat": "transfer",
+   "icon": "🙋",
+   "fr": [
+    "expéditeur",
+    "émetteur"
+   ],
+   "en": [
+    "sender"
+   ],
+   "easy": "Expéditeur (la personne qui envoie)"
+  },
+  {
+   "id": "term.phone",
+   "type": "term",
+   "cat": "transfer",
+   "icon": "📱",
+   "fr": [
+    "numéro de téléphone",
+    "téléphone",
+    "numéro",
+    "numéro du bénéficiaire",
+    "numéro mobile"
+   ],
+   "en": [
+    "phone number",
+    "phone",
+    "number",
+    "mobile number",
+    "recipient number"
+   ],
+   "easy": "Numéro de téléphone"
+  },
+  {
+   "id": "term.account",
+   "type": "term",
+   "cat": "info",
+   "icon": "🏦",
+   "fr": [
+    "compte",
+    "mon compte",
+    "numéro de compte"
+   ],
+   "en": [
+    "account",
+    "my account",
+    "account number"
+   ],
+   "easy": "Compte"
+  },
+  {
+   "id": "term.transfer",
+   "type": "term",
+   "cat": "transfer",
+   "icon": "📤",
+   "fr": [
+    "transfert",
+    "envoi",
+    "envoyer de l'argent",
+    "transfert d'argent",
+    "nouveau transfert",
+    "préparer un transfert"
+   ],
+   "en": [
+    "transfer",
+    "send money",
+    "money transfer",
+    "new transfer"
+   ],
+   "easy": "Envoyer de l'argent"
+  },
+  {
+   "id": "term.send",
+   "type": "term",
+   "cat": "transfer",
+   "icon": "📤",
+   "fr": [
+    "envoyer"
+   ],
+   "en": [
+    "send"
+   ],
+   "easy": "Envoyer"
+  },
+  {
+   "id": "term.receive",
+   "type": "term",
+   "cat": "transfer",
+   "icon": "📥",
+   "fr": [
+    "recevoir",
+    "réception",
+    "argent reçu"
+   ],
+   "en": [
+    "receive",
+    "received",
+    "money received"
+   ],
+   "easy": "Recevoir"
+  },
+  {
+   "id": "term.withdraw",
+   "type": "term",
+   "cat": "transfer",
+   "icon": "🏧",
+   "fr": [
+    "retrait",
+    "retirer",
+    "retirer de l'argent"
+   ],
+   "en": [
+    "withdrawal",
+    "withdraw",
+    "cash out"
+   ],
+   "easy": "Retrait (sortir l'argent en espèces)"
+  },
+  {
+   "id": "term.deposit",
+   "type": "term",
+   "cat": "transfer",
+   "icon": "📥",
+   "fr": [
+    "dépôt",
+    "déposer"
+   ],
+   "en": [
+    "deposit",
+    "cash in"
+   ],
+   "easy": "Dépôt (mettre de l'argent sur le compte)"
+  },
+  {
+   "id": "term.pay",
+   "type": "term",
+   "cat": "transfer",
+   "icon": "💳",
+   "fr": [
+    "payer",
+    "paiement",
+    "payer un marchand"
+   ],
+   "en": [
+    "pay",
+    "payment",
+    "pay merchant"
+   ],
+   "easy": "Payer"
+  },
+  {
+   "id": "term.bill",
+   "type": "term",
+   "cat": "transfer",
+   "icon": "🧾",
+   "fr": [
+    "facture",
+    "payer une facture",
+    "factures"
+   ],
+   "en": [
+    "bill",
+    "pay bill",
+    "bills"
+   ],
+   "easy": "Facture (eau, électricité…)"
+  },
+  {
+   "id": "term.airtime",
+   "type": "term",
+   "cat": "transfer",
+   "icon": "📶",
+   "fr": [
+    "crédit de communication",
+    "recharge",
+    "achat de crédit"
+   ],
+   "en": [
+    "airtime",
+    "top up",
+    "buy airtime"
+   ],
+   "easy": "Crédit de téléphone"
+  },
+  {
+   "id": "term.savings",
+   "type": "term",
+   "cat": "info",
+   "icon": "🐷",
+   "fr": [
+    "épargne",
+    "compte épargne"
+   ],
+   "en": [
+    "savings",
+    "savings account"
+   ],
+   "easy": "Épargne (argent mis de côté)"
+  },
+  {
+   "id": "term.loan",
+   "type": "term",
+   "cat": "condition",
+   "icon": "🤝",
+   "fr": [
+    "prêt",
+    "crédit",
+    "emprunt"
+   ],
+   "en": [
+    "loan",
+    "credit"
+   ],
+   "easy": "Prêt (argent emprunté qu'il faut rembourser)"
+  },
+  {
+   "id": "term.interest",
+   "type": "term",
+   "cat": "condition",
+   "icon": "📈",
+   "fr": [
+    "intérêts",
+    "taux d'intérêt",
+    "taux"
+   ],
+   "en": [
+    "interest",
+    "interest rate",
+    "rate"
+   ],
+   "easy": "Intérêts (argent en plus à rembourser)"
+  },
+  {
+   "id": "term.history",
+   "type": "term",
+   "cat": "info",
+   "icon": "📜",
+   "fr": [
+    "historique",
+    "transactions récentes",
+    "historique des transactions",
+    "mes opérations"
+   ],
+   "en": [
+    "history",
+    "transaction history",
+    "recent transactions"
+   ],
+   "easy": "Historique (les opérations passées)"
+  },
+  {
+   "id": "term.receipt",
+   "type": "term",
+   "cat": "success",
+   "icon": "🧾",
+   "fr": [
+    "reçu",
+    "justificatif"
+   ],
+   "en": [
+    "receipt"
+   ],
+   "easy": "Reçu (la preuve de l'opération)"
+  },
+  {
+   "id": "term.reference",
+   "type": "term",
+   "cat": "info",
+   "icon": "🏷️",
+   "fr": [
+    "référence",
+    "numéro de référence",
+    "id de transaction",
+    "identifiant de transaction"
+   ],
+   "en": [
+    "reference",
+    "transaction id",
+    "reference number"
+   ],
+   "easy": "Référence (numéro de l'opération)"
+  },
+  {
+   "id": "term.date",
+   "type": "term",
+   "cat": "info",
+   "icon": "📅",
+   "fr": [
+    "date",
+    "date et heure"
+   ],
+   "en": [
+    "date",
+    "date and time"
+   ],
+   "easy": "Date"
+  },
+  {
+   "id": "term.confirm",
+   "type": "term",
+   "cat": "confirm",
+   "icon": "✅",
+   "fr": [
+    "confirmer",
+    "valider",
+    "je confirme",
+    "confirmer le transfert",
+    "confirmer l'envoi"
+   ],
+   "en": [
+    "confirm",
+    "validate",
+    "confirm transfer"
+   ],
+   "easy": "Confirmer (dire oui, l'opération part)"
+  },
+  {
+   "id": "term.cancel",
+   "type": "term",
+   "cat": "info",
+   "icon": "❌",
+   "fr": [
+    "annuler"
+   ],
+   "en": [
+    "cancel"
+   ],
+   "easy": "Annuler (arrêter, rien ne part)"
+  },
+  {
+   "id": "term.continue",
+   "type": "term",
+   "cat": "info",
+   "icon": "➡️",
+   "fr": [
+    "continuer",
+    "suivant"
+   ],
+   "en": [
+    "continue",
+    "next"
+   ],
+   "easy": "Continuer"
+  },
+  {
+   "id": "term.back",
+   "type": "term",
+   "cat": "info",
+   "icon": "⬅️",
+   "fr": [
+    "retour",
+    "précédent",
+    "revenir"
+   ],
+   "en": [
+    "back",
+    "previous",
+    "go back"
+   ],
+   "easy": "Retour"
+  },
+  {
+   "id": "term.home",
+   "type": "term",
+   "cat": "info",
+   "icon": "🏠",
+   "fr": [
+    "accueil"
+   ],
+   "en": [
+    "home"
+   ],
+   "easy": "Accueil"
+  },
+  {
+   "id": "term.login",
+   "type": "term",
+   "cat": "info",
+   "icon": "🔑",
+   "fr": [
+    "connexion",
+    "se connecter"
+   ],
+   "en": [
+    "log in",
+    "login",
+    "sign in"
+   ],
+   "easy": "Se connecter"
+  },
+  {
+   "id": "term.logout",
+   "type": "term",
+   "cat": "info",
+   "icon": "🚪",
+   "fr": [
+    "déconnexion",
+    "se déconnecter"
+   ],
+   "en": [
+    "log out",
+    "logout",
+    "sign out"
+   ],
+   "easy": "Se déconnecter"
+  },
+  {
+   "id": "term.pin",
+   "type": "term",
+   "cat": "pin",
+   "icon": "🔒",
+   "critical": true,
+   "fr": [
+    "code pin",
+    "code secret",
+    "pin",
+    "mot de passe",
+    "votre code pin"
+   ],
+   "en": [
+    "pin",
+    "pin code",
+    "secret code",
+    "password"
+   ],
+   "easy": "Code secret (à ne montrer à personne)"
+  },
+  {
+   "id": "term.otp",
+   "type": "term",
+   "cat": "pin",
+   "icon": "🔐",
+   "critical": true,
+   "fr": [
+    "code de confirmation",
+    "code otp",
+    "code reçu par sms",
+    "code de vérification",
+    "otp"
+   ],
+   "en": [
+    "otp",
+    "verification code",
+    "confirmation code",
+    "sms code"
+   ],
+   "easy": "Code reçu par SMS (à ne donner à personne)"
+  },
+  {
+   "id": "term.security",
+   "type": "term",
+   "cat": "warning",
+   "icon": "🛡️",
+   "fr": [
+    "sécurité",
+    "conseils de sécurité",
+    "alerte de sécurité"
+   ],
+   "en": [
+    "security",
+    "security tips",
+    "security alert"
+   ],
+   "easy": "Sécurité"
+  },
+  {
+   "id": "term.warning",
+   "type": "term",
+   "cat": "warning",
+   "icon": "⚠️",
+   "critical": true,
+   "fr": [
+    "attention",
+    "avertissement",
+    "important"
+   ],
+   "en": [
+    "warning",
+    "caution",
+    "important"
+   ],
+   "easy": "Attention !"
+  },
+  {
+   "id": "term.error",
+   "type": "term",
+   "cat": "error",
+   "icon": "⛔",
+   "fr": [
+    "erreur",
+    "échec",
+    "échoué",
+    "transaction échouée"
+   ],
+   "en": [
+    "error",
+    "failed",
+    "failure",
+    "transaction failed"
+   ],
+   "easy": "Erreur (ça n'a pas marché)"
+  },
+  {
+   "id": "term.success",
+   "type": "term",
+   "cat": "success",
+   "icon": "🎉",
+   "fr": [
+    "succès",
+    "réussi",
+    "réussie"
+   ],
+   "en": [
+    "success",
+    "successful"
+   ],
+   "easy": "Réussi"
+  },
+  {
+   "id": "term.pending",
+   "type": "term",
+   "cat": "info",
+   "icon": "⏳",
+   "fr": [
+    "en attente",
+    "en cours"
+   ],
+   "en": [
+    "pending",
+    "processing"
+   ],
+   "easy": "En attente"
+  },
+  {
+   "id": "term.insufficient",
+   "type": "term",
+   "cat": "error",
+   "icon": "🪫",
+   "critical": true,
+   "fr": [
+    "insuffisant",
+    "fonds insuffisants"
+   ],
+   "en": [
+    "insufficient",
+    "insufficient funds"
+   ],
+   "easy": "Pas assez d'argent"
+  },
+  {
+   "id": "term.limit",
+   "type": "term",
+   "cat": "condition",
+   "icon": "📏",
+   "fr": [
+    "plafond",
+    "limite",
+    "montant maximum",
+    "montant minimum",
+    "plafond journalier"
+   ],
+   "en": [
+    "limit",
+    "maximum amount",
+    "minimum amount",
+    "daily limit"
+   ],
+   "easy": "Limite (montant à ne pas dépasser)"
+  },
+  {
+   "id": "term.fraud",
+   "type": "term",
+   "cat": "warning",
+   "icon": "🚨",
+   "critical": true,
+   "fr": [
+    "fraude",
+    "arnaque",
+    "escroquerie",
+    "escroc",
+    "escrocs",
+    "arnaques"
+   ],
+   "en": [
+    "fraud",
+    "scam",
+    "scammer",
+    "scams"
+   ],
+   "easy": "Arnaque (quelqu'un veut voler votre argent)"
+  },
+  {
+   "id": "term.agent",
+   "type": "term",
+   "cat": "info",
+   "icon": "🧑‍💼",
+   "fr": [
+    "agent",
+    "point de vente",
+    "agence"
+   ],
+   "en": [
+    "agent",
+    "branch"
+   ],
+   "easy": "Agent (point de service)"
+  },
+  {
+   "id": "term.never",
+   "type": "term",
+   "cat": "warning",
+   "icon": "🚫",
+   "critical": true,
+   "fr": [
+    "jamais"
+   ],
+   "en": [
+    "never"
+   ],
+   "easy": "Jamais"
+  },
+  {
+   "id": "term.irreversible",
+   "type": "term",
+   "cat": "condition",
+   "icon": "⛔",
+   "critical": true,
+   "fr": [
+    "irréversible",
+    "définitif",
+    "non remboursable",
+    "ne peut pas être annulé"
+   ],
+   "en": [
+    "irreversible",
+    "non-refundable",
+    "cannot be undone",
+    "final"
+   ],
+   "easy": "Définitif (on ne peut pas revenir en arrière)"
+  },
+  {
+   "id": "term.free",
+   "type": "term",
+   "cat": "fees",
+   "icon": "🆓",
+   "fr": [
+    "gratuit",
+    "sans frais"
+   ],
+   "en": [
+    "free",
+    "no fee"
+   ],
+   "easy": "Gratuit (pas de frais)"
+  },
+  {
+   "id": "term.name",
+   "type": "term",
+   "cat": "info",
+   "icon": "🪪",
+   "fr": [
+    "nom",
+    "nom complet"
+   ],
+   "en": [
+    "name",
+    "full name"
+   ],
+   "easy": "Nom"
+  },
+  {
+   "id": "term.help",
+   "type": "term",
+   "cat": "info",
+   "icon": "🆘",
+   "fr": [
+    "aide",
+    "service client",
+    "assistance",
+    "besoin d'aide"
+   ],
+   "en": [
+    "help",
+    "customer service",
+    "support",
+    "need help"
+   ],
+   "easy": "Aide"
+  },
+  {
+   "id": "term.yes",
+   "type": "term",
+   "cat": "info",
+   "icon": "👍",
+   "fr": [
+    "oui"
+   ],
+   "en": [
+    "yes"
+   ],
+   "easy": "Oui"
+  },
+  {
+   "id": "term.no",
+   "type": "term",
+   "cat": "info",
+   "icon": "👎",
+   "fr": [
+    "non"
+   ],
+   "en": [
+    "no"
+   ],
+   "easy": "Non"
+  },
+  {
+   "id": "term.thanks",
+   "type": "term",
+   "cat": "info",
+   "icon": "🙏",
+   "fr": [
+    "merci"
+   ],
+   "en": [
+    "thank you",
+    "thanks"
+   ],
+   "easy": "Merci"
+  },
+  {
+   "id": "term.retry",
+   "type": "term",
+   "cat": "error",
+   "icon": "🔁",
+   "fr": [
+    "réessayer",
+    "recommencer"
+   ],
+   "en": [
+    "try again",
+    "retry"
+   ],
+   "easy": "Réessayer"
+  },
+  {
+   "id": "term.wrong",
+   "type": "term",
+   "cat": "error",
+   "icon": "✖️",
+   "fr": [
+    "incorrect",
+    "invalide",
+    "erroné"
+   ],
+   "en": [
+    "incorrect",
+    "invalid",
+    "wrong"
+   ],
+   "easy": "Faux (pas correct)"
+  },
+  {
+   "id": "term.blocked",
+   "type": "term",
+   "cat": "error",
+   "icon": "🔐",
+   "critical": true,
+   "fr": [
+    "bloqué",
+    "suspendu"
+   ],
+   "en": [
+    "blocked",
+    "suspended",
+    "locked"
+   ],
+   "easy": "Bloqué"
+  },
+  {
+   "id": "term.check",
+   "type": "term",
+   "cat": "confirm",
+   "icon": "🔍",
+   "fr": [
+    "vérifier",
+    "vérifiez",
+    "récapitulatif",
+    "résumé"
+   ],
+   "en": [
+    "check",
+    "verify",
+    "summary",
+    "review"
+   ],
+   "easy": "Vérifier (regarder bien)"
+  },
+  {
+   "id": "ph.balance_is",
+   "type": "phrase",
+   "cat": "balance",
+   "icon": "💰",
+   "fr": [
+    "votre solde est de {AMOUNT}",
+    "votre solde disponible est de {AMOUNT}",
+    "solde disponible {AMOUNT}",
+    "solde {AMOUNT}",
+    "votre solde est {AMOUNT}",
+    "solde actuel {AMOUNT}"
+   ],
+   "en": [
+    "your balance is {AMOUNT}",
+    "your available balance is {AMOUNT}",
+    "available balance {AMOUNT}",
+    "balance {AMOUNT}",
+    "current balance {AMOUNT}"
+   ],
+   "easy": "Il vous reste {AMOUNT} sur votre compte."
+  },
+  {
+   "id": "ph.fees_are",
+   "type": "phrase",
+   "cat": "fees",
+   "icon": "🧾",
+   "fr": [
+    "frais {AMOUNT}",
+    "les frais sont de {AMOUNT}",
+    "frais de transfert {AMOUNT}",
+    "frais de transaction {AMOUNT}",
+    "frais de cette opération {AMOUNT}",
+    "commission {AMOUNT}"
+   ],
+   "en": [
+    "fee {AMOUNT}",
+    "fees {AMOUNT}",
+    "the fee is {AMOUNT}",
+    "transfer fee {AMOUNT}",
+    "transaction fee {AMOUNT}",
+    "charges {AMOUNT}"
+   ],
+   "easy": "Le service prend {AMOUNT} de frais."
+  },
+  {
+   "id": "ph.fee_applied",
+   "type": "phrase",
+   "cat": "fees",
+   "icon": "🧾",
+   "fr": [
+    "des frais de {AMOUNT} seront appliqués",
+    "des frais de {AMOUNT} s'appliquent",
+    "des frais de {AMOUNT} seront prélevés"
+   ],
+   "en": [
+    "a fee of {AMOUNT} will be charged",
+    "a fee of {AMOUNT} applies"
+   ],
+   "easy": "Le service va prendre {AMOUNT} de frais."
+  },
+  {
+   "id": "ph.fee_percent",
+   "type": "phrase",
+   "cat": "fees",
+   "icon": "🧾",
+   "fr": [
+    "frais {PERCENT} du montant",
+    "frais de {PERCENT} du montant"
+   ],
+   "en": [
+    "fee {PERCENT} of the amount"
+   ],
+   "easy": "Les frais sont {PERCENT} du montant envoyé."
+  },
+  {
+   "id": "ph.fee_range",
+   "type": "phrase",
+   "cat": "fees",
+   "icon": "🧾",
+   "fr": [
+    "de {AMOUNT} à {AMOUNT2} frais {AMOUNT3}",
+    "de {AMOUNT} à {AMOUNT2} {AMOUNT3}"
+   ],
+   "en": [
+    "from {AMOUNT} to {AMOUNT2} fee {AMOUNT3}",
+    "{AMOUNT} to {AMOUNT2} {AMOUNT3}"
+   ],
+   "easy": "Pour envoyer entre {AMOUNT} et {AMOUNT2}, les frais sont {AMOUNT3}."
+  },
+  {
+   "id": "ph.amount_is",
+   "type": "phrase",
+   "cat": "transfer",
+   "icon": "🔢",
+   "fr": [
+    "montant {AMOUNT}",
+    "montant à envoyer {AMOUNT}",
+    "montant du transfert {AMOUNT}"
+   ],
+   "en": [
+    "amount {AMOUNT}",
+    "amount to send {AMOUNT}",
+    "transfer amount {AMOUNT}"
+   ],
+   "easy": "Montant envoyé : {AMOUNT}."
+  },
+  {
+   "id": "ph.total_is",
+   "type": "phrase",
+   "cat": "confirm",
+   "icon": "➕",
+   "fr": [
+    "total {AMOUNT}",
+    "montant total {AMOUNT}",
+    "total à débiter {AMOUNT}",
+    "total à payer {AMOUNT}",
+    "montant débité {AMOUNT}"
+   ],
+   "en": [
+    "total {AMOUNT}",
+    "total amount {AMOUNT}",
+    "total to be debited {AMOUNT}",
+    "total to pay {AMOUNT}"
+   ],
+   "easy": "En tout, {AMOUNT} vont sortir de votre compte."
+  },
+  {
+   "id": "ph.total_debit",
+   "type": "phrase",
+   "cat": "confirm",
+   "icon": "➕",
+   "fr": [
+    "un total de {AMOUNT} sera débité de votre compte",
+    "{AMOUNT} seront débités de votre compte"
+   ],
+   "en": [
+    "a total of {AMOUNT} will be debited from your account",
+    "{AMOUNT} will be debited from your account"
+   ],
+   "easy": "En tout, {AMOUNT} vont sortir de votre compte."
+  },
+  {
+   "id": "ph.beneficiary_is",
+   "type": "phrase",
+   "cat": "transfer",
+   "icon": "👤",
+   "fr": [
+    "bénéficiaire {NAME}",
+    "destinataire {NAME}",
+    "nom du bénéficiaire {NAME}"
+   ],
+   "en": [
+    "beneficiary {NAME}",
+    "recipient {NAME}",
+    "recipient name {NAME}"
+   ],
+   "easy": "La personne qui reçoit : {NAME}."
+  },
+  {
+   "id": "ph.phone_is",
+   "type": "phrase",
+   "cat": "transfer",
+   "icon": "📱",
+   "fr": [
+    "numéro {PHONE}",
+    "numéro du bénéficiaire {PHONE}",
+    "téléphone {PHONE}",
+    "numéro de téléphone {PHONE}"
+   ],
+   "en": [
+    "number {PHONE}",
+    "phone {PHONE}",
+    "phone number {PHONE}",
+    "recipient number {PHONE}"
+   ],
+   "easy": "Numéro de téléphone : {PHONE}."
+  },
+  {
+   "id": "ph.send_to",
+   "type": "phrase",
+   "cat": "confirm",
+   "icon": "📤",
+   "fr": [
+    "vous allez envoyer {AMOUNT} à {NAME}",
+    "vous êtes sur le point d'envoyer {AMOUNT} à {NAME}",
+    "envoyer {AMOUNT} à {NAME}"
+   ],
+   "en": [
+    "you are about to send {AMOUNT} to {NAME}",
+    "you will send {AMOUNT} to {NAME}",
+    "send {AMOUNT} to {NAME}"
+   ],
+   "easy": "Vous allez envoyer {AMOUNT} à {NAME}."
+  },
+  {
+   "id": "ph.send_to_phone",
+   "type": "phrase",
+   "cat": "confirm",
+   "icon": "📤",
+   "fr": [
+    "vous allez envoyer {AMOUNT} à {NAME} {PHONE}",
+    "vous êtes sur le point d'envoyer {AMOUNT} à {NAME} {PHONE}",
+    "vous allez envoyer {AMOUNT} à {NAME} au {PHONE}"
+   ],
+   "en": [
+    "you are about to send {AMOUNT} to {NAME} {PHONE}",
+    "you will send {AMOUNT} to {NAME} {PHONE}"
+   ],
+   "easy": "Vous allez envoyer {AMOUNT} à {NAME}, numéro {PHONE}."
+  },
+  {
+   "id": "ph.send_to_number",
+   "type": "phrase",
+   "cat": "confirm",
+   "icon": "📤",
+   "fr": [
+    "vous allez envoyer {AMOUNT} au {PHONE}",
+    "vous allez envoyer {AMOUNT} au numéro {PHONE}"
+   ],
+   "en": [
+    "you are about to send {AMOUNT} to {PHONE}",
+    "you will send {AMOUNT} to {PHONE}"
+   ],
+   "easy": "Vous allez envoyer {AMOUNT} au numéro {PHONE}."
+  },
+  {
+   "id": "ph.sent_success",
+   "type": "phrase",
+   "cat": "success",
+   "icon": "🎉",
+   "fr": [
+    "vous avez envoyé {AMOUNT} à {NAME}",
+    "transfert de {AMOUNT} à {NAME} réussi",
+    "vous avez envoyé {AMOUNT} à {NAME} {PHONE}"
+   ],
+   "en": [
+    "you have sent {AMOUNT} to {NAME}",
+    "you sent {AMOUNT} to {NAME}"
+   ],
+   "easy": "C'est fait : {AMOUNT} sont partis chez {NAME}."
+  },
+  {
+   "id": "ph.received",
+   "type": "phrase",
+   "cat": "success",
+   "icon": "📥",
+   "fr": [
+    "vous avez reçu {AMOUNT} de {NAME}",
+    "vous avez reçu {AMOUNT} de la part de {NAME}"
+   ],
+   "en": [
+    "you have received {AMOUNT} from {NAME}",
+    "you received {AMOUNT} from {NAME}"
+   ],
+   "easy": "Vous avez reçu {AMOUNT} de {NAME}."
+  },
+  {
+   "id": "ph.new_balance",
+   "type": "phrase",
+   "cat": "balance",
+   "icon": "💰",
+   "fr": [
+    "nouveau solde {AMOUNT}",
+    "votre nouveau solde est de {AMOUNT}"
+   ],
+   "en": [
+    "new balance {AMOUNT}",
+    "your new balance is {AMOUNT}"
+   ],
+   "easy": "Maintenant il vous reste {AMOUNT}."
+  },
+  {
+   "id": "ph.never_share_pin",
+   "type": "phrase",
+   "cat": "pin",
+   "icon": "🔒",
+   "critical": true,
+   "fr": [
+    "ne partagez jamais votre code pin",
+    "ne communiquez jamais votre code secret",
+    "ne donnez jamais votre code pin à personne",
+    "ne partagez jamais votre code secret avec personne",
+    "ne partagez jamais votre code pin avec personne",
+    "ne communiquez jamais votre code pin"
+   ],
+   "en": [
+    "never share your pin",
+    "never share your pin with anyone",
+    "never share your pin code with anyone",
+    "do not share your pin with anyone",
+    "never give your pin to anyone"
+   ],
+   "easy": "Ne donnez JAMAIS votre code secret à personne."
+  },
+  {
+   "id": "ph.never_share_otp",
+   "type": "phrase",
+   "cat": "pin",
+   "icon": "🔐",
+   "critical": true,
+   "fr": [
+    "ne communiquez à personne le code reçu par sms",
+    "ne partagez jamais le code reçu par sms",
+    "ne donnez jamais le code de confirmation"
+   ],
+   "en": [
+    "do not share the code received by sms",
+    "never share your verification code",
+    "never share the sms code"
+   ],
+   "easy": "Le code reçu par SMS est secret : ne le donnez JAMAIS à personne."
+  },
+  {
+   "id": "ph.staff_never_ask",
+   "type": "phrase",
+   "cat": "pin",
+   "icon": "🔒",
+   "critical": true,
+   "fr": [
+    "notre personnel ne vous demandera jamais votre code pin",
+    "nos agents ne vous demanderont jamais votre code secret",
+    "nous ne vous demanderons jamais votre code pin",
+    "aucun agent ne vous demandera votre code secret"
+   ],
+   "en": [
+    "our staff will never ask for your pin",
+    "we will never ask for your pin",
+    "no agent will ever ask for your pin"
+   ],
+   "easy": "Le service ne vous demandera JAMAIS votre code secret. Si quelqu'un le demande, c'est un voleur."
+  },
+  {
+   "id": "ph.insufficient",
+   "type": "phrase",
+   "cat": "error",
+   "icon": "🪫",
+   "critical": true,
+   "fr": [
+    "solde insuffisant",
+    "votre solde est insuffisant",
+    "votre solde est insuffisant pour effectuer cette opération",
+    "fonds insuffisants",
+    "votre solde est insuffisant pour cette opération"
+   ],
+   "en": [
+    "insufficient balance",
+    "insufficient funds",
+    "your balance is insufficient",
+    "your balance is insufficient for this transaction"
+   ],
+   "easy": "Vous n'avez pas assez d'argent pour cette opération."
+  },
+  {
+   "id": "ph.wrong_pin",
+   "type": "phrase",
+   "cat": "error",
+   "icon": "✖️",
+   "critical": true,
+   "fr": [
+    "code pin incorrect",
+    "code secret incorrect",
+    "code pin invalide"
+   ],
+   "en": [
+    "incorrect pin",
+    "wrong pin",
+    "invalid pin"
+   ],
+   "easy": "Le code secret est faux."
+  },
+  {
+   "id": "ph.wrong_pin_attempts",
+   "type": "phrase",
+   "cat": "error",
+   "icon": "✖️",
+   "critical": true,
+   "fr": [
+    "code pin incorrect il vous reste {NUM} tentatives",
+    "code pin incorrect il vous reste {NUM} tentative",
+    "code secret incorrect il vous reste {NUM} essais"
+   ],
+   "en": [
+    "wrong pin you have {NUM} attempts left",
+    "incorrect pin {NUM} attempts remaining"
+   ],
+   "easy": "Le code secret est faux. Vous pouvez encore essayer {NUM} fois, après le compte sera bloqué."
+  },
+  {
+   "id": "ph.attempts_left",
+   "type": "phrase",
+   "cat": "error",
+   "icon": "🔢",
+   "critical": true,
+   "fr": [
+    "il vous reste {NUM} tentatives",
+    "il vous reste {NUM} tentative",
+    "il vous reste {NUM} essais",
+    "{NUM} tentatives restantes"
+   ],
+   "en": [
+    "you have {NUM} attempts left",
+    "{NUM} attempts remaining",
+    "{NUM} attempts left"
+   ],
+   "easy": "Vous pouvez encore essayer {NUM} fois. Après, le compte sera bloqué."
+  },
+  {
+   "id": "ph.success",
+   "type": "phrase",
+   "cat": "success",
+   "icon": "🎉",
+   "fr": [
+    "transaction réussie",
+    "transfert effectué avec succès",
+    "votre transfert a été effectué avec succès",
+    "opération réussie",
+    "transfert réussi",
+    "paiement réussi"
+   ],
+   "en": [
+    "transaction successful",
+    "transfer successful",
+    "your transfer was successful",
+    "payment successful"
+   ],
+   "easy": "C'est réussi, l'opération est faite."
+  },
+  {
+   "id": "ph.failed",
+   "type": "phrase",
+   "cat": "error",
+   "icon": "⛔",
+   "fr": [
+    "transaction échouée",
+    "le transfert a échoué",
+    "échec de la transaction",
+    "l'opération a échoué"
+   ],
+   "en": [
+    "transaction failed",
+    "the transfer failed",
+    "operation failed"
+   ],
+   "easy": "L'opération n'a pas marché. Votre argent n'est pas parti."
+  },
+  {
+   "id": "ph.check_before_confirm",
+   "type": "phrase",
+   "cat": "confirm",
+   "icon": "🔍",
+   "critical": true,
+   "fr": [
+    "vérifiez les informations avant de confirmer",
+    "veuillez vérifier les informations avant de confirmer",
+    "vérifiez bien les informations avant de valider",
+    "veuillez vérifier les détails avant de confirmer"
+   ],
+   "en": [
+    "please check the details before confirming",
+    "check the details before you confirm",
+    "please review the details before confirming"
+   ],
+   "easy": "Regardez bien le nom, le numéro et le montant AVANT de confirmer."
+  },
+  {
+   "id": "ph.irreversible",
+   "type": "phrase",
+   "cat": "condition",
+   "icon": "⛔",
+   "critical": true,
+   "fr": [
+    "cette opération est irréversible",
+    "cette opération ne peut pas être annulée",
+    "une fois confirmé le transfert ne peut pas être annulé",
+    "une fois confirmé le transfert est irréversible",
+    "ce transfert est définitif"
+   ],
+   "en": [
+    "this transaction cannot be undone",
+    "this operation is irreversible",
+    "once confirmed the transfer cannot be cancelled"
+   ],
+   "easy": "Après confirmation, on ne peut PLUS annuler. L'argent part pour toujours."
+  },
+  {
+   "id": "ph.enter_pin",
+   "type": "phrase",
+   "cat": "pin",
+   "icon": "🔒",
+   "fr": [
+    "entrez votre code pin pour confirmer",
+    "saisissez votre code secret",
+    "entrez votre code pin",
+    "saisissez votre code pin pour valider",
+    "entrez votre code secret pour confirmer"
+   ],
+   "en": [
+    "enter your pin to confirm",
+    "enter your pin",
+    "enter your secret code"
+   ],
+   "easy": "Tapez votre code secret pour confirmer. Cachez l'écran."
+  },
+  {
+   "id": "ph.enter_amount",
+   "type": "phrase",
+   "cat": "transfer",
+   "icon": "🔢",
+   "fr": [
+    "entrez le montant",
+    "saisissez le montant",
+    "montant à envoyer en fcfa"
+   ],
+   "en": [
+    "enter the amount",
+    "enter amount"
+   ],
+   "easy": "Écrivez combien d'argent vous voulez envoyer."
+  },
+  {
+   "id": "ph.enter_number",
+   "type": "phrase",
+   "cat": "transfer",
+   "icon": "📱",
+   "fr": [
+    "entrez le numéro du bénéficiaire",
+    "saisissez le numéro de téléphone",
+    "entrez le numéro de téléphone du bénéficiaire"
+   ],
+   "en": [
+    "enter the recipient's number",
+    "enter the phone number",
+    "enter recipient number"
+   ],
+   "easy": "Écrivez le numéro de téléphone de la personne qui reçoit."
+  },
+  {
+   "id": "ph.network_error",
+   "type": "phrase",
+   "cat": "error",
+   "icon": "📡",
+   "fr": [
+    "erreur réseau",
+    "erreur de connexion veuillez réessayer",
+    "service indisponible veuillez réessayer plus tard",
+    "erreur de connexion"
+   ],
+   "en": [
+    "network error",
+    "connection error please try again",
+    "service unavailable please try again later"
+   ],
+   "easy": "Problème de réseau. Réessayez plus tard. Votre argent n'est pas parti."
+  },
+  {
+   "id": "ph.limit_exceeded",
+   "type": "phrase",
+   "cat": "error",
+   "icon": "📏",
+   "critical": true,
+   "fr": [
+    "le montant dépasse votre plafond",
+    "plafond journalier atteint",
+    "montant supérieur au plafond autorisé"
+   ],
+   "en": [
+    "amount exceeds your limit",
+    "daily limit reached",
+    "amount above the allowed limit"
+   ],
+   "easy": "Le montant est trop grand : il dépasse la limite permise."
+  },
+  {
+   "id": "ph.max_amount",
+   "type": "phrase",
+   "cat": "condition",
+   "icon": "📏",
+   "fr": [
+    "montant maximum par transaction {AMOUNT}",
+    "montant maximum {AMOUNT}",
+    "plafond {AMOUNT}",
+    "plafond journalier {AMOUNT}"
+   ],
+   "en": [
+    "maximum amount per transaction {AMOUNT}",
+    "maximum amount {AMOUNT}",
+    "daily limit {AMOUNT}"
+   ],
+   "easy": "Vous ne pouvez pas dépasser {AMOUNT}."
+  },
+  {
+   "id": "ph.min_amount",
+   "type": "phrase",
+   "cat": "condition",
+   "icon": "📏",
+   "fr": [
+    "montant minimum {AMOUNT}",
+    "montant minimum par transaction {AMOUNT}"
+   ],
+   "en": [
+    "minimum amount {AMOUNT}"
+   ],
+   "easy": "Il faut au moins {AMOUNT}."
+  },
+  {
+   "id": "ph.fraud_warning",
+   "type": "phrase",
+   "cat": "warning",
+   "icon": "🚨",
+   "critical": true,
+   "fr": [
+    "attention aux arnaques",
+    "méfiez-vous des escrocs",
+    "attention à la fraude",
+    "méfiez-vous des arnaques"
+   ],
+   "en": [
+    "beware of scams",
+    "beware of fraud",
+    "watch out for scammers"
+   ],
+   "easy": "Attention aux voleurs qui veulent votre argent ou votre code."
+  },
+  {
+   "id": "ph.account_blocked",
+   "type": "phrase",
+   "cat": "error",
+   "icon": "🔐",
+   "critical": true,
+   "fr": [
+    "votre compte est bloqué",
+    "votre compte a été suspendu",
+    "compte bloqué"
+   ],
+   "en": [
+    "your account is blocked",
+    "your account has been suspended",
+    "account locked"
+   ],
+   "easy": "Votre compte est bloqué. Allez voir une agence officielle."
+  },
+  {
+   "id": "ph.pending",
+   "type": "phrase",
+   "cat": "info",
+   "icon": "⏳",
+   "fr": [
+    "votre transaction est en cours de traitement",
+    "transaction en attente",
+    "opération en cours"
+   ],
+   "en": [
+    "your transaction is being processed",
+    "transaction pending",
+    "processing"
+   ],
+   "easy": "L'opération est en cours. Attendez, ne recommencez pas."
+  },
+  {
+   "id": "ph.reference_is",
+   "type": "phrase",
+   "cat": "info",
+   "icon": "🏷️",
+   "fr": [
+    "référence {REF}",
+    "id de transaction {REF}",
+    "numéro de référence {REF}"
+   ],
+   "en": [
+    "reference {REF}",
+    "transaction id {REF}"
+   ],
+   "easy": "Numéro de l'opération : {REF} (gardez-le)."
+  },
+  {
+   "id": "ph.welcome",
+   "type": "phrase",
+   "cat": "info",
+   "icon": "👋",
+   "fr": [
+    "bienvenue",
+    "bonjour"
+   ],
+   "en": [
+    "welcome",
+    "hello"
+   ],
+   "easy": "Bienvenue"
+  },
+  {
+   "id": "ph.welcome_name",
+   "type": "phrase",
+   "cat": "info",
+   "icon": "👋",
+   "fr": [
+    "bienvenue {NAME}",
+    "bonjour {NAME}"
+   ],
+   "en": [
+    "welcome {NAME}",
+    "hello {NAME}"
+   ],
+   "easy": "Bienvenue {NAME}"
+  },
+  {
+   "id": "cat.balance",
+   "type": "cat",
+   "icon": "💰",
+   "easy": "Ce message parle de votre solde (l'argent qui reste)."
+  },
+  {
+   "id": "cat.fees",
+   "type": "cat",
+   "icon": "🧾",
+   "easy": "Ce message parle des frais (l'argent pris par le service)."
+  },
+  {
+   "id": "cat.transfer",
+   "type": "cat",
+   "icon": "📤",
+   "easy": "Ce message parle d'un envoi d'argent."
+  },
+  {
+   "id": "cat.confirm",
+   "type": "cat",
+   "icon": "🔍",
+   "easy": "Récapitulatif : vérifiez tout avant de confirmer."
+  },
+  {
+   "id": "cat.warning",
+   "type": "cat",
+   "icon": "⚠️",
+   "easy": "Attention : message de sécurité important."
+  },
+  {
+   "id": "cat.pin",
+   "type": "cat",
+   "icon": "🔒",
+   "easy": "Ce message parle de votre code secret : ne le donnez à personne."
+  },
+  {
+   "id": "cat.error",
+   "type": "cat",
+   "icon": "⛔",
+   "easy": "Problème : l'opération n'a pas marché."
+  },
+  {
+   "id": "cat.success",
+   "type": "cat",
+   "icon": "🎉",
+   "easy": "Bonne nouvelle : l'opération a réussi."
+  },
+  {
+   "id": "cat.fraud",
+   "type": "cat",
+   "icon": "🚨",
+   "easy": "DANGER : ceci ressemble à une arnaque."
+  },
+  {
+   "id": "cat.condition",
+   "type": "cat",
+   "icon": "📏",
+   "easy": "Ce message contient une condition ou une limite à bien lire."
+  },
+  {
+   "id": "cat.info",
+   "type": "cat",
+   "icon": "ℹ️",
+   "easy": "Information."
+  },
+  {
+   "id": "flag.negation",
+   "type": "ui",
+   "icon": "🚫",
+   "easy": "Ce message contient une INTERDICTION (ne pas… / jamais)."
+  },
+  {
+   "id": "flag.condition",
+   "type": "ui",
+   "icon": "❗",
+   "easy": "Ce message contient une CONDITION (si, sauf, avant, maximum…)."
+  },
+  {
+   "id": "guide.balance",
+   "type": "guide",
+   "icon": "💰",
+   "easy": "Ici, vous voyez l'argent qui reste sur votre compte."
+  },
+  {
+   "id": "guide.fees",
+   "type": "guide",
+   "icon": "🧾",
+   "easy": "Ici, vous voyez combien le service prend pour chaque envoi. Plus on envoie, plus les frais montent."
+  },
+  {
+   "id": "guide.transfer_number",
+   "type": "guide",
+   "icon": "📱",
+   "easy": "Étape 1 : écrivez le numéro de la personne qui reçoit."
+  },
+  {
+   "id": "guide.transfer_amount",
+   "type": "guide",
+   "icon": "🔢",
+   "easy": "Étape 2 : écrivez le montant à envoyer."
+  },
+  {
+   "id": "guide.transfer_check",
+   "type": "guide",
+   "icon": "🔍",
+   "easy": "Étape 3 : regardez les frais et le total."
+  },
+  {
+   "id": "guide.transfer_confirm",
+   "type": "guide",
+   "icon": "✅",
+   "easy": "Étape 4 : confirmez. Tapez votre code secret en cachant l'écran."
+  },
+  {
+   "id": "guide.summary",
+   "type": "guide",
+   "icon": "🔍",
+   "easy": "Vérifiez le nom, le numéro, le montant, les frais et le total. Si une chose est fausse, appuyez sur Annuler."
+  },
+  {
+   "id": "guide.error",
+   "type": "guide",
+   "icon": "⛔",
+   "easy": "L'opération n'a pas marché. Votre argent n'est pas parti. Lisez la raison."
+  },
+  {
+   "id": "guide.success",
+   "type": "guide",
+   "icon": "🎉",
+   "easy": "C'est réussi. Gardez le numéro de référence comme preuve."
+  },
+  {
+   "id": "guide.security",
+   "type": "guide",
+   "icon": "🛡️",
+   "easy": "Conseils pour protéger votre argent. Lisez-les bien."
+  },
+  {
+   "id": "ui.original",
+   "type": "ui",
+   "icon": "🇫🇷",
+   "easy": "Texte original"
+  },
+  {
+   "id": "ui.listen",
+   "type": "ui",
+   "icon": "🔊",
+   "easy": "Écouter"
+  },
+  {
+   "id": "ui.unvalidated",
+   "type": "ui",
+   "icon": "◌",
+   "easy": "pas encore validé par un locuteur"
+  },
+  {
+   "id": "ui.factsheet",
+   "type": "ui",
+   "icon": "📋",
+   "easy": "Fiche claire"
+  },
+  {
+   "id": "ui.total_ok",
+   "type": "ui",
+   "icon": "✅",
+   "easy": "Le calcul est juste : montant + frais = total."
+  },
+  {
+   "id": "ui.total_mismatch",
+   "type": "ui",
+   "icon": "🚨",
+   "easy": "ATTENTION : montant + frais ne fait pas le total affiché. Ne confirmez pas !"
+  },
+  {
+   "id": "ui.notes",
+   "type": "ui",
+   "icon": "💵",
+   "easy": "En billets et pièces"
+  },
+  {
+   "id": "ui.scam_alert",
+   "type": "ui",
+   "icon": "🚨",
+   "easy": "Un vrai service ne demande JAMAIS votre code secret ni de payer pour recevoir un gain. C'est sûrement une arnaque."
+  },
+  {
+   "id": "ui.keywords",
+   "type": "ui",
+   "icon": "🔑",
+   "easy": "Mots importants"
+  },
+  {
+   "id": "ui.ai",
+   "type": "ui",
+   "icon": "🤖",
+   "easy": "Traduction automatique, à vérifier"
+  },
+  {
+   "id": "ui.next",
+   "type": "ui",
+   "icon": "➡️",
+   "easy": "Suivant"
+  },
+  {
+   "id": "ui.locked_values",
+   "type": "ui",
+   "icon": "🔐",
+   "easy": "Chiffres et noms gardés exactement"
+  }
+ ]
+}

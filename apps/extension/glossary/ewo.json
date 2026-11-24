@@ -1,0 +1,25 @@
+{
+  "code": "ewo",
+  "name": "Ewondo",
+  "native": "Kolo / Ewondo",
+  "flag": "🌳",
+  "region": "Centre, Sud (Yaoundé) — langue véhiculaire du Sud",
+  "tts": "fr-FR",
+  "status_note": "KIT DE DÉMARRAGE : vocabulaire de base seulement. Les phrases complètes doivent être rédigées par des locuteurs natifs dans le Studio linguistique. En attendant, NkapLingua affiche le français facile + pictogrammes (jamais une traduction inventée).",
+  "default_status": "propose",
+  "sources": [
+    "Wikipedia (discussion Ewondo) : mot = personne, minga = femme, fam = homme",
+    "Owona, A. (2004). L'orthographe harmonisée de l'ewondo. Université de Yaoundé",
+    "Abega, P. (1975). Petit lexique ewondo — référence à consulter pour compléter",
+    "Mozilla Data Collective — Ewondo ALCAM datasets (lexique + phrases alignées FR)"
+  ],
+  "entries": {
+    "term.money": "Mone",
+    "term.send": "Lôm",
+    "term.transfer": "Lôm mone",
+    "term.name": "Dzoé",
+    "term.yes": "Ee",
+    "term.thanks": "Akiba",
+    "term.check": "Yen (regarde)"
+  }
+}
