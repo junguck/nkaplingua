@@ -47,6 +47,7 @@ pnpm typecheck             # TypeScript strict, zéro any
 | [`docs/ROADMAP.md`](docs/ROADMAP.md) | Plan des 3 jours, priorités P0/P1/P2, correspondance avec les livrables §11 |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Architecture, technologie linguistique, intégration, sécurité, scalabilité |
 | [`docs/adr/`](docs/adr/) | Décisions d'architecture et leurs compromis |
+| [`docs/SANDBOX-SAFINUM.md`](docs/SANDBOX-SAFINUM.md) | Contrat de la sandbox SAFINUM, règles d'évaluation, écarts à corriger |
 | [`preselection/`](preselection/) | Dossier de la phase de présélection (extension v1.1, vidéo, notes) |
 
 ## Structure

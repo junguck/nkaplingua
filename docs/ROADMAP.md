@@ -14,16 +14,22 @@ Priorités : **P0** = sans ça on est éliminé · **P1** = ce qui fait gagner �
 - [x] `@nkap/banking-sim` : comptes, contacts, grilles de frais, plafonds, idempotence, historique
 - [x] **53 tests** dont les 10 scénarios du §7 joués de bout en bout
 
-## J1 — la passerelle et les canaux obligatoires
+## J1 — le middleware SAFINUM (révisé après lecture de la doc sandbox)
+
+> La passerelle SAFINUM appelle NOTRE middleware pour `ussd`, `mobile` et `web` : c'est le chemin évalué.
+> Détail et écarts : [`SANDBOX-SAFINUM.md`](SANDBOX-SAFINUM.md).
 
 | P | Tâche | Livrable vérifiable |
 |---|---|---|
-| P0 | **Gateway NestJS** : `POST /v1/turns`, validation zod, CORS, health | `curl` → réponse + trace |
-| P0 | **Canal USSD** : webhook `POST /channels/ussd` (format `sessionId, phoneNumber, text` → `CON …`/`END …`), menu de langue `*126#` | Simulateur USSD en navigateur qui l'appelle |
-| P0 | **Flux des traces** : `GET /v1/traces` + SSE `GET /v1/traces/stream` | Le jury voit chaque tour en direct |
-| P0 | **Adaptateur SAFINUM** dès réception de la doc (sinon : simulateur) | Même tests, autre backend |
-| P1 | **Canal SMS** : webhook entrant + réponse ≤ 160 car. + alerte anti-arnaque | Démo « SOLDE » / « envoie 2000 a maman » |
-| P1 | **Validation linguistique** : session avec les locuteurs, statuts mis à jour | Gabarits critiques en « validé » |
+| P0 | **Port financier v2** : `initiate / update / confirm / cancel`, contexte de tour avec `X-Trace-Id` | Tests du dialogue verts sur le nouveau port |
+| P0 | **Adaptateur `SafinumBank`** (`X-Team-Key`, `X-Trace-Id`, `GET /fees`, `GET /beneficiaries`, erreurs → messages) | `GET /accounts/{phone}` visible dans le journal du jury |
+| P0 | **Middleware NestJS** `POST /middleware/:channel` : contrat reçu → `TurnRequest` → réponse au format SAFINUM | Le contrôle de contrat du simulateur passe |
+| P0 | **Correspondance des intentions** + `CLARIFICATION_NEEDED` / `CORRECTION` | Aucune `INVALID_RESPONSE` |
+| P0 | **Sortie GSM-7** sur USSD (translittération ɓ ɗ ŋ ƴ ɛ ɔ ə, ponctuation) | Panneau Diagnostics sans anomalie |
+| P0 | Grille de frais officielle dans `banking-sim` | 25 000 → 25 150 |
+| P0 | Tunnel public + `POST /sandbox/endpoint` pour les 3 canaux | `GET /sandbox/endpoint` renvoie nos URL |
+| P1 | Flux des traces en direct (console jury locale) | SSE |
+| P1 | Validation linguistique fulfulde (+ duala ou ewondo) avec des locuteurs | Gabarits critiques « validé » |
 
 ## J2 — les interfaces
 
@@ -32,7 +38,7 @@ Priorités : **P0** = sans ça on est éliminé · **P1** = ce qui fait gagner �
 | P0 | **Web (Next.js + shadcn/ui)** : banque en ligne simulée + assistant intégré (texte + micro) | Parcours transfert complet en fulfulde |
 | P0 | **Console jury** : traces en direct + **matrice de cohérence** (une requête → 6 canaux → comparaison) | §8 démontré en un clic |
 | P0 | **Mobile (Expo / React Native)** : tableau de bord (solde, envoi, retrait, crédit, facture) + assistant, moteur embarqué hors ligne | APK de démo |
-| P1 | **Bulle flottante Android** (module natif Kotlin : `SYSTEM_ALERT_WINDOW` + lecture d'écran à la demande) | Toucher la bulle sur une app tierce → fiche claire |
+| P2 | **Bulle flottante Android** (module natif Kotlin, lecture d'écran à la demande ; non évaluée par la sandbox) | Toucher la bulle sur une app tierce → fiche claire |
 | P1 | **Extension navigateur** (présélection) branchée sur la gateway : panneau « demander » en plus de la superposition | Fonctionne sur les simulateurs web SAFINUM sans intégration |
 | P2 | **Widget embarquable** `<script src=…/nkap-widget.js>` | Une institution l'ajoute en une ligne |
 
