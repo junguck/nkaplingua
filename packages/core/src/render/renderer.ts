@@ -38,7 +38,8 @@ function checkIntegrity(template: string, output: string, params: MessageParams)
   });
 }
 
-function renderTemplate(set: TemplateSet, lang: LanguageCode, params: MessageParams, key: string): RenderedText {
+/** Rend un gabarit avec ses emplacements verrouillés ; repli français signalé si la traduction est invalide. */
+export function renderTemplate(set: TemplateSet, lang: LanguageCode, params: MessageParams, key: string): RenderedText {
   const reference = set.fr;
   const target = resolveTemplate(set, lang);
   // Un gabarit traduit qui n'a pas exactement les mêmes emplacements que la référence est rejeté.

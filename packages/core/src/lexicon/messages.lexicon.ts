@@ -294,6 +294,62 @@ export const MESSAGES = {
   'biller.ENEO': { fr: 'ENEO (électricité)', en: 'ENEO (electricity)', fub: 'ENEO (yiite)', wes: 'ENEO (light)' },
   'biller.CAMWATER': { fr: 'CAMWATER (eau)', en: 'CAMWATER (water)', fub: 'CAMWATER (ndiyam)', wes: 'CAMWATER (wata)' },
   'biller.CANAL': { fr: 'CANAL+ (télévision)', en: 'CANAL+ (TV)', fub: 'CANAL+ (TV)', wes: 'CANAL+ (TV)' },
+  // --- Lecture d'écran (bulle Android, extension) : libellés repris du glossaire de présélection.
+  'screen.title': { fr: 'Ce que dit cet écran', en: 'What this screen says', fub: 'Kaayit laaɓɗo', wes: 'Clear card' },
+  'screen.field.amount': { fr: 'Montant', en: 'Amount', fub: 'Keewal ceede', wes: 'Haw moch moni' },
+  'screen.field.fee': { fr: 'Frais', en: 'Fees', fub: 'Njoɓdi', wes: 'Charges' },
+  'screen.field.total': { fr: 'Total', en: 'Total', fub: 'Fof', wes: 'Ol togeda' },
+  'screen.field.balance': { fr: 'Solde', en: 'Balance', fub: 'Ceede keddiiɗe', wes: 'Balans' },
+  'screen.field.recipient': { fr: 'Bénéficiaire', en: 'Recipient', fub: 'Mo heɓata ceede', wes: 'Pesin wey go receive di moni' },
+  'screen.field.phone': { fr: 'Numéro', en: 'Phone number', fub: 'Limgal telefon', wes: 'Fon nomba' },
+  'screen.field.reference': { fr: 'Référence', en: 'Reference', fub: 'Limgal golle', wes: 'Nomba for di transaction' },
+  'screen.total.ok': {
+    fr: 'Le calcul est juste : montant + frais = total.',
+    en: 'The sum is right: amount + fees = total.',
+    fub: 'Hiisa ngan feewi: ceede + njoɓdi = fof.',
+    wes: 'Di count correct: moni + charges = total.',
+  },
+  'screen.total.mismatch': {
+    fr: 'ATTENTION : montant + frais ne font pas le total affiché. Ne confirmez pas !',
+    en: 'WARNING: amount + fees do not add up to the total shown. Do not confirm!',
+    fub: 'HAKKILO: ceede + njoɓdi fotaaki e fof. Taa tabbitin!',
+    wes: 'TEK KIA: moni + charges no reach di total wey dem show. No confam!',
+  },
+  'screen.check': {
+    fr: 'Vérifiez tout avant de confirmer.',
+    en: 'Check everything before you confirm.',
+    fub: 'Ndaar fof ado a tabbitinde.',
+    wes: 'Check everytin before you confam.',
+  },
+  'screen.scam.title': {
+    fr: 'DANGER : cela ressemble à une arnaque !',
+    en: 'DANGER: this looks like a scam!',
+    fub: 'MUSIIBA: ɗum ina nanndi e jamfa!',
+    wes: 'DANGER: dis one fit be feyman bizness!',
+  },
+  'screen.scam.advice': {
+    fr: 'Un vrai service ne demande jamais votre code secret. C’est une arnaque !',
+    en: 'A real service never asks for your PIN. This is a scam!',
+    fub: 'Sarwis goongaajo naamnataa sirri maa abada. Ɗum jamfa!',
+    wes: 'Real sevis neva ask ya secret code, an neva ask you pay before you receive prize. Na feyman!',
+  },
+  // Pas encore de forme nationale : repli français signalé plutôt qu'une traduction inventée.
+  'screen.empty': {
+    fr: 'Je ne vois ni montant ni message à risque sur cet écran.',
+    en: 'I see no amount and no risky message on this screen.',
+  },
+  'screen.notAllowed': {
+    fr: 'Par sécurité, je ne lis que les applications financières de votre liste.',
+    en: 'For your safety, I only read the financial apps on your list.',
+  },
+  'screen.scam.reason.askCode': { fr: 'On vous demande un code secret', en: 'You are asked for a secret code' },
+  'screen.scam.reason.miracleGain': { fr: 'On vous promet un gain ou un cadeau', en: 'You are promised a prize or a gift' },
+  'screen.scam.reason.payToReceive': { fr: 'On vous demande de payer pour recevoir', en: 'You are asked to pay in order to receive' },
+  'screen.scam.reason.urgency': { fr: 'On vous presse (urgence)', en: 'You are being rushed (urgency)' },
+  'screen.scam.reason.mistakenTransfer': { fr: 'On dit avoir envoyé de l’argent « par erreur »', en: 'Someone claims they sent money “by mistake”' },
+  'screen.scam.reason.blockThreat': { fr: 'On menace de bloquer votre compte', en: 'You are threatened with a blocked account' },
+  'screen.scam.reason.suspiciousLink': { fr: 'Lien ou adresse suspecte', en: 'Suspicious link or address' },
+  'screen.scam.reason.ussdWithData': { fr: 'Code USSD contenant des données à saisir', en: 'USSD code that contains data to enter' },
 } as const satisfies Readonly<Record<string, TemplateSet>>;
 
 export type MessageKey = keyof typeof MESSAGES;
