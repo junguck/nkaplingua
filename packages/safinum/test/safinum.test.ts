@@ -28,10 +28,11 @@ describe('@nkap/safinum — contrat de sortie', () => {
     for (const intent of INTENTS) expect(SAFINUM_INTENTS).toContain(toSafinumIntent(intent));
   });
 
-  it('statut : seules les valeurs observées sortent en mode contrat (§8)', () => {
-    expect(toContractStatus('confirmed')).toBe('pending');
-    expect(toContractStatus('cancelled')).toBe('none');
-    expect(toContractStatus('failed')).toBe('none');
-    expect(toContractStatus('confirmed', 'lifecycle')).toBe('confirmed');
+  it('statut : cycle bancaire par défaut, comme le kit officiel ; mode `contract` en repli', () => {
+    expect(toContractStatus('confirmed')).toBe('confirmed');
+    expect(toContractStatus('cancelled')).toBe('cancelled');
+    expect(toContractStatus('failed')).toBe('failed');
+    expect(toContractStatus('confirmed', 'contract')).toBe('pending');
+    expect(toContractStatus('cancelled', 'contract')).toBe('none');
   });
 });

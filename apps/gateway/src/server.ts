@@ -86,7 +86,14 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
       }
 
       const pathChannel = url.pathname.split('/')[2];
-      const turn: InboundTurn = pathChannel ? { ...payload, channel: payload.channel ?? pathChannel } : payload;
+      // Kit officiel : la passerelle envoie l'identifiant du tour dans l'en-tête `X-Trace-Id`, le corps
+      // n'est qu'un repli. Une trace erronée sur nos appels bancaires = NO_BANK_CALL (travail invisible).
+      const traceId = traceFrom(req.headers['x-trace-id'], payload.trace_id);
+      const turn: InboundTurn = {
+        ...payload,
+        ...(traceId === undefined ? {} : { trace_id: traceId }),
+        ...(pathChannel ? { channel: payload.channel ?? pathChannel } : {}),
+      };
 
       try {
         const handled = await gateway.handleWithMeta(turn);
@@ -132,6 +139,14 @@ function readJson(req: http.IncomingMessage): Promise<InboundTurn> {
     });
     req.on('error', reject);
   });
+}
+
+/** En-tête `X-Trace-Id` d'abord (kit officiel), `trace_id` du corps en repli. */
+export function traceFrom(header: string | string[] | undefined, body: string | undefined): string | undefined {
+  const fromHeader = (Array.isArray(header) ? header[0] : header)?.trim();
+  if (fromHeader) return fromHeader;
+  const fromBody = body?.trim();
+  return fromBody ? fromBody : undefined;
 }
 
 function json(res: http.ServerResponse, status: number, body: unknown): void {

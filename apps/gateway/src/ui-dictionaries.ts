@@ -4,9 +4,9 @@
  * Le français est la langue source ; `en` est complet ; `fub` couvre l'écran d'accueil et le
  * parcours de paiement (formes proposées, à valider par un locuteur).
  *
- * Règle de repli : si UNE SEULE clé demandée manque, l'écran entier part en français et
- * `language` vaut `fr`. Mieux vaut un écran cohérent en français qu'un écran moitié traduit
- * présenté comme fulfulde — c'est exactement ce que la sandbox signale `UNTRANSLATED`.
+ * Règle de repli (voir `ui.ts`) : clé par clé comme le kit officiel — une clé absente est omise et
+ * l'appli affiche le français pour elle ; sous 75 % de clés traduites, l'écran entier part en
+ * français et `language` vaut `fr` (sinon la sandbox signalerait `UNTRANSLATED`).
  */
 
 export type UiLanguage = 'fr' | 'en' | 'fub';
@@ -111,6 +111,9 @@ const FUB: Dictionary = {
   'nav.pay': 'Yoɓ',
   'nav.history': 'Golle',
   'shell.greeting': 'A jaɓɓaama {name}',
+  // Glossaire fub.json : term.logout « Yaltu » (proposé). « Connexion sécurisée » n'a pas d'équivalent
+  // relu : la clé `shell.secure` reste absente → repli français clé par clé.
+  'shell.logout': 'Yaltu',
   'common.back': 'Rutto',
   'common.continue': 'Jokku',
   'common.cancel': 'Haaytu',

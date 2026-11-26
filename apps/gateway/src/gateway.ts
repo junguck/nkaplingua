@@ -26,7 +26,7 @@ export interface GatewayOptions {
   readonly bankUrl: string;
   readonly sessions?: SessionStore;
   readonly timeoutMs?: number;
-  /** `contract` (défaut) : statuts observés seulement (SANDBOX-SAFINUM §8). `lifecycle` : cycle bancaire brut. */
+  /** `lifecycle` (défaut, comme le kit officiel) : cycle bancaire. `contract` : repli none/pending (§8). */
   readonly statusMode?: StatusMode;
   readonly fetchImpl?: typeof fetch;
   /** Injection pour les tests : évite tout appel réseau. */

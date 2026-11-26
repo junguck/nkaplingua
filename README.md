@@ -26,7 +26,7 @@ altérer un montant, un nom ou un numéro**.
 | **Contrat** `@nkap/contracts` | intentions canoniques, tours, traces jury (§6.D), port financier, schémas zod |
 | **Banque simulée** `@nkap/banking-sim` | comptes, contacts, grilles de frais, plafonds, historique, codes de retrait |
 | **Mode hors-ligne** | menus USSD pré-traduits servis depuis un cache local quand la banque est injoignable ; corrections mises en file puis synchronisées ([ADR 0005](docs/adr/0005-mode-hors-ligne-ussd.md)) |
-| **Tests** | **139/139**, dont les **10 scénarios standardisés du §7** joués de bout en bout et 43 tests du middleware SAFINUM |
+| **Tests** | **143/143**, dont les **10 scénarios standardisés du §7** joués de bout en bout et 47 tests du middleware SAFINUM |
 
 ## Ce qui est prêt (J2 — clients)
 
@@ -43,7 +43,7 @@ altérer un montant, un nom ou un numéro**.
 | | |
 |---|---|
 | **Middleware** `apps/gateway` | `POST /middleware/:channel` pour `ussd`, `mobile` et `web` ; `SafinumBank` (`X-Team-Key`, `X-Trace-Id`), cycle `pending → confirm` au tour suivant, sortie GSM-7, dictionnaires `ui_translation`, **texte libre compris par le moteur partagé** (« Neldu ujineere jowi ka Aicha » → récapitulatif direct) |
-| **Contrat SAFINUM** `@nkap/safinum` | protocole, 13 intentions officielles, langues, grille de frais (seule copie), statuts conformes au §8 ([ADR 0006](docs/adr/0006-middleware-sur-le-moteur-partage.md)) |
+| **Contrat SAFINUM** `@nkap/safinum` | protocole, 13 intentions officielles, langues, grille de frais (seule copie), statuts du kit officiel ([ADR 0006](docs/adr/0006-middleware-sur-le-moteur-partage.md)) |
 | **Banque de démonstration** `apps/gateway/src/demo` | mêmes routes et codes d'erreur que l'API SAFINUM, pour tester sans clé d'équipe |
 | **Branchement** | [`docs/INNOVATIONS.md`](docs/INNOVATIONS.md) | Quatre pistes d'innovation : anti-arnaque par message, second regard et aller-retour de vérification implémentés ; corrections communautaires à arbitrer |
 | [`docs/GUIDE-SAFINUM.md`](docs/GUIDE-SAFINUM.md) : clé, tunnel, déclaration des trois canaux, dépannage |
@@ -56,7 +56,7 @@ le tunnel et la déclaration des trois canaux, la console jury, la voix — voir
 ```bash
 corepack enable            # pnpm 10
 pnpm install
-pnpm test                  # 139 tests, < 5 s
+pnpm test                  # 143 tests, < 5 s
 pnpm typecheck             # TypeScript strict, zéro any (9 projets)
 
 pnpm dev:web               # http://localhost:3000 — banque en ligne + assistant

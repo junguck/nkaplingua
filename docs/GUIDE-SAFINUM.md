@@ -1,6 +1,6 @@
 # Brancher SAFINUM — mode d'emploi du middleware
 
-> `apps/gateway` · 43 tests dédiés · une seule URL pour `ussd`, `mobile` et `web`.<br>
+> `apps/gateway` · 47 tests dédiés · une seule URL pour `ussd`, `mobile` et `web`.<br>
 > Contrat et règles d'évaluation : [`SANDBOX-SAFINUM.md`](SANDBOX-SAFINUM.md).
 
 ## 1. Ce qui existe
@@ -18,7 +18,7 @@ passerelle SAFINUM ──POST──► apps/gateway ──X-Team-Key + X-Trace-I
 | Fichier | Rôle |
 | --- | --- |
 | `src/bank.ts` | `SafinumBank` : en-têtes du tour sur chaque appel, délai 2,2 s, erreurs traduites |
-| `src/ussd.ts` | dialogue à états : création `pending`, puis `confirm` **au tour suivant** ; statut de sortie conforme au §8 |
+| `src/ussd.ts` | dialogue à états : création `pending`, puis `confirm` **au tour suivant** ; statut de sortie = cycle bancaire, comme le kit officiel |
 | `src/free-text.ts` | phrase libre → interprétation du moteur (`@nkap/core`) → point d'entrée du dialogue USSD |
 | `src/language.ts` | détection du moteur + prudence du middleware (langues servies, écart net) |
 | `src/ui.ts` | écrans : emplacements intacts, `max_chars` par clé, repli complet en `fr` |
@@ -141,13 +141,20 @@ détection. L'ewondo a des libellés proposés dans le moteur, mais il lui manqu
 3. Intentions officielles uniquement, casse exacte, sinon `INVALID_RESPONSE`.
 4. Aucune devinette : ambiguïté → `CLARIFICATION_NEEDED`.
 5. USSD : 182 septets GSM-7 (translittérer, ne pas laisser passer ɛ ɔ ŋ ə).
-6. Langue déclarée honnête : repli complet en `fr`, jamais un écran moitié traduit.
+6. Langue déclarée honnête : USSD → repli complet en `fr` (jamais un écran USSD moitié traduit) ; écrans
+   mobile/web → clé par clé comme le kit, et tout en `fr` sous 75 % de clés traduites.
 7. Jamais de code d'erreur bancaire brut à l'utilisateur.
 
-Statut de transaction : par défaut, seulement `none` et `pending` (SANDBOX-SAFINUM §8). Une opération
-confirmée renvoie `pending` avec l'identifiant de la transaction, une annulation renvoie `none` avec cet
-identifiant. `SAFINUM_STATUS=lifecycle` renvoie le cycle brut (`confirmed`, `cancelled`, `failed`) : à
-n'activer qu'après l'avoir vu accepté par la sandbox.
+Statut de transaction : comme le **kit officiel** SAFINUM — `pending` au récapitulatif, `confirmed` après
+confirmation, `cancelled` après annulation, `failed` sur erreur bancaire. `SAFINUM_STATUS=contract` ne garde
+que `none` / `pending` (ancienne hypothèse, conservée en repli si la sandbox refusait une valeur).
+
+Identifiant de trace : l'en-tête HTTP `X-Trace-Id` envoyé par la passerelle prime sur le `trace_id` du corps
+(règle du kit) ; c'est lui qui est recopié sur chaque appel bancaire.
+
+Écrans mobile/web : traduction **clé par clé** (règle du kit). Une clé sans traduction valide est omise
+(l'appli affiche le français, la sandbox signale `MISSING_STRINGS`) ; une valeur aux emplacements cassés ou
+trop longue n'est jamais envoyée. Sous 75 % de clés traduites, tout l'écran repasse en français déclaré `fr`.
 
 ## 7. Dépannage
 
@@ -164,7 +171,7 @@ n'activer qu'après l'avoir vu accepté par la sandbox.
 
 ## 8. Ce qui a été vérifié
 
-- `pnpm test` : 139 tests (43 pour le gateway, dont 6 pour le mode hors-ligne et 8 pour le second regard), chaîne réelle middleware → HTTP → banque.
+- `pnpm test` : 143 tests (47 pour le gateway, dont 6 pour le mode hors-ligne et 8 pour le second regard), chaîne réelle middleware → HTTP → banque.
 - `pnpm typecheck` : 9 projets verts.
 - Bundle `dist/server.js` + banque de démo en HTTP : kit officiel (menu, solde, écran web), transfert en
   texte libre fulfulde créé au tour A puis confirmé au tour B, options dans la langue de l'écran.

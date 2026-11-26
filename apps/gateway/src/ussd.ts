@@ -43,7 +43,7 @@ const FALLBACK_BILLERS = ['ENEO', 'CAMWATER', 'CANAL', 'CAMTEL'];
 export interface UssdDeps {
   readonly bank: BankPort;
   readonly sessions: SessionStore;
-  /** `contract` (défaut) : seuls les statuts observés sortent (§8). `lifecycle` : cycle bancaire brut. */
+  /** `lifecycle` (défaut, comme le kit officiel) : cycle bancaire. `contract` : repli none/pending. */
   readonly statusMode?: StatusMode;
   /** Second regard (optionnel) : un proche valide les gros transferts avant confirmation. */
   readonly secondLook?: SecondLook;
@@ -68,7 +68,7 @@ export async function handleUssd(turn: InboundTurn, deps: UssdDeps): Promise<Uss
   if (result.keep) deps.sessions.set(key, state);
   else deps.sessions.delete(key);
 
-  // Un seul point de sortie pour le statut : jamais une valeur hors contrat vers la passerelle.
+  // Un seul point de sortie pour le statut (cycle bancaire par défaut, repli `contract` configurable).
   const { transaction } = result.reply;
   return { ...result.reply, transaction: { ...transaction, status: toContractStatus(transaction.status, deps.statusMode) } };
 }
@@ -176,7 +176,7 @@ async function advance(
     }
     default:
       state.step = 'menu';
-      return keep(reply(language, menuText(language), 'UNKNOWN'));
+      return keep(reply(language, menuText(language), 'UNKNOWN', menuOptions(language)));
   }
 }
 
@@ -215,10 +215,10 @@ async function menu(
       state.step = 'language';
       return keep(reply(language, message(language, 'ask.language'), 'LANGUAGE_SWITCH'));
     default: {
-      if (text === '') return keep(reply(language, menuText(language), 'UNKNOWN'));
+      if (text === '') return keep(reply(language, menuText(language), 'UNKNOWN', menuOptions(language)));
       const understood = understandFreeText(text, language);
       if (understood) return withExtracted(await followFreeText(state, understood, phone, deps, language), understood);
-      return keep(reply(language, `${message(language, 'invalid.choice')}\n${menuText(language)}`, 'CLARIFICATION_NEEDED'));
+      return keep(reply(language, `${message(language, 'invalid.choice')}\n${menuText(language)}`, 'CLARIFICATION_NEEDED', menuOptions(language)));
     }
   }
 }
@@ -540,7 +540,7 @@ async function atConfirmation(
   const pending = state.pending;
   if (!pending) {
     state.step = 'menu';
-    return keep(reply(language, menuText(language), 'UNKNOWN'));
+    return keep(reply(language, menuText(language), 'UNKNOWN', menuOptions(language)));
   }
 
   const value = text.trim().toLowerCase();
@@ -727,6 +727,8 @@ interface ReplyOptions {
   readonly params?: Record<string, string | number | boolean | null>;
   readonly term?: string;
   readonly language?: GatewayLanguage;
+  /** Le texte écrit déjà la liste numérotée (menu) : `options` ne sert qu'aux boutons du simulateur. */
+  readonly listedInText?: boolean;
 }
 
 function reply(
@@ -736,7 +738,7 @@ function reply(
   options: ReplyOptions = {},
 ): UssdReply {
   const optionLabels = options.options ?? [];
-  const body = finalizeText(text, optionLabels, MAX_CHARS);
+  const body = options.listedInText ? truncateGsm7(toGsm7(text), MAX_CHARS) : finalizeText(text, optionLabels, MAX_CHARS);
   const params: Record<string, string | number | boolean | null> = { ...(options.params ?? {}) };
   if (options.term) params.term = options.term;
 
@@ -758,6 +760,11 @@ function finalizeText(text: string, options: readonly string[], maxChars: number
   const budget = optionsBlock ? maxChars - gsm7Length(optionsBlock) - 1 : maxChars;
   const body = truncateGsm7(toGsm7(text), Math.max(24, budget));
   return optionsBlock ? `${body}\n${optionsBlock}` : body;
+}
+
+/** Comme le kit officiel : la liste est dans le texte, et ses libellés dans `options`. */
+function menuOptions(language: GatewayLanguage): ReplyOptions {
+  return { options: MENU_KEYS.map((key) => message(language, key)), listedInText: true };
 }
 
 function menuText(language: GatewayLanguage): string {

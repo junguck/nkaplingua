@@ -40,8 +40,8 @@ function turn(overrides: Partial<InboundTurn>): InboundTurn {
 /** Vérifie ce que la sandbox vérifierait : intention officielle, statut connu, GSM-7 et 182 septets. */
 function assertContract(reply: UssdReply): void {
   expect(SAFINUM_INTENTS).toContain(reply.interpretation.intent);
-  // Mode contrat (défaut) : seules les valeurs observées sur la sandbox sortent (SANDBOX-SAFINUM §8).
-  expect(['none', 'pending']).toContain(reply.transaction.status);
+  // Valeurs du kit officiel SAFINUM (cycle bancaire).
+  expect(['none', 'pending', 'confirmed', 'cancelled', 'failed']).toContain(reply.transaction.status);
   expect(typeof reply.response.text).toBe('string');
   expect(reply.response.text.length).toBeGreaterThan(0);
   expect(isGsm7(reply.response.text)).toBe(true);
@@ -128,8 +128,8 @@ describe('banque de démonstration et middleware (chaîne HTTP réelle)', () => 
     )) as UssdReply;
     assertContract(confirmed);
     expect(confirmed.interpretation.intent).toBe('CONFIRM');
-    // §8 : exécutée = `pending` + id de la transaction confirmée.
-    expect(confirmed.transaction).toEqual({ id: summary.transaction.id, status: 'pending' });
+    // Comme le kit officiel : `confirmed` + id de la transaction.
+    expect(confirmed.transaction).toEqual({ id: summary.transaction.id, status: 'confirmed' });
     expect(confirmed.response.text).toContain('244 950 FCFA');
 
     const confirmCall = calls.find((call) => call.path.endsWith('/confirm'));
@@ -149,7 +149,7 @@ describe('banque de démonstration et middleware (chaîne HTTP réelle)', () => 
     )) as UssdReply;
     assertContract(cancelled);
     expect(cancelled.interpretation.intent).toBe('CANCEL');
-    expect(cancelled.transaction.status).toBe('none');
+    expect(cancelled.transaction.status).toBe('cancelled');
     expect(cancelled.transaction.id).toMatch(/^MBP/);
 
     const balance = (await gateway.handle(turn({ input: { type: 'menu', text: '1' } }))) as UssdReply;
@@ -286,7 +286,9 @@ describe('banque de démonstration et middleware (chaîne HTTP réelle)', () => 
       const body = (await response.json()) as UssdReply;
       assertContract(body);
       expect(body.interpretation.intent).toBe('BALANCE_INQUIRY');
-      expect(calls.some((call) => call.traceId === 'essai-local-0002')).toBe(true);
+      // Kit officiel : l'en-tête X-Trace-Id prime sur le `trace_id` du corps.
+      expect(calls.some((call) => call.traceId === 'trace-http')).toBe(true);
+      expect(calls.some((call) => call.traceId === 'essai-local-0002')).toBe(false);
     } finally {
       await new Promise<void>((resolve) => server.close(() => resolve()));
     }
@@ -482,12 +484,12 @@ describe('texte libre sur USSD : compris par le moteur partagé', () => {
     expect(chosen.interpretation).toMatchObject({ intent: 'LANGUAGE_SWITCH', language: 'en' });
   });
 
-  it('mode `lifecycle` : le cycle bancaire brut, à n’activer qu’après validation sur la sandbox', async () => {
-    const gateway = new Gateway({ teamKey: DEMO_TEAM_KEY, bankUrl, sessions: new InMemorySessions(), statusMode: 'lifecycle' });
-    const session = 'libre-cycle';
+  it('mode `contract` (repli) : seulement none / pending, l’identifiant porte l’information', async () => {
+    const gateway = new Gateway({ teamKey: DEMO_TEAM_KEY, bankUrl, sessions: new InMemorySessions(), statusMode: 'contract' });
+    const session = 'libre-contrat';
     await gateway.handle(turn({ session_id: session, input: { type: 'text', text: 'Neldu ujineere jowi ka Aicha' } }));
     const done = (await gateway.handle(turn({ session_id: session, input: { type: 'text', text: '1' } }))) as UssdReply;
-    expect(done.transaction.status).toBe('confirmed');
+    expect(done.transaction).toMatchObject({ status: 'pending', id: expect.stringMatching(/^MBP/) });
   });
 
   it('choix du crédit : la liste traduite n’apparaît qu’une fois', async () => {
@@ -496,5 +498,57 @@ describe('texte libre sur USSD : compris par le moteur partagé', () => {
     assertContract(reply);
     expect(reply.response.text.match(/My number/g)).toHaveLength(1);
     expect(reply.response.text).not.toContain('Mon numero');
+  });
+
+  it('menu : la liste est dans le texte (une fois) et ses libellés dans `options`, comme le kit', async () => {
+    const gateway = new Gateway({ teamKey: DEMO_TEAM_KEY, bankUrl, sessions: new InMemorySessions() });
+    const reply = (await gateway.handle(turn({ session_id: 'menu-options', language: 'en', input: { type: 'text', text: '' } }))) as UssdReply;
+    assertContract(reply);
+    expect(reply.response.options).toHaveLength(8);
+    expect(reply.response.options[0]).toBe('My balance');
+    expect(reply.response.text.match(/My balance/g)).toHaveLength(1);
+  });
+});
+
+describe('écrans mobile/web : traduction clé par clé (kit officiel)', () => {
+  const screen = (language: string, strings: Record<string, { text: string; max_chars?: number | null }>): InboundTurn => ({
+    trace_id: 'ui',
+    channel: 'mobile',
+    type: 'ui_translation',
+    language,
+    source_language: 'fr',
+    strings,
+  });
+  const gateway = new Gateway({ teamKey: 'k', bankUrl: '', bankFactory: () => ({}) as BankPort });
+
+  it('une clé sans traduction est omise, le reste part dans la langue demandée', async () => {
+    const strings = Object.fromEntries(
+      ['nav.home', 'nav.transfer', 'nav.pay', 'nav.history', 'common.back', 'common.cancel', 'common.continue', 'shell.secure'].map((k) => [k, { text: k }]),
+    );
+    const reply = (await gateway.handle(screen('fub', strings))) as { language: string; strings: Record<string, string> };
+    expect(reply.language).toBe('fub');
+    expect(reply.strings['nav.home']).toBe('Fuɗɗorde');
+    expect(reply.strings).not.toHaveProperty('shell.secure');
+  });
+
+  it('un emplacement cassé ou un dépassement de max_chars n’est jamais envoyé', async () => {
+    const reply = (await gateway.handle(
+      screen('en', {
+        'nav.home': { text: 'Accueil', max_chars: 3 },
+        'shell.greeting': { text: 'Bonjour {name}' },
+        'common.back': { text: 'Retour' },
+        'common.cancel': { text: 'Annuler' },
+      }),
+    )) as { language: string; strings: Record<string, string> };
+    expect(reply.language).toBe('en');
+    expect(reply.strings).not.toHaveProperty('nav.home');
+    expect(reply.strings['shell.greeting']).toBe('Hello {name}');
+  });
+
+  it('sous 75 % de clés traduites : tout en français, déclaré `fr`', async () => {
+    const reply = (await gateway.handle(
+      screen('fub', { 'shell.secure': { text: 'Connexion sécurisée' }, 'inconnue.a': { text: 'A' }, 'nav.home': { text: 'Accueil' } }),
+    )) as { language: string; strings: Record<string, string> };
+    expect(reply).toEqual({ language: 'fr', strings: { 'shell.secure': 'Connexion sécurisée', 'inconnue.a': 'A', 'nav.home': 'Accueil' } });
   });
 });

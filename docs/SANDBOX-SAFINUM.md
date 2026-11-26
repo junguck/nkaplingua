@@ -189,6 +189,10 @@ serveur sur chaque réponse USSD).
 
 ### `Trace.status` ↔ `transaction.status` de la sandbox
 
+> **Remplacé par le kit officiel (26/11).** Le tableau ci-dessous était une hypothèse prudente, faite sans
+> source. Le kit de démarrage SAFINUM renvoie le cycle bancaire tel quel (`confirmed`, `cancelled`, `failed`) :
+> c'est désormais le défaut du middleware. Voir §9.
+
 Nos statuts internes sont plus riches que le contrat sandbox (valeurs observées : `none`, `pending` ; liste
 complète **inconnue**). Correspondance à appliquer dans le middleware :
 
@@ -206,3 +210,20 @@ complète **inconnue**). Correspondance à appliquer dans le middleware :
 Rappels bloquants : `X-Trace-Id` recopié sur **chaque** appel bancaire (sinon `NO_BANK_CALL`), et `confirm`
 obligatoirement dans un tour portant un **autre** `trace_id` que l'initiation (sinon ÉCHEC). En `mobile` / `web`,
 aucun appel bancaire n'est attendu : nos `Trace` locales y servent la démo, pas le journal du jury.
+
+## 9. Ce que le kit de démarrage officiel confirme (reçu le 26/11)
+
+Le kit Node.js remis aux équipes (« respecte déjà le contrat ») tranche plusieurs points marqués **inconnu** :
+
+| Point | Ce que fait le kit | Notre middleware |
+|---|---|---|
+| `transaction.status` | `pending` au récapitulatif, `confirmed`, `cancelled`, `failed` | aligné (défaut `lifecycle`) |
+| Identifiant de trace | en-tête HTTP `X-Trace-Id` de la requête, `trace_id` du corps en repli | aligné |
+| `input.type` USSD | `"text"`, saisie dans `input.text`, `ussd_text` = chaîne `*123#*1` | déjà géré |
+| `response.options` | libellés des choix, en plus de la liste écrite dans `text` | aligné (menu inclus) |
+| Écrans `ui_translation` | clé par clé ; clé absente = repli français par l'appli ; emplacements triés sans doublon | aligné (+ seuil 75 %) |
+| Langue sans traduction | déclarer `fr` | déjà le cas |
+| Contrôle GET | `GET /` → `{ "ok": true }` pour vérifier le tunnel | déjà le cas |
+| Erreur bancaire | fin de session, `transaction.status: failed` si une transaction existait | déjà le cas |
+| Clés d'écran de référence | `translations/en.json` : 89 clés | identiques à notre dictionnaire anglais (89/89) |
+

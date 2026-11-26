@@ -62,4 +62,4 @@ Ce qui est livré est décrit dans le [README](../README.md) et les [ADR](adr/) 
 - Agréger de vrais comptes MTN/Orange/banques (agrément, accès API).
 - Lire l'écran en continu sur Android (sécurité, politique Play Store).
 - Prétendre à une reconnaissance vocale fulfulde : Android, iOS et Chrome n'en fournissent pas (piste : modèles MMS / Omnilingual ASR de Meta côté serveur).
-- Servir une langue à moitié traduite : sans catalogue complet et relu, le middleware répond en français et le déclare.
+- Servir un écran USSD à moitié traduit : sans catalogue complet et relu, le middleware répond en français et le déclare (les écrans mobile/web suivent la règle clé par clé du kit, avec un seuil de 75 %).
