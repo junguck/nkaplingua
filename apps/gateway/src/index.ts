@@ -14,4 +14,5 @@ export { SAFINUM_INTENTS, SAFINUM_LANGUAGES, normalizePhone, isUiTranslation } f
 export type { InboundTurn, SafinumIntent, SafinumLanguage, SafinumChannel, UssdReply, UiReply, TransactionStatus } from './contract.js';
 export { DemoBank } from './demo/demo-bank.js';
 export { createDemoServer, startDemoServer, DEMO_TEAM_KEY, type DemoCall, type DemoServerOptions } from './demo/server.js';
+export { SecondLook, type SecondLookPolicy, type TrustedContact, type Decision, type ApprovalRequest, type Notifier } from './second-look.js';
 export { TranslationCache, Connectivity, SyncQueue, ResilientBank, checkConstraints, USSD_MAX_CHARS, type CachedString, type QueuedChange, type SyncSender, type Charset } from './offline.js';

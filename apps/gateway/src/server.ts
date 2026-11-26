@@ -58,6 +58,20 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
         });
       }
 
+      // Réponse du proche de confiance : POST /second-look/{id}/answer  { "text": "1" }
+      const second = url.pathname.match(/^\/second-look\/([\w-]+)\/answer$/);
+      if (req.method === 'POST' && second) {
+        if (!gateway.secondLook) return json(res, 404, { error: 'Second regard désactivé' });
+        let body: { text?: unknown };
+        try {
+          body = (await readJson(req)) as { text?: unknown };
+        } catch {
+          return json(res, 400, { error: 'JSON invalide' });
+        }
+        const outcome = await gateway.secondLook.answer(second[1] ?? '', typeof body.text === 'string' ? body.text : '');
+        return json(res, outcome === 'unknown' ? 404 : 200, { decision: outcome });
+      }
+
       if (req.method !== 'POST') return json(res, 405, { error: 'POST attendu' });
       if (url.pathname !== '/' && !url.pathname.startsWith('/middleware/')) {
         return json(res, 404, { error: 'Route inconnue' });

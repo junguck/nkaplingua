@@ -1,16 +1,14 @@
 # Pistes d'innovation
 
-Quatre idées qui prolongent NkapLingua au-delà de la traduction des services financiers. Aucune n'est
-implémentée : ce document sert à choisir. Les deux premières s'appuient sur des briques déjà présentes
-(file de synchronisation hors-ligne, moteur anti-arnaque) ; les deux dernières sont de nouvelles fonctions
-du produit.
+Quatre idées qui prolongent NkapLingua au-delà de la traduction des services financiers. Les idées 2, 3 et 4
+sont implémentées et testées (voir « État » ci-dessous) ; l'idée 1 reste à arbitrer.
 
-| # | Idée | Dépend de | Effort | Effet pour la démonstration |
+| # | Idée | Dépend de | État | Effet pour la démonstration |
 |---|---|---|---|---|
-| 1 | Boîte à corrections communautaire | file de synchro ([ADR 0005](adr/0005-mode-hors-ligne-ussd.md)), studio | moyen | rend la validation linguistique mesurable |
-| 2 | Alerte anti-arnaque par message | moteur `screen` (`cat.fraud`, `ui.scam_alert`) | faible | démonstration en 30 secondes, sans banque |
-| 3 | Second regard (confirmation par un proche) | confirmation du dialogue, canal SMS | moyen | protège contre la contrainte et l'erreur |
-| 4 | Aller-retour de vérification | moteur de rendu, valeurs verrouillées | moyen | détecte une mauvaise traduction sans locuteur |
+| 1 | Boîte à corrections communautaire | file de synchro ([ADR 0005](adr/0005-mode-hors-ligne-ussd.md)), studio | à faire | rend la validation linguistique mesurable |
+| 2 | Alerte anti-arnaque par message | moteur `screen` (`cat.fraud`, `ui.scam_alert`) | fait (cœur) | démonstration en 30 secondes, sans banque |
+| 3 | Second regard (confirmation par un proche) | confirmation du dialogue, canal SMS | fait | protège contre la contrainte et l'erreur |
+| 4 | Aller-retour de vérification | moteur de rendu, valeurs verrouillées | fait (cœur) | détecte une mauvaise traduction sans locuteur |
 
 ## 1. Boîte à corrections communautaire
 
@@ -69,3 +67,22 @@ est marquée « à vérifier » et le français est proposé en repli. La trace 
 des éléments verrouillés et des marqueurs de négation ; statut supplémentaire dans la trace.
 
 **Risque.** Le glossaire inversé ne couvre que les entrées connues : une phrase libre peut passer sans contrôle.
+
+## État d'implémentation
+
+| Idée | Code | Tests | Pas encore fait |
+|---|---|---|---|
+| 2. Alerte anti-arnaque | `checkMessage(texte, langue)` dans `packages/core/src/screen/message-check.ts` ; textes `msgcheck.*` en français et en anglais | `packages/core/test/innovations.test.ts` | écran web / entrée SMS ; textes fulfulde et pidgin (repli français signalé) |
+| 3. Second regard | `apps/gateway/src/second-look.ts` ; option `secondLook` de `Gateway` ; route `POST /second-look/{id}/answer` ; branché à la confirmation USSD d'un transfert | `apps/gateway/test/second-look.test.ts` (7 cas, avec la banque de démo) | envoi réel des SMS (`Notifier` injecté), saisie du proche et du seuil par l'utilisateur, balayage périodique `sweep()` |
+| 4. Aller-retour | `auditRoundTrip`, `compareTemplates`, `renderVerified` dans `packages/core/src/render/round-trip.ts` | `packages/core/test/innovations.test.ts` | rendu automatique par le moteur (`renderVerified` est à appeler explicitement) |
+
+Réglage du second regard : `new Gateway({ ..., secondLook: new SecondLook({ thresholdXAF, ttlMs, contactFor }, notify) })`.
+Sans `secondLook`, le comportement de la sandbox est inchangé.
+
+Points d'honnêteté :
+
+- Le contrôle d'aller-retour produit des **alertes à vérifier**, pas des erreurs prouvées. Sur le lexique actuel il
+  signale quelques gabarits (par exemple `not.understood` en fulfulde) : les marqueurs de négation fulfulde et pidgin
+  sont une liste courte, à enrichir avec les relecteurs. Une alerte ne dit pas que la traduction est fausse.
+- L'alerte anti-arnaque ne couvre que ce que les règles du moteur reconnaissent (français et anglais).
+- Le second regard envoie le résumé au numéro national à 9 chiffres ; le branchement à un opérateur SMS reste à faire.

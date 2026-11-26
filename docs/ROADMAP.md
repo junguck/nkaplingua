@@ -80,4 +80,4 @@ relever sur l'appareil les identifiants réels des applis MoMo / Orange Money po
 
 ## Pistes d'innovation
 
-Quatre idées non planifiées sont décrites dans [`INNOVATIONS.md`](INNOVATIONS.md) : corrections communautaires, alerte anti-arnaque par message, second regard, aller-retour de vérification.
+Quatre idées sont décrites dans [`INNOVATIONS.md`](INNOVATIONS.md) : l'alerte anti-arnaque par message, le second regard et l'aller-retour de vérification sont implémentés ; les corrections communautaires restent à arbitrer.

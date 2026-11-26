@@ -143,7 +143,7 @@ français et `interpretation.language` vaut `fr`. Mieux vaut un repli déclaré 
 
 ## 7. Ce qui a été vérifié
 
-- `pnpm test` : 102 tests (29 pour le gateway, dont 6 pour le mode hors-ligne), chaîne réelle middleware → HTTP → banque.
+- `pnpm test` : 119 tests (36 pour le gateway, dont 6 pour le mode hors-ligne et 7 pour le second regard), chaîne réelle middleware → HTTP → banque.
 - `pnpm typecheck` : 8 projets verts.
 - En-têtes `X-Team-Key` et `X-Trace-Id` observés côté banque, `trace_id` différent entre
   l'initiation et la confirmation.

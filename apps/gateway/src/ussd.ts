@@ -8,6 +8,7 @@
  *      `CLARIFICATION_NEEDED` et on pose la question.
  */
 
+import type { SecondLook } from './second-look.js';
 import {
   normalizePhone,
   type InboundTurn,
@@ -50,6 +51,8 @@ export interface UssdDeps {
   readonly sessions: SessionStore;
   /** Contrat prudent : n'envoyer que les statuts déjà observés (`none`, `pending`). */
   readonly strictStatus?: boolean;
+  /** Second regard (optionnel) : un proche valide les gros transferts avant confirmation. */
+  readonly secondLook?: SecondLook;
 }
 
 export async function handleUssd(turn: InboundTurn, deps: UssdDeps): Promise<UssdReply> {
@@ -489,6 +492,35 @@ async function atConfirmation(
   const value = text.trim().toLowerCase();
 
   if (value === '1' || ['oui', 'yes', 'eey', 'confirmer', 'confirm', 'tabbitin'].includes(value)) {
+    const contact = pending.type === 'transfer' ? deps.secondLook?.applies(phone, pending.total) : undefined;
+    if (deps.secondLook && contact) {
+      const request = await deps.secondLook.open(
+        {
+          transactionId: pending.id,
+          userPhone: phone,
+          userLanguage: language,
+          amount: pending.amount,
+          fee: pending.fee,
+          total: pending.total,
+          ...(pending.name === undefined ? {} : { recipientName: pending.name }),
+          ...(pending.to === undefined ? {} : { recipientPhone: pending.to }),
+        },
+        contact,
+        deps.bank,
+      );
+      const wait =
+        language === 'en'
+          ? `Waiting for ${contact.name} to approve. You will get an SMS.`
+          : `En attente de ${contact.name}. Vous recevrez un SMS.`;
+      return done(
+        reply(language, wait, 'CONFIRM', {
+          end: true,
+          transaction: { id: pending.id, status: 'pending' },
+          params: { second_look: request.id },
+        }),
+      );
+    }
+
     const result = await deps.bank.confirm(pending.id);
     if (!result.ok) return failure(result, 'CONFIRM', language, pending.id);
 
