@@ -44,7 +44,8 @@ altérer un montant, un nom ou un numéro**.
 |---|---|
 | **Middleware** `apps/gateway` | `POST /middleware/:channel` pour `ussd`, `mobile` et `web` ; `SafinumBank` (`X-Team-Key`, `X-Trace-Id`), intentions officielles, cycle `pending → confirm`, grille de frais officielle, sortie GSM-7, dictionnaires `ui_translation` |
 | **Banque de démonstration** `apps/gateway/src/demo` | mêmes routes et codes d'erreur que l'API SAFINUM, pour tester sans clé d'équipe |
-| **Branchement** | [`docs/GUIDE-SAFINUM.md`](docs/GUIDE-SAFINUM.md) : clé, tunnel, déclaration des trois canaux, dépannage |
+| **Branchement** | [`docs/INNOVATIONS.md`](docs/INNOVATIONS.md) | Quatre pistes d'innovation à arbitrer (corrections communautaires, anti-arnaque par message, second regard, aller-retour de vérification) |
+| [`docs/GUIDE-SAFINUM.md`](docs/GUIDE-SAFINUM.md) : clé, tunnel, déclaration des trois canaux, dépannage |
 
 Reste : la **clé d'équipe `sbx_…`** pour publier l'endpoint dans la sandbox, la console jury, la voix —
 voir [`docs/ROADMAP.md`](docs/ROADMAP.md).

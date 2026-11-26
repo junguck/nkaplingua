@@ -77,3 +77,7 @@ relever sur l'appareil les identifiants réels des applis MoMo / Orange Money po
 - Agréger de vrais comptes MTN/Orange/banques (agrément, accès API).
 - Lire l'écran en continu sur Android (sécurité, politique Play Store).
 - Prétendre à une reconnaissance vocale fulfulde : Android, iOS et Chrome n'en fournissent pas (à revérifier J1 ; piste : modèles MMS / Omnilingual ASR de Meta côté serveur).
+
+## Pistes d'innovation
+
+Quatre idées non planifiées sont décrites dans [`INNOVATIONS.md`](INNOVATIONS.md) : corrections communautaires, alerte anti-arnaque par message, second regard, aller-retour de vérification.
