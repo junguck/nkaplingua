@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NkapLingua Répondeur</title>
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header>
+  <h1>☎️ NkapLingua <span>Répondeur</span></h1>
+  <p class="demo">DÉMONSTRATION — aucun vrai argent, aucun vrai code secret.</p>
+</header>
+<main>
+  <section class="phone" aria-label="Téléphone">
+    <div id="banner" hidden></div>
+    <div class="screen" id="screen" role="log" aria-live="polite"></div>
+    <div class="entry"><span id="entry-label">Saisie :</span> <output id="buffer">—</output></div>
+    <div class="keys" id="keys"></div>
+    <div class="row">
+      <button id="call" class="call">📞 Appeler</button>
+      <button id="hang" class="hang" disabled>⏹ Raccrocher</button>
+    </div>
+  </section>
+  <aside>
+    <section class="card"><h2>💰 Mon compte (démo)</h2><div id="balance" class="big"></div><ul id="history"></ul></section>
+    <section class="card"><h2>🗣️ Langues</h2><div id="langs"></div>
+      <p class="hint">Une langue n'est <b>parlée</b> que si un locuteur natif l'a enregistrée <b>et</b> qu'un second locuteur l'a validée. Sinon : français facile + pictogramme (badge <b>FR</b>).</p>
+      <button id="studio">🎙️ Studio linguistique</button></section>
+    <section class="card"><h2>🔔 Notifications</h2>
+      <p class="hint">Envoi, retrait, tontine, crédit : une notification (et sa voix) arrive même si cet onglet est fermé.</p>
+      <button id="test-notif">Tester une notification</button>
+      <button id="reset" class="ghost">Réinitialiser la démo</button></section>
+  </aside>
+</main>
+<script type="module" src="app.js"></script>
+</body>
+</html>

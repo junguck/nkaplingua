@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Traducteur de glossaire NkapLingua</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      color: #17332c;
+      background: #f3f6f2;
+    }
+
+    * { box-sizing: border-box; }
+
+    body { margin: 0; }
+
+    main {
+      width: min(920px, calc(100% - 32px));
+      margin: 32px auto;
+    }
+
+    h1 { margin: 0 0 8px; font-size: 1.65rem; }
+    p { line-height: 1.5; }
+
+    .panel {
+      padding: 20px;
+      border: 1px solid #d5e0d8;
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 8px 24px #17332c0d;
+    }
+
+    label { display: block; font-weight: 650; }
+
+    input, textarea, button { font: inherit; }
+
+    input[type="text"], input[type="search"], textarea {
+      width: 100%;
+      margin-top: 8px;
+      padding: 11px 12px;
+      border: 1px solid #b9c9bf;
+      border-radius: 8px;
+      background: #fff;
+      color: inherit;
+    }
+
+    input:focus, textarea:focus, button:focus-visible {
+      outline: 3px solid #79b89a;
+      outline-offset: 2px;
+    }
+
+    .language { margin: 20px 0; }
+
+    .catalog {
+      max-height: 390px;
+      overflow: auto;
+      margin-top: 12px;
+      border: 1px solid #d5e0d8;
+      border-radius: 9px;
+    }
+
+    .word {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px 16px;
+      width: 100%;
+      padding: 12px;
+      border: 0;
+      border-bottom: 1px solid #e8eee9;
+      background: #fff;
+      color: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+
+    .word:last-child { border-bottom: 0; }
+    .word:hover { background: #f5faf6; }
+    .word[aria-current="true"] { background: #e8f4ec; }
+    .word-label { font-weight: 650; }
+    .word-id { grid-column: 1; color: #60766a; font-size: .82rem; }
+    .word-state { grid-column: 2; grid-row: 1 / span 2; align-self: center; color: #60766a; font-size: .82rem; }
+
+    .translation { margin-top: 20px; }
+    textarea { min-height: 88px; resize: vertical; }
+
+    .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    #progress, #message { color: #60766a; font-size: .92rem; }
+
+    button.download {
+      padding: 11px 16px;
+      border: 0;
+      border-radius: 8px;
+      background: #176844;
+      color: #fff;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    button.download:disabled { background: #9aa9a0; cursor: not-allowed; }
+
+    .error { color: #9b3024; }
+
+    @media (max-width: 560px) {
+      main { width: min(100% - 20px, 920px); margin: 18px auto; }
+      .panel { padding: 14px; }
+      .footer { align-items: stretch; flex-direction: column; }
+      button.download { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Traducteur de glossaire</h1>
+    <p>Choisissez un mot ou une expression, saisissez sa traduction, puis téléchargez le fichier JSON.</p>
+
+    <section class="panel" aria-label="Éditeur de glossaire">
+      <label class="language" for="language">
+        Langue à créer
+        <input id="language" type="text" autocomplete="off" placeholder="Ex. Ewondo" required>
+      </label>
+
+      <label for="search">Mots du glossaire (français)</label>
+      <input id="search" type="search" placeholder="Filtrer les mots…">
+      <div id="catalog" class="catalog" role="listbox" aria-label="Mots du glossaire"></div>
+
+      <div class="translation">
+        <label id="selected-label" for="translation">Sélectionnez un mot dans la liste</label>
+        <textarea id="translation" placeholder="Entrez la traduction…" disabled></textarea>
+      </div>
+
+      <div class="footer">
+        <span>
+          <span id="progress">Chargement du glossaire…</span>
+          <span id="message" role="status"></span>
+        </span>
+        <button id="download" class="download" type="button" disabled>Télécharger le glossaire</button>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const catalogElement = document.querySelector("#catalog");
+    const languageInput = document.querySelector("#language");
+    const searchInput = document.querySelector("#search");
+    const translationInput = document.querySelector("#translation");
+    const selectedLabel = document.querySelector("#selected-label");
+    const progressElement = document.querySelector("#progress");
+    const messageElement = document.querySelector("#message");
+    const downloadButton = document.querySelector("#download");
+
+    const concepts = [{"id":"term.balance","easy":"Solde (l'argent qui reste sur votre compte)","fr":["solde","solde disponible","solde actuel","mon solde","consulter le solde","consulter mon solde"],"icon":"💰"},{"id":"term.money","easy":"Argent","fr":["argent"],"icon":"💵"},{"id":"term.amount","easy":"Montant (combien d'argent)","fr":["montant","montant à envoyer","somme","montant du transfert"],"icon":"🔢"},{"id":"term.fees","easy":"Frais (l'argent que le service prend)","fr":["frais","frais de transfert","frais de transaction","commission","frais de service","frais d'envoi","frais de retrait","grille tarifaire","tarifs","consulter les frais"],"icon":"🧾"},{"id":"term.total","easy":"Total (montant + frais, tout ensemble)","fr":["total","montant total","total à débiter","total à payer","montant débité"],"icon":"➕"},{"id":"term.beneficiary","easy":"Bénéficiaire (la personne qui reçoit l'argent)","fr":["bénéficiaire","destinataire","nom du bénéficiaire"],"icon":"👤"},{"id":"term.sender","easy":"Expéditeur (la personne qui envoie)","fr":["expéditeur","émetteur"],"icon":"🙋"},{"id":"term.phone","easy":"Numéro de téléphone","fr":["numéro de téléphone","téléphone","numéro","numéro du bénéficiaire","numéro mobile"],"icon":"📱"},{"id":"term.account","easy":"Compte","fr":["compte","mon compte","numéro de compte"],"icon":"🏦"},{"id":"term.transfer","easy":"Envoyer de l'argent","fr":["transfert","envoi","envoyer de l'argent","transfert d'argent","nouveau transfert","préparer un transfert"],"icon":"📤"},{"id":"term.send","easy":"Envoyer","fr":["envoyer"],"icon":"📤"},{"id":"term.receive","easy":"Recevoir","fr":["recevoir","réception","argent reçu"],"icon":"📥"},{"id":"term.withdraw","easy":"Retrait (sortir l'argent en espèces)","fr":["retrait","retirer","retirer de l'argent"],"icon":"🏧"},{"id":"term.deposit","easy":"Dépôt (mettre de l'argent sur le compte)","fr":["dépôt","déposer"],"icon":"📥"},{"id":"term.pay","easy":"Payer","fr":["payer","paiement","payer un marchand"],"icon":"💳"},{"id":"term.bill","easy":"Facture (eau, électricité…)","fr":["facture","payer une facture","factures"],"icon":"🧾"},{"id":"term.airtime","easy":"Crédit de téléphone","fr":["crédit de communication","recharge","achat de crédit"],"icon":"📶"},{"id":"term.savings","easy":"Épargne (argent mis de côté)","fr":["épargne","compte épargne"],"icon":"🐷"},{"id":"term.loan","easy":"Prêt (argent emprunté qu'il faut rembourser)","fr":["prêt","crédit","emprunt"],"icon":"🤝"},{"id":"term.interest","easy":"Intérêts (argent en plus à rembourser)","fr":["intérêts","taux d'intérêt","taux"],"icon":"📈"},{"id":"term.history","easy":"Historique (les opérations passées)","fr":["historique","transactions récentes","historique des transactions","mes opérations"],"icon":"📜"},{"id":"term.receipt","easy":"Reçu (la preuve de l'opération)","fr":["reçu","justificatif"],"icon":"🧾"},{"id":"term.reference","easy":"Référence (numéro de l'opération)","fr":["référence","numéro de référence","id de transaction","identifiant de transaction"],"icon":"🏷️"},{"id":"term.date","easy":"Date","fr":["date","date et heure"],"icon":"📅"},{"id":"term.confirm","easy":"Confirmer (dire oui, l'opération part)","fr":["confirmer","valider","je confirme","confirmer le transfert","confirmer l'envoi"],"icon":"✅"},{"id":"term.cancel","easy":"Annuler (arrêter, rien ne part)","fr":["annuler"],"icon":"❌"},{"id":"term.continue","easy":"Continuer","fr":["continuer","suivant"],"icon":"➡️"},{"id":"term.back","easy":"Retour","fr":["retour","précédent","revenir"],"icon":"⬅️"},{"id":"term.home","easy":"Accueil","fr":["accueil"],"icon":"🏠"},{"id":"term.login","easy":"Se connecter","fr":["connexion","se connecter"],"icon":"🔑"},{"id":"term.logout","easy":"Se déconnecter","fr":["déconnexion","se déconnecter"],"icon":"🚪"},{"id":"term.pin","easy":"Code secret (à ne montrer à personne)","fr":["code pin","code secret","pin","mot de passe","votre code pin"],"icon":"🔒"},{"id":"term.otp","easy":"Code reçu par SMS (à ne donner à personne)","fr":["code de confirmation","code otp","code reçu par sms","code de vérification","otp"],"icon":"🔐"},{"id":"term.security","easy":"Sécurité","fr":["sécurité","conseils de sécurité","alerte de sécurité"],"icon":"🛡️"},{"id":"term.warning","easy":"Attention !","fr":["attention","avertissement","important"],"icon":"⚠️"},{"id":"term.error","easy":"Erreur (ça n'a pas marché)","fr":["erreur","échec","échoué","transaction échouée"],"icon":"⛔"},{"id":"term.success","easy":"Réussi","fr":["succès","réussi","réussie"],"icon":"🎉"},{"id":"term.pending","easy":"En attente","fr":["en attente","en cours"],"icon":"⏳"},{"id":"term.insufficient","easy":"Pas assez d'argent","fr":["insuffisant","fonds insuffisants"],"icon":"🪫"},{"id":"term.limit","easy":"Limite (montant à ne pas dépasser)","fr":["plafond","limite","montant maximum","montant minimum","plafond journalier"],"icon":"📏"},{"id":"term.fraud","easy":"Arnaque (quelqu'un veut voler votre argent)","fr":["fraude","arnaque","escroquerie","escroc","escrocs","arnaques"],"icon":"🚨"},{"id":"term.agent","easy":"Agent (point de service)","fr":["agent","point de vente","agence"],"icon":"🧑‍💼"},{"id":"term.never","easy":"Jamais","fr":["jamais"],"icon":"🚫"},{"id":"term.irreversible","easy":"Définitif (on ne peut pas revenir en arrière)","fr":["irréversible","définitif","non remboursable","ne peut pas être annulé"],"icon":"⛔"},{"id":"term.free","easy":"Gratuit (pas de frais)","fr":["gratuit","sans frais"],"icon":"🆓"},{"id":"term.name","easy":"Nom","fr":["nom","nom complet"],"icon":"🪪"},{"id":"term.help","easy":"Aide","fr":["aide","service client","assistance","besoin d'aide"],"icon":"🆘"},{"id":"term.yes","easy":"Oui","fr":["oui"],"icon":"👍"},{"id":"term.no","easy":"Non","fr":["non"],"icon":"👎"},{"id":"term.thanks","easy":"Merci","fr":["merci"],"icon":"🙏"},{"id":"term.retry","easy":"Réessayer","fr":["réessayer","recommencer"],"icon":"🔁"},{"id":"term.wrong","easy":"Faux (pas correct)","fr":["incorrect","invalide","erroné"],"icon":"✖️"},{"id":"term.blocked","easy":"Bloqué","fr":["bloqué","suspendu"],"icon":"🔐"},{"id":"term.check","easy":"Vérifier (regarder bien)","fr":["vérifier","vérifiez","récapitulatif","résumé"],"icon":"🔍"},{"id":"ph.balance_is","easy":"Il vous reste {AMOUNT} sur votre compte.","fr":["votre solde est de {AMOUNT}","votre solde disponible est de {AMOUNT}","solde disponible {AMOUNT}","solde {AMOUNT}","votre solde est {AMOUNT}","solde actuel {AMOUNT}"],"icon":"💰"},{"id":"ph.fees_are","easy":"Le service prend {AMOUNT} de frais.","fr":["frais {AMOUNT}","les frais sont de {AMOUNT}","frais de transfert {AMOUNT}","frais de transaction {AMOUNT}","frais de cette opération {AMOUNT}","commission {AMOUNT}"],"icon":"🧾"},{"id":"ph.fee_applied","easy":"Le service va prendre {AMOUNT} de frais.","fr":["des frais de {AMOUNT} seront appliqués","des frais de {AMOUNT} s'appliquent","des frais de {AMOUNT} seront prélevés"],"icon":"🧾"},{"id":"ph.fee_percent","easy":"Les frais sont {PERCENT} du montant envoyé.","fr":["frais {PERCENT} du montant","frais de {PERCENT} du montant"],"icon":"🧾"},{"id":"ph.fee_range","easy":"Pour envoyer entre {AMOUNT} et {AMOUNT2}, les frais sont {AMOUNT3}.","fr":["de {AMOUNT} à {AMOUNT2} frais {AMOUNT3}","de {AMOUNT} à {AMOUNT2} {AMOUNT3}"],"icon":"🧾"},{"id":"ph.amount_is","easy":"Montant envoyé : {AMOUNT}.","fr":["montant {AMOUNT}","montant à envoyer {AMOUNT}","montant du transfert {AMOUNT}"],"icon":"🔢"},{"id":"ph.total_is","easy":"En tout, {AMOUNT} vont sortir de votre compte.","fr":["total {AMOUNT}","montant total {AMOUNT}","total à débiter {AMOUNT}","total à payer {AMOUNT}","montant débité {AMOUNT}"],"icon":"➕"},{"id":"ph.total_debit","easy":"En tout, {AMOUNT} vont sortir de votre compte.","fr":["un total de {AMOUNT} sera débité de votre compte","{AMOUNT} seront débités de votre compte"],"icon":"➕"},{"id":"ph.beneficiary_is","easy":"La personne qui reçoit : {NAME}.","fr":["bénéficiaire {NAME}","destinataire {NAME}","nom du bénéficiaire {NAME}"],"icon":"👤"},{"id":"ph.phone_is","easy":"Numéro de téléphone : {PHONE}.","fr":["numéro {PHONE}","numéro du bénéficiaire {PHONE}","téléphone {PHONE}","numéro de téléphone {PHONE}"],"icon":"📱"},{"id":"ph.send_to","easy":"Vous allez envoyer {AMOUNT} à {NAME}.","fr":["vous allez envoyer {AMOUNT} à {NAME}","vous êtes sur le point d'envoyer {AMOUNT} à {NAME}","envoyer {AMOUNT} à {NAME}"],"icon":"📤"},{"id":"ph.send_to_phone","easy":"Vous allez envoyer {AMOUNT} à {NAME}, numéro {PHONE}.","fr":["vous allez envoyer {AMOUNT} à {NAME} {PHONE}","vous êtes sur le point d'envoyer {AMOUNT} à {NAME} {PHONE}","vous allez envoyer {AMOUNT} à {NAME} au {PHONE}"],"icon":"📤"},{"id":"ph.send_to_number","easy":"Vous allez envoyer {AMOUNT} au numéro {PHONE}.","fr":["vous allez envoyer {AMOUNT} au {PHONE}","vous allez envoyer {AMOUNT} au numéro {PHONE}"],"icon":"📤"},{"id":"ph.sent_success","easy":"C'est fait : {AMOUNT} sont partis chez {NAME}.","fr":["vous avez envoyé {AMOUNT} à {NAME}","transfert de {AMOUNT} à {NAME} réussi","vous avez envoyé {AMOUNT} à {NAME} {PHONE}"],"icon":"🎉"},{"id":"ph.received","easy":"Vous avez reçu {AMOUNT} de {NAME}.","fr":["vous avez reçu {AMOUNT} de {NAME}","vous avez reçu {AMOUNT} de la part de {NAME}"],"icon":"📥"},{"id":"ph.new_balance","easy":"Maintenant il vous reste {AMOUNT}.","fr":["nouveau solde {AMOUNT}","votre nouveau solde est de {AMOUNT}"],"icon":"💰"},{"id":"ph.never_share_pin","easy":"Ne donnez JAMAIS votre code secret à personne.","fr":["ne partagez jamais votre code pin","ne communiquez jamais votre code secret","ne donnez jamais votre code pin à personne","ne partagez jamais votre code secret avec personne","ne partagez jamais votre code pin avec personne","ne communiquez jamais votre code pin"],"icon":"🔒"},{"id":"ph.never_share_otp","easy":"Le code reçu par SMS est secret : ne le donnez JAMAIS à personne.","fr":["ne communiquez à personne le code reçu par sms","ne partagez jamais le code reçu par sms","ne donnez jamais le code de confirmation"],"icon":"🔐"},{"id":"ph.staff_never_ask","easy":"Le service ne vous demandera JAMAIS votre code secret. Si quelqu'un le demande, c'est un voleur.","fr":["notre personnel ne vous demandera jamais votre code pin","nos agents ne vous demanderont jamais votre code secret","nous ne vous demanderons jamais votre code pin","aucun agent ne vous demandera votre code secret"],"icon":"🔒"},{"id":"ph.insufficient","easy":"Vous n'avez pas assez d'argent pour cette opération.","fr":["solde insuffisant","votre solde est insuffisant","votre solde est insuffisant pour effectuer cette opération","fonds insuffisants","votre solde est insuffisant pour cette opération"],"icon":"🪫"},{"id":"ph.wrong_pin","easy":"Le code secret est faux.","fr":["code pin incorrect","code secret incorrect","code pin invalide"],"icon":"✖️"},{"id":"ph.wrong_pin_attempts","easy":"Le code secret est faux. Vous pouvez encore essayer {NUM} fois, après le compte sera bloqué.","fr":["code pin incorrect il vous reste {NUM} tentatives","code pin incorrect il vous reste {NUM} tentative","code secret incorrect il vous reste {NUM} essais"],"icon":"✖️"},{"id":"ph.attempts_left","easy":"Vous pouvez encore essayer {NUM} fois. Après, le compte sera bloqué.","fr":["il vous reste {NUM} tentatives","il vous reste {NUM} tentative","il vous reste {NUM} essais","{NUM} tentatives restantes"],"icon":"🔢"},{"id":"ph.success","easy":"C'est réussi, l'opération est faite.","fr":["transaction réussie","transfert effectué avec succès","votre transfert a été effectué avec succès","opération réussie","transfert réussi","paiement réussi"],"icon":"🎉"},{"id":"ph.failed","easy":"L'opération n'a pas marché. Votre argent n'est pas parti.","fr":["transaction échouée","le transfert a échoué","échec de la transaction","l'opération a échoué"],"icon":"⛔"},{"id":"ph.check_before_confirm","easy":"Regardez bien le nom, le numéro et le montant AVANT de confirmer.","fr":["vérifiez les informations avant de confirmer","veuillez vérifier les informations avant de confirmer","vérifiez bien les informations avant de valider","veuillez vérifier les détails avant de confirmer"],"icon":"🔍"},{"id":"ph.irreversible","easy":"Après confirmation, on ne peut PLUS annuler. L'argent part pour toujours.","fr":["cette opération est irréversible","cette opération ne peut pas être annulée","une fois confirmé le transfert ne peut pas être annulé","une fois confirmé le transfert est irréversible","ce transfert est définitif"],"icon":"⛔"},{"id":"ph.enter_pin","easy":"Tapez votre code secret pour confirmer. Cachez l'écran.","fr":["entrez votre code pin pour confirmer","saisissez votre code secret","entrez votre code pin","saisissez votre code pin pour valider","entrez votre code secret pour confirmer"],"icon":"🔒"},{"id":"ph.enter_amount","easy":"Écrivez combien d'argent vous voulez envoyer.","fr":["entrez le montant","saisissez le montant","montant à envoyer en fcfa"],"icon":"🔢"},{"id":"ph.enter_number","easy":"Écrivez le numéro de téléphone de la personne qui reçoit.","fr":["entrez le numéro du bénéficiaire","saisissez le numéro de téléphone","entrez le numéro de téléphone du bénéficiaire"],"icon":"📱"},{"id":"ph.network_error","easy":"Problème de réseau. Réessayez plus tard. Votre argent n'est pas parti.","fr":["erreur réseau","erreur de connexion veuillez réessayer","service indisponible veuillez réessayer plus tard","erreur de connexion"],"icon":"📡"},{"id":"ph.limit_exceeded","easy":"Le montant est trop grand : il dépasse la limite permise.","fr":["le montant dépasse votre plafond","plafond journalier atteint","montant supérieur au plafond autorisé"],"icon":"📏"},{"id":"ph.max_amount","easy":"Vous ne pouvez pas dépasser {AMOUNT}.","fr":["montant maximum par transaction {AMOUNT}","montant maximum {AMOUNT}","plafond {AMOUNT}","plafond journalier {AMOUNT}"],"icon":"📏"},{"id":"ph.min_amount","easy":"Il faut au moins {AMOUNT}.","fr":["montant minimum {AMOUNT}","montant minimum par transaction {AMOUNT}"],"icon":"📏"},{"id":"ph.fraud_warning","easy":"Attention aux voleurs qui veulent votre argent ou votre code.","fr":["attention aux arnaques","méfiez-vous des escrocs","attention à la fraude","méfiez-vous des arnaques"],"icon":"🚨"},{"id":"ph.account_blocked","easy":"Votre compte est bloqué. Allez voir une agence officielle.","fr":["votre compte est bloqué","votre compte a été suspendu","compte bloqué"],"icon":"🔐"},{"id":"ph.pending","easy":"L'opération est en cours. Attendez, ne recommencez pas.","fr":["votre transaction est en cours de traitement","transaction en attente","opération en cours"],"icon":"⏳"},{"id":"ph.reference_is","easy":"Numéro de l'opération : {REF} (gardez-le).","fr":["référence {REF}","id de transaction {REF}","numéro de référence {REF}"],"icon":"🏷️"},{"id":"ph.welcome","easy":"Bienvenue","fr":["bienvenue","bonjour"],"icon":"👋"},{"id":"ph.welcome_name","easy":"Bienvenue {NAME}","fr":["bienvenue {NAME}","bonjour {NAME}"],"icon":"👋"},{"id":"cat.balance","easy":"Ce message parle de votre solde (l'argent qui reste).","icon":"💰"},{"id":"cat.fees","easy":"Ce message parle des frais (l'argent pris par le service).","icon":"🧾"},{"id":"cat.transfer","easy":"Ce message parle d'un envoi d'argent.","icon":"📤"},{"id":"cat.confirm","easy":"Récapitulatif : vérifiez tout avant de confirmer.","icon":"🔍"},{"id":"cat.warning","easy":"Attention : message de sécurité important.","icon":"⚠️"},{"id":"cat.pin","easy":"Ce message parle de votre code secret : ne le donnez à personne.","icon":"🔒"},{"id":"cat.error","easy":"Problème : l'opération n'a pas marché.","icon":"⛔"},{"id":"cat.success","easy":"Bonne nouvelle : l'opération a réussi.","icon":"🎉"},{"id":"cat.fraud","easy":"DANGER : ceci ressemble à une arnaque.","icon":"🚨"},{"id":"cat.condition","easy":"Ce message contient une condition ou une limite à bien lire.","icon":"📏"},{"id":"cat.info","easy":"Information.","icon":"ℹ️"},{"id":"flag.negation","easy":"Ce message contient une INTERDICTION (ne pas… / jamais).","icon":"🚫"},{"id":"flag.condition","easy":"Ce message contient une CONDITION (si, sauf, avant, maximum…).","icon":"❗"},{"id":"guide.balance","easy":"Ici, vous voyez l'argent qui reste sur votre compte.","icon":"💰"},{"id":"guide.fees","easy":"Ici, vous voyez combien le service prend pour chaque envoi. Plus on envoie, plus les frais montent.","icon":"🧾"},{"id":"guide.transfer_number","easy":"Étape 1 : écrivez le numéro de la personne qui reçoit.","icon":"📱"},{"id":"guide.transfer_amount","easy":"Étape 2 : écrivez le montant à envoyer.","icon":"🔢"},{"id":"guide.transfer_check","easy":"Étape 3 : regardez les frais et le total.","icon":"🔍"},{"id":"guide.transfer_confirm","easy":"Étape 4 : confirmez. Tapez votre code secret en cachant l'écran.","icon":"✅"},{"id":"guide.summary","easy":"Vérifiez le nom, le numéro, le montant, les frais et le total. Si une chose est fausse, appuyez sur Annuler.","icon":"🔍"},{"id":"guide.error","easy":"L'opération n'a pas marché. Votre argent n'est pas parti. Lisez la raison.","icon":"⛔"},{"id":"guide.success","easy":"C'est réussi. Gardez le numéro de référence comme preuve.","icon":"🎉"},{"id":"guide.security","easy":"Conseils pour protéger votre argent. Lisez-les bien.","icon":"🛡️"},{"id":"ui.original","easy":"Texte original","icon":"🇫🇷"},{"id":"ui.listen","easy":"Écouter","icon":"🔊"},{"id":"ui.unvalidated","easy":"pas encore validé par un locuteur","icon":"◌"},{"id":"ui.factsheet","easy":"Fiche claire","icon":"📋"},{"id":"ui.total_ok","easy":"Le calcul est juste : montant + frais = total.","icon":"✅"},{"id":"ui.total_mismatch","easy":"ATTENTION : montant + frais ne fait pas le total affiché. Ne confirmez pas !","icon":"🚨"},{"id":"ui.notes","easy":"En billets et pièces","icon":"💵"},{"id":"ui.scam_alert","easy":"Un vrai service ne demande JAMAIS votre code secret ni de payer pour recevoir un gain. C'est sûrement une arnaque.","icon":"🚨"},{"id":"ui.keywords","easy":"Mots importants","icon":"🔑"},{"id":"ui.ai","easy":"Traduction automatique, à vérifier","icon":"🤖"},{"id":"ui.next","easy":"Suivant","icon":"➡️"},{"id":"ui.locked_values","easy":"Chiffres et noms gardés exactement","icon":"🔐"}];
+    let selectedId = "";
+    const translations = new Map();
+
+    function conceptLabel(concept) {
+      return concept.easy || (concept.fr && concept.fr[0]) || concept.id;
+    }
+
+    function matchingConcepts() {
+      const query = searchInput.value.trim().toLocaleLowerCase("fr");
+      return concepts.filter((concept) =>
+        `${concept.id} ${conceptLabel(concept)} ${(concept.fr || []).join(" ")}`
+          .toLocaleLowerCase("fr")
+          .includes(query)
+      );
+    }
+
+    function renderCatalog() {
+      catalogElement.replaceChildren();
+      for (const concept of matchingConcepts()) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "word";
+        button.setAttribute("role", "option");
+        button.setAttribute("aria-current", String(concept.id === selectedId));
+
+        const label = document.createElement("span");
+        label.className = "word-label";
+        label.textContent = `${concept.icon ? `${concept.icon} ` : ""}${conceptLabel(concept)}`;
+
+        const id = document.createElement("span");
+        id.className = "word-id";
+        id.textContent = concept.id;
+
+        const state = document.createElement("span");
+        state.className = "word-state";
+        state.textContent = translations.has(concept.id) ? "Traduit" : "À traduire";
+
+        button.append(label, id, state);
+        button.addEventListener("click", () => selectConcept(concept));
+        catalogElement.append(button);
+      }
+
+      if (!catalogElement.childElementCount) {
+        const empty = document.createElement("p");
+        empty.textContent = "Aucun mot ne correspond à cette recherche.";
+        catalogElement.append(empty);
+      }
+    }
+
+    function updateProgress() {
+      const count = translations.size;
+      progressElement.textContent = `${count} traduction${count === 1 ? "" : "s"} saisie${count === 1 ? "" : "s"} sur ${concepts.length}`;
+      downloadButton.disabled = !languageInput.value.trim() || count === 0;
+    }
+
+    function selectConcept(concept) {
+      if (selectedId) {
+        const value = translationInput.value.trim();
+        if (value) translations.set(selectedId, value);
+        else translations.delete(selectedId);
+      }
+
+      selectedId = concept.id;
+      selectedLabel.textContent = `${conceptLabel(concept)} — ${concept.id}`;
+      translationInput.disabled = false;
+      translationInput.value = translations.get(selectedId) || "";
+      messageElement.textContent = "";
+      renderCatalog();
+      updateProgress();
+      translationInput.focus();
+    }
+
+    translationInput.addEventListener("input", () => {
+      const value = translationInput.value.trim();
+      if (value) translations.set(selectedId, value);
+      else translations.delete(selectedId);
+      renderCatalog();
+      updateProgress();
+    });
+
+    languageInput.addEventListener("input", updateProgress);
+    searchInput.addEventListener("input", renderCatalog);
+
+    function languageCode(name) {
+      return name
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "");
+    }
+
+    downloadButton.addEventListener("click", () => {
+      if (selectedId) {
+        const value = translationInput.value.trim();
+        if (value) translations.set(selectedId, value);
+        else translations.delete(selectedId);
+      }
+
+      const name = languageInput.value.trim();
+      const code = languageCode(name);
+      if (!name || !code || !translations.size) {
+        messageElement.textContent = "Indiquez la langue et au moins une traduction.";
+        return;
+      }
+
+      const entries = Object.fromEntries(
+        [...translations].map(([id, text]) => [id, { t: text, s: "propose" }])
+      );
+      const glossary = {
+        code,
+        name,
+        native: name,
+        flag: "",
+        region: "",
+        tts: "fr-FR",
+        status_note: "Traductions à relire et valider par des locuteurs natifs.",
+        default_status: "propose",
+        sources: [],
+        entries
+      };
+
+      const blob = new Blob([`${JSON.stringify(glossary, null, 2)}\n`], {
+        type: "application/json;charset=utf-8"
+      });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `glossaire_${code}.json`;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      messageElement.textContent = `Fichier téléchargé : glossaire_${code}.json`;
+    });
+
+    progressElement.textContent = `${concepts.length} mots et expressions chargés`;
+    renderCatalog();
+    updateProgress();
+  </script>
+</body>
+</html>

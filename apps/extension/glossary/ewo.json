@@ -1,25 +1,181 @@
 {
-  "code": "ewo",
+  "code": "ewondo",
   "name": "Ewondo",
-  "native": "Kolo / Ewondo",
-  "flag": "🌳",
-  "region": "Centre, Sud (Yaoundé) — langue véhiculaire du Sud",
+  "native": "Ewondo",
+  "flag": "",
+  "region": "",
   "tts": "fr-FR",
-  "status_note": "KIT DE DÉMARRAGE : vocabulaire de base seulement. Les phrases complètes doivent être rédigées par des locuteurs natifs dans le Studio linguistique. En attendant, NkapLingua affiche le français facile + pictogrammes (jamais une traduction inventée).",
+  "status_note": "Traductions à relire et valider par des locuteurs natifs.",
   "default_status": "propose",
-  "sources": [
-    "Wikipedia (discussion Ewondo) : mot = personne, minga = femme, fam = homme",
-    "Owona, A. (2004). L'orthographe harmonisée de l'ewondo. Université de Yaoundé",
-    "Abega, P. (1975). Petit lexique ewondo — référence à consulter pour compléter",
-    "Mozilla Data Collective — Ewondo ALCAM datasets (lexique + phrases alignées FR)"
-  ],
+  "sources": [],
   "entries": {
-    "term.money": "Mone",
-    "term.send": "Lôm",
-    "term.transfer": "Lôm mone",
-    "term.name": "Dzoé",
-    "term.yes": "Ee",
-    "term.thanks": "Akiba",
-    "term.check": "Yen (regarde)"
+    "term.balance": {
+      "t": "Í mɔ̄ní á líg á ǹkɔ́p",
+      "s": "propose"
+    },
+    "term.money": {
+      "t": "Mɔ̄ní",
+      "s": "propose"
+    },
+    "term.amount": {
+      "t": "Á bím mɔ̄ní",
+      "s": "propose"
+    },
+    "term.fees": {
+      "t": "Í mɔ̄ní bá nɔ́ŋ",
+      "s": "propose"
+    },
+    "term.total": {
+      "t": "Mɔ̄ní á sə",
+      "s": "propose"
+    },
+    "term.beneficiary": {
+      "t": "Í mód á nɔ́ŋ mɔ̄ní",
+      "s": "propose"
+    },
+    "term.sender": {
+      "t": "Í mód á lóm mɔ́ni",
+      "s": "propose"
+    },
+    "term.phone": {
+      "t": "Number telefón",
+      "s": "propose"
+    },
+    "term.account": {
+      "t": "Ǹkɔ́p",
+      "s": "propose"
+    },
+    "term.transfer": {
+      "t": "Á lóm mɔ̄ní",
+      "s": "propose"
+    },
+    "term.send": {
+      "t": "Lóm",
+      "s": "propose"
+    },
+    "term.receive": {
+      "t": "Á bǐ",
+      "s": "propose"
+    },
+    "term.withdraw": {
+      "t": "Á nɔ́ŋ mɔ̄ní",
+      "s": "propose"
+    },
+    "term.deposit": {
+      "t": "Á fúd mɔ̄ní",
+      "s": "propose"
+    },
+    "term.pay": {
+      "t": "Á yánər",
+      "s": "propose"
+    },
+    "term.loan": {
+      "t": "Í kól mɔ̄ní",
+      "s": "propose"
+    },
+    "term.insufficient": {
+      "t": "Mɔ̄ní á yénə kí",
+      "s": "propose"
+    },
+    "term.free": {
+      "t": "Zízə",
+      "s": "propose"
+    },
+    "term.name": {
+      "t": "Dzóé",
+      "s": "propose"
+    },
+    "term.help": {
+      "t": "Á voílí",
+      "s": "propose"
+    },
+    "term.yes": {
+      "t": "Owé",
+      "s": "propose"
+    },
+    "term.no": {
+      "t": "Á yé",
+      "s": "propose"
+    },
+    "term.thanks": {
+      "t": "Abui ngǎŋ",
+      "s": "propose"
+    },
+    "term.retry": {
+      "t": "Á bâ bɔ̀",
+      "s": "propose"
+    },
+    "term.check": {
+      "t": "Á bəbə̄",
+      "s": "propose"
+    },
+    "ph.beneficiary_is": {
+      "t": "Í mód á nɔ́ŋ (á nə dzwé nâ)",
+      "s": "propose"
+    },
+    "ph.phone_is": {
+      "t": "Number telefón",
+      "s": "propose"
+    },
+    "ph.send_to": {
+      "t": "Mə lóm (mɔ̄ní) á (dzóé)",
+      "s": "propose"
+    },
+    "ph.received": {
+      "t": "Ú bí mɔ̄ní á dzóé",
+      "s": "propose"
+    },
+    "ph.enter_amount": {
+      "t": "Tílí á bím mɔ̄ní mí nə́ lóm",
+      "s": "propose"
+    },
+    "ph.enter_number": {
+      "t": "Tílí number telefón í mód é nɔ́ŋ mɔ̄ní",
+      "s": "propose"
+    },
+    "ui.listen": {
+      "t": "Á wɔ́g",
+      "s": "propose"
+    },
+    "ui.notes": {
+      "t": "Mə fəp mə mɔ̄ní, é mí sáŋ mí mɔ̄ní",
+      "s": "propose"
+    },
+    "guide.transfer_amount": {
+      "t": "Tílí á bím mɔ̄ní wē lóm",
+      "s": "propose"
+    },
+    "guide.transfer_number": {
+      "t": "Tílí number í mód é nɔ́ŋ",
+      "s": "propose"
+    },
+    "guide.balance": {
+      "t": "Á mú wǎ yən í mɔ̄ní á líg á ǹkɔ́p",
+      "s": "propose"
+    },
+    "ph.min_amount": {
+      "t": "Yá síli á bím mɔ̀ní",
+      "s": "propose"
+    },
+    "ph.max_amount": {
+      "t": "Mí ní sí kí dzǎm lód á bím mɔ̄ní dí",
+      "s": "propose"
+    },
+    "ph.check_before_confirm": {
+      "t": "Mí ní bəgə dzóé, number telefón, á bím mɔ̄ní",
+      "s": "propose"
+    },
+    "ph.send_to_number": {
+      "t": "Wé lóm mɔ̄ní á number telefón",
+      "s": "propose"
+    },
+    "ph.send_to_phone": {
+      "t": "Bé lóm mɔ̄ní á dzóé, á number telefón",
+      "s": "propose"
+    },
+    "ph.amount_is": {
+      "t": "Á bím wé lóm: Mɔ̄ní",
+      "s": "propose"
+    }
   }
 }
