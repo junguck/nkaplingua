@@ -25,7 +25,8 @@ altérer un montant, un nom ou un numéro**.
 | **Moteur** `@nkap/core` | compréhension (langue, montants en chiffres et en lettres dans 4 langues, intention, bénéficiaire), dialogue à états (clarification, correction, confirmation, idempotence), rendu multilingue à valeurs verrouillées, mise en forme USSD/SMS |
 | **Contrat** `@nkap/contracts` | intentions canoniques, tours, traces jury (§6.D), port financier, schémas zod |
 | **Banque simulée** `@nkap/banking-sim` | comptes, contacts, grilles de frais, plafonds, historique, codes de retrait |
-| **Tests** | **91/91**, dont les **10 scénarios standardisés du §7** joués de bout en bout et 18 tests du middleware SAFINUM |
+| **Mode hors-ligne** | menus USSD pré-traduits servis depuis un cache local quand la banque est injoignable ; corrections mises en file puis synchronisées ([ADR 0005](docs/adr/0005-mode-hors-ligne-ussd.md)) |
+| **Tests** | **102/102**, dont les **10 scénarios standardisés du §7** joués de bout en bout et 18 tests du middleware SAFINUM |
 
 ## Ce qui est prêt (J2 — clients)
 
@@ -74,7 +75,7 @@ autoriser la superposition et « Lecture d'écran à la demande » → **Lancer 
 | [`docs/BRAINSTORM.md`](docs/BRAINSTORM.md) | De l'idée « Shazam de la finance » au produit : ce qu'on garde, ce qu'on change, pourquoi |
 | [`docs/ROADMAP.md`](docs/ROADMAP.md) | Plan des 3 jours, priorités P0/P1/P2, correspondance avec les livrables §11 |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Architecture, technologie linguistique, intégration, sécurité, scalabilité |
-| [`docs/adr/`](docs/adr/) | Décisions d'architecture et leurs compromis |
+| [`docs/adr/`](docs/adr/) | Décisions d'architecture et leurs compromis (0001–0005, dont le mode hors-ligne USSD) |
 | [`docs/SANDBOX-SAFINUM.md`](docs/SANDBOX-SAFINUM.md) | Contrat de la sandbox SAFINUM, règles d'évaluation, écarts corrigés |
 | [`docs/GUIDE-SAFINUM.md`](docs/GUIDE-SAFINUM.md) | Brancher le middleware : clé, tunnel, déclaration des trois canaux, dépannage |
 | [`preselection/`](preselection/) | Dossier de la phase de présélection (extension v1.1, vidéo, notes) |
@@ -110,3 +111,8 @@ Chaque phrase affichée porte un statut : **référence** (français/anglais), *
 **validé** (deux locuteurs natifs), **proposé** (glossaire de l'équipe), **brouillon** (jamais relu).
 Le statut le plus faible d'une réponse remonte jusqu'à la trace du jury. Les formes fulfulde et pidgin
 non validées **doivent** être relues par des locuteurs natifs avant la démonstration officielle.
+
+**Haoussa (`hau`)** : 65 entrées sur 129 (54 termes et 11 libellés d'interface) ont été ajoutées au glossaire de
+l'extension (`apps/extension/glossary/hau.json`) à partir d'enregistrements audio transcrits automatiquement. Toutes sont
+« proposées » et à relire par des locuteurs natifs ; les phrases `ph.*` restent à traduire (repli français). Le haoussa
+n'est pas encore servi par le middleware.

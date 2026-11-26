@@ -27,6 +27,7 @@ Priorités : **P0** = sans ça on est éliminé · **P1** = ce qui fait gagner �
 | ✅ P0 | **Correspondance des intentions** + `CLARIFICATION_NEEDED` / `CORRECTION` | Aucune intention hors liste (vérifié par test) |
 | ✅ P0 | **Sortie GSM-7** sur USSD (translittération ɓ ɗ ŋ ƴ ɛ ɔ ə, ponctuation, septets) | 182 septets vérifiés, options comprises |
 | ✅ P0 | Grille de frais officielle dans `banking-sim` | 25 000 → 25 150 |
+| ✅ P1 | **Mode hors-ligne USSD** : cache de traductions (max_chars, GSM-7/utf8), détection de panne, menu de secours, file de synchronisation | `apps/gateway/src/offline.ts`, 6 tests ; [ADR 0005](adr/0005-mode-hors-ligne-ussd.md). `sender` de synchro non branché |
 | ⏳ P0 | Tunnel public + `POST /sandbox/endpoint` pour les 3 canaux | Outil prêt (`scripts/safinum.mjs`) ; **bloqué : aucune clé `sbx_…`** |
 | P1 | Flux des traces en direct (console jury locale) | SSE |
 | P1 | Validation linguistique fulfulde (+ duala ou ewondo) avec des locuteurs | Gabarits critiques « validé » |

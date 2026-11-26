@@ -138,12 +138,32 @@ français et `interpretation.language` vaut `fr`. Mieux vaut un repli déclaré 
 | `CONFIG_LOCKED` | évaluation en cours | déclarer l'URL définitive avant le passage |
 | `TIMEOUT` | banque lente | budget 3 s, coupure à 2,2 s |
 | `INVALID_RESPONSE` | intention/statut hors contrat | `pnpm test` |
+| Menu « Service momentanement indisponible » | banque injoignable : mode hors-ligne | relancer la banque ; sonde toutes les 15 s |
 | `MISSING_STRINGS` / `UNTRANSLATED` | dictionnaire incomplet | compléter `src/ui-dictionaries.ts` |
 
 ## 7. Ce qui a été vérifié
 
-- `pnpm test` : 91 tests (18 pour le gateway), chaîne réelle middleware → HTTP → banque.
+- `pnpm test` : 102 tests (29 pour le gateway, dont 6 pour le mode hors-ligne), chaîne réelle middleware → HTTP → banque.
 - `pnpm typecheck` : 8 projets verts.
 - En-têtes `X-Team-Key` et `X-Trace-Id` observés côté banque, `trace_id` différent entre
   l'initiation et la confirmation.
 - **Sandbox en direct : non testée**, aucune clé d'équipe disponible.
+
+## 8. Mode hors-ligne (zones blanches)
+
+Le middleware garde ses traductions en local (`TranslationCache`, garni au démarrage). Si la banque ne répond
+pas, il répond depuis ce cache sans rien attendre.
+
+- **Détection** : un `UNREACHABLE` de la banque passe en hors-ligne ; elle n'est ensuite sondée que toutes
+  les 15 s (`Connectivity`).
+- **USSD hors-ligne** : message d'indisponibilité + menu complet dans la langue du tour, GSM-7, 182 septets
+  maximum, session ouverte. Un dialogue en cours repart du menu.
+- **Corrections** : `gateway.correct(langue, clé, texte, max_chars, charset)` refuse une chaîne qui viole
+  `max_chars`, le charset ou les emplacements `{x}` ; sinon elle vaut immédiatement (mobile/web comme USSD)
+  et est mise en file. `gateway.sync()` rejoue la file au retour du réseau.
+- **Options** (`new Gateway({ ..., offline: { cacheFile, sender, queue, connectivity } })`) : `cacheFile` =
+  instantané relu au démarrage ; `sender(changes) => Promise<boolean>` = envoi réel. **Sans `sender`, la file
+  attend** : SAFINUM ne documente aucun point de terminaison de synchronisation.
+
+Essai local : arrêter la banque de démo (`pkill -f dist/demo/server.js`), envoyer `1` en USSD → menu de secours ;
+relancer la banque → la réponse normale revient au plus tard 15 s après. Décision : [ADR 0005](adr/0005-mode-hors-ligne-ussd.md).
