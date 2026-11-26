@@ -121,11 +121,20 @@ Facturiers : `ENEO`, `CAMWATER`, `CANAL`, `CAMTEL`. Opérateurs : `MTN` (67, 650
 
 | Canal | max_chars | charset | mode | délai |
 |---|---|---|---|---|
-| ussd | 182 | gsm7 | menu | 3 s |
-| mobile | 1000 | utf8 | free | 10 s |
-| web | 2000 | utf8 | free | 10 s |
+| ussd | 182 (septets) | gsm7 | menu | 3 s |
+| mobile | `null` au niveau canal → **par clé** (`strings.*.max_chars`) | utf8 | ui_translation | 10 s |
+| web | `null` au niveau canal → **par clé** (`strings.*.max_chars`) | utf8 | ui_translation | 10 s |
 
-- **ɛ, ɔ, ŋ, ə ne sont PAS dans GSM-7** ; la longueur se compte en septets (« € » = 2).
+- **USSD seulement** : ɛ, ɔ, ŋ, ə ne sont pas dans GSM-7 ; la longueur se compte en septets (« € » = 2).
+  Un seul caractère hors alphabet fait basculer le message en UCS-2 → 70 caractères (choix à assumer : translittérer ou réduire).
+- **Mobile et web ne conversent pas** (`mode: "ui_translation"`) : on traduit les `strings` d'un écran.
+  `constraints.charset` vaut `utf8` et la seule limite de longueur qui compte est celle portée **par chaque clé**
+  (`max_chars: null` = pas de limite pour cette clé). Les anciennes valeurs globales 1000 / 2000 et le mode `free`
+  étaient une grille périmée : ne plus s'y fier.
+  - `max_chars` renseigné et dépassé → `OVER_LENGTH`.
+  - clé absente de la réponse → texte affiché en français + `MISSING_STRINGS`.
+  - plus d'un quart des textes identiques au français → `UNTRANSLATED`.
+  - `{amount}`, `{name}`, `{fee}` supprimés ou renommés → `PLACEHOLDER_BROKEN`, l'écran casse.
 - Le délai inclut nos appels bancaires → `TIMEOUT`.
 - SMS (v2) : 160 car. GSM-7 / 70 UCS-2 par segment, segments comptés. ATM (v2) : retraits en multiples de 5 000 FCFA.
 
@@ -151,3 +160,49 @@ Facturiers : `ENEO`, `CAMWATER`, `CANAL`, `CAMTEL`. Opérateurs : `MTN` (67, 650
 | Pidgin absent des langues de la sandbox | Stratégique | Fulfulde en langue principale ; Duala ou Ewondo en seconde (kits de démarrage de la présélection) ; pidgin hors évaluation |
 | `language: null` | Moyenne | Déjà couvert par la détection ; ajouter les langues de la sandbox au détecteur |
 | Notre app mobile / bulle ne sont pas le chemin évalué | Stratégique | Priorité au **middleware** ; app et bulle redescendent en P2 (démonstration d'innovation seulement) |
+
+## 8. Correspondance `Trace` (notre socle) ↔ dashboard du jury
+
+Le dashboard du jury n'est pas à nous : SAFINUM le remplit depuis le journal de la passerelle. Notre seul levier
+est le middleware, qui produit `interpretation`, `response` et `transaction`, et qui doit relayer `X-Trace-Id`.
+Passage entre `Trace` (`packages/contracts/src/trace.ts`, ordre du règlement §6.D) et ce que le jury voit :
+
+| Champ `Trace` | Dashboard du jury | Produit par | Remarque |
+|---|---|---|---|
+| `team` | nom de l'équipe | passerelle (`team_id`) | nous ne le renseignons pas |
+| `channel` | canal testé | passerelle (`channel`) | `ussd` / `mobile` / `web` |
+| `lang` | langue utilisée | passerelle (`language`) **ou** notre détection si `null` | à renvoyer dans `interpretation.language` (USSD) et `language` (ui_translation) |
+| `rawInput` | requête initiale | passerelle | sur mobile/web = textes FR de l'écran, pas une phrase |
+| `intent` | intention interprétée | notre middleware | casse exacte, liste fermée des 13 intentions |
+| `params` | paramètres extraits | notre middleware | = `interpretation.parameters` |
+| `response` | réponse générée | notre middleware | `response.text` (USSD) / `strings` (mobile-web) |
+| `status` | statut de la transaction | notre middleware | `transaction.status` — voir le mapping ci-dessous |
+| `latencyMs` | temps d'exécution | passerelle | inclut nos appels bancaires ; budget 3 s / 10 s |
+| `errors` | erreurs techniques | passerelle + nous | `INVALID_RESPONSE`, `TIMEOUT`, `PLACEHOLDER_BROKEN`, `NO_BANK_CALL`… |
+| `validation.integrity` | résultat de la validation | croisement journal ↔ intention déclarée | faux si l'intention n'est pas suivie des appels réels |
+| `validation.translationStatus` | qualité linguistique | notre rendu (`reference` / `validated` / `draft`) | pas d'équivalent direct côté sandbox |
+| `validation.fallback` | (aucune colonne) | notre rendu | se manifeste côté jury en `MISSING_STRINGS` / `UNTRANSLATED` |
+
+Colonnes du dashboard **sans équivalent dans `Trace`** : les **appels bancaires réellement exécutés**
+(reconstitués par la passerelle via `X-Trace-Id`) et les **septets / caractères hors GSM-7** (mesurés côté
+serveur sur chaque réponse USSD).
+
+### `Trace.status` ↔ `transaction.status` de la sandbox
+
+Nos statuts internes sont plus riches que le contrat sandbox (valeurs observées : `none`, `pending` ; liste
+complète **inconnue**). Correspondance à appliquer dans le middleware :
+
+| `Trace.status` | `transaction.status` | Sens |
+|---|---|---|
+| `none` | `none` | aucun objet transactionnel (solde, frais, historique, explication de terme) |
+| `awaiting_input` | `none` | on attend un complément, rien n'est créé |
+| `awaiting_clarification` | `none` (intention `CLARIFICATION_NEEDED`) | ambiguïté : on ne devine pas |
+| `awaiting_confirmation` | `pending` | transaction créée côté banque, aucun débit |
+| `executed` | `pending` + `id` de la transaction confirmée | `POST /transactions/{id}/confirm` appelé au tour **suivant** |
+| `cancelled` | `none` + `id` | `POST /transactions/{id}/cancel` |
+| `rejected` | `none` | refus métier (`INSUFFICIENT_FUNDS`, `LIMIT_EXCEEDED`…) expliqué en langue |
+| `failed` | `none` | erreur technique ; `errors` renseigné |
+
+Rappels bloquants : `X-Trace-Id` recopié sur **chaque** appel bancaire (sinon `NO_BANK_CALL`), et `confirm`
+obligatoirement dans un tour portant un **autre** `trace_id` que l'initiation (sinon ÉCHEC). En `mobile` / `web`,
+aucun appel bancaire n'est attendu : nos `Trace` locales y servent la démo, pas le journal du jury.
