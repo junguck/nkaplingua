@@ -21,6 +21,7 @@ export type MessageKey =
   | 'menu.language'
   | 'common.confirm'
   | 'common.cancel'
+  | 'common.edit'
   | 'ask.beneficiary'
   | 'ask.amount'
   | 'ask.feesAmount'
@@ -68,6 +69,18 @@ export type MessageKey =
 
 type Catalogue = Readonly<Record<MessageKey, string>>;
 
+/** Entrées du menu principal, dans l'ordre des touches 1 à 8 (dialogue en ligne et menu hors-ligne). */
+export const MENU_KEYS = [
+  'menu.balance',
+  'menu.transfer',
+  'menu.fees',
+  'menu.history',
+  'menu.airtime',
+  'menu.bill',
+  'menu.help',
+  'menu.language',
+] as const satisfies readonly MessageKey[];
+
 const FR: Catalogue = {
   'menu.header': 'Safinum. Choisissez:',
   'menu.balance': 'Mon solde',
@@ -80,6 +93,7 @@ const FR: Catalogue = {
   'menu.language': 'Langue',
   'common.confirm': 'Confirmer',
   'common.cancel': 'Annuler',
+  'common.edit': 'Modifier',
   'ask.beneficiary': 'Numero du beneficiaire (9 chiffres):',
   'ask.amount': 'Montant (FCFA):',
   'ask.feesAmount': 'Frais pour quel montant (FCFA) ?',
@@ -138,6 +152,7 @@ const EN: Catalogue = {
   'menu.language': 'Language',
   'common.confirm': 'Confirm',
   'common.cancel': 'Cancel',
+  'common.edit': 'Change',
   'ask.beneficiary': 'Beneficiary number (9 digits):',
   'ask.amount': 'Amount (FCFA):',
   'ask.feesAmount': 'Fees for which amount (FCFA)?',
@@ -200,6 +215,7 @@ const FUB: Catalogue = {
   'menu.language': 'Ɗemngal',
   'common.confirm': 'Tabbitin',
   'common.cancel': 'Haaytu',
+  'common.edit': 'Waylu',
   'ask.beneficiary': 'Limgal keɓoowo ceede (9 limle):',
   'ask.amount': 'Ceede (FCFA):',
   'ask.feesAmount': 'Njoɓdi ngam ceede njelu (FCFA)?',

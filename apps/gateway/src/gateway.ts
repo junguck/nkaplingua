@@ -5,7 +5,7 @@
  * `ui_translation` part vers la traduction d'écran, tout le reste est un menu USSD.
  */
 
-import { isUiTranslation, normalizeChannel, type InboundTurn, type SafinumChannel, type UiReply, type UssdReply } from './contract.js';
+import { isUiTranslation, normalizeChannel, type InboundTurn, type SafinumChannel, type StatusMode, type UiReply, type UssdReply } from '@nkap/safinum';
 import { SafinumBank, type BankPort } from './bank.js';
 import { handleUssd } from './ussd.js';
 import { handleUi } from './ui.js';
@@ -25,7 +25,8 @@ export interface GatewayOptions {
   readonly bankUrl: string;
   readonly sessions?: SessionStore;
   readonly timeoutMs?: number;
-  readonly strictStatus?: boolean;
+  /** `contract` (défaut) : statuts observés seulement (SANDBOX-SAFINUM §8). `lifecycle` : cycle bancaire brut. */
+  readonly statusMode?: StatusMode;
   readonly fetchImpl?: typeof fetch;
   /** Injection pour les tests : évite tout appel réseau. */
   readonly bankFactory?: (turn: InboundTurn) => BankPort;
@@ -105,7 +106,7 @@ export class Gateway {
     const reply = await handleUssd(turn, {
       bank,
       sessions: this.sessions,
-      ...(this.options.strictStatus === undefined ? {} : { strictStatus: this.options.strictStatus }),
+      ...(this.options.statusMode === undefined ? {} : { statusMode: this.options.statusMode }),
     });
 
     // Banque injoignable : on répond depuis le cache, menu pré-traduit, session ouverte.

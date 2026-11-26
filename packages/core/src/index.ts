@@ -1,6 +1,6 @@
 export { NkapEngine, type EngineOptions } from './engine';
 export { interpret, type InterpretContext } from './nlu/interpreter';
-export { detectLanguage } from './nlu/language-detector';
+export { detectLanguage, type LanguageGuess } from './nlu/language-detector';
 export { extractEntities } from './nlu/entities';
 export { renderPlan, renderPart, renderTemplate, weakestStatus, type RenderedText } from './render/renderer';
 export type { TemplateSet, Template } from './lexicon/types';
@@ -16,3 +16,4 @@ export { INTENT_CUES } from './lexicon/intents.lexicon';
 export { readScreen, SCREEN_FIELDS, type ScreenField, type ScreenReading, type TotalCheck } from './screen/screen-reader';
 export { renderScreenCard, type ScreenCard, type ScreenCardRow, type ScreenAlert, type ScreenAlertLevel } from './screen/screen-card';
 export { detectScam, SCAM_REASONS, type ScamReason, type ScamVerdict } from './screen/scam';
+export { gsm7Length, isGsm7, toGsm7, truncateGsm7 } from './text/gsm7';

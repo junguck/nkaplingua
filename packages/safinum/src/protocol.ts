@@ -1,3 +1,5 @@
+import type { TransactionStatus } from './status';
+
 /**
  * Contrat de la passerelle SAFINUM, tel que documenté sur https://safinum.cm/sandbox/docs.
  *
@@ -76,13 +78,6 @@ export interface UiReply {
   language: SafinumLanguage;
   strings: Record<string, string>;
 }
-
-/**
- * Statuts observés côté sandbox : `none` et `pending`. Les autres valeurs suivent le cycle
- * de l'API bancaire (`confirmed`, `cancelled`, `failed`) ; en cas de doute, `SAFINUM_STATUS_STRICT=1`
- * force l'envoi de `pending`, seule valeur confirmée par la documentation pour une transaction qui avance.
- */
-export type TransactionStatus = 'none' | 'pending' | 'confirmed' | 'cancelled' | 'failed';
 
 const SAFINUM_LANGUAGE_SET: ReadonlySet<string> = new Set(SAFINUM_LANGUAGES);
 

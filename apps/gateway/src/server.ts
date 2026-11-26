@@ -13,7 +13,7 @@ import http from 'node:http';
 import { fileURLToPath } from 'node:url';
 import type { AddressInfo } from 'node:net';
 import { Gateway } from './gateway.js';
-import type { InboundTurn } from './contract.js';
+import { statusModeFrom, type InboundTurn, type StatusMode } from '@nkap/safinum';
 import { loadEnv } from './env.js';
 
 loadEnv();
@@ -23,7 +23,7 @@ const MAX_BODY_BYTES = 512 * 1024;
 export interface ServerOptions {
   readonly teamKey: string;
   readonly bankUrl: string;
-  readonly strictStatus?: boolean;
+  readonly statusMode?: StatusMode;
   readonly log?: (line: string) => void;
 }
 
@@ -31,7 +31,7 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
   const gateway = new Gateway({
     teamKey: options.teamKey,
     bankUrl: options.bankUrl,
-    ...(options.strictStatus === undefined ? {} : { strictStatus: options.strictStatus }),
+    ...(options.statusMode === undefined ? {} : { statusMode: options.statusMode }),
   });
   const log = options.log ?? ((line: string) => console.log(line));
 
@@ -143,7 +143,7 @@ export function defaultOptions(): ServerOptions {
   return {
     teamKey: process.env.SAFINUM_TEAM_KEY ?? '',
     bankUrl,
-    strictStatus: process.env.SAFINUM_STATUS_STRICT === '1',
+    statusMode: statusModeFrom(process.env.SAFINUM_STATUS),
   };
 }
 

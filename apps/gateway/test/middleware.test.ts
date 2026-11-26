@@ -2,22 +2,16 @@ import fs from 'node:fs';
 import path from 'node:path';
 import type { AddressInfo } from 'node:net';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
+import { gsm7Length, isGsm7, toGsm7 } from '@nkap/core';
+import { SAFINUM_INTENTS, officialFee, officialTotal, type InboundTurn, type UssdReply } from '@nkap/safinum';
 import {
   Gateway,
   detectLanguage,
-  SAFINUM_INTENTS,
   DEMO_TEAM_KEY,
   InMemorySessions,
   createDemoServer,
   createMiddlewareServer,
-  gsm7Length,
-  isGsm7,
-  officialFee,
-  officialTotal,
-  toGsm7,
   type BankPort,
-  type InboundTurn,
-  type UssdReply,
   type DemoCall,
 } from '../src/index.js';
 
@@ -46,7 +40,8 @@ function turn(overrides: Partial<InboundTurn>): InboundTurn {
 /** Vérifie ce que la sandbox vérifierait : intention officielle, statut connu, GSM-7 et 182 septets. */
 function assertContract(reply: UssdReply): void {
   expect(SAFINUM_INTENTS).toContain(reply.interpretation.intent);
-  expect(['none', 'pending', 'confirmed', 'cancelled', 'failed']).toContain(reply.transaction.status);
+  // Mode contrat (défaut) : seules les valeurs observées sur la sandbox sortent (SANDBOX-SAFINUM §8).
+  expect(['none', 'pending']).toContain(reply.transaction.status);
   expect(typeof reply.response.text).toBe('string');
   expect(reply.response.text.length).toBeGreaterThan(0);
   expect(isGsm7(reply.response.text)).toBe(true);
@@ -133,7 +128,8 @@ describe('banque de démonstration et middleware (chaîne HTTP réelle)', () => 
     )) as UssdReply;
     assertContract(confirmed);
     expect(confirmed.interpretation.intent).toBe('CONFIRM');
-    expect(confirmed.transaction.status).toBe('confirmed');
+    // §8 : exécutée = `pending` + id de la transaction confirmée.
+    expect(confirmed.transaction).toEqual({ id: summary.transaction.id, status: 'pending' });
     expect(confirmed.response.text).toContain('244 950 FCFA');
 
     const confirmCall = calls.find((call) => call.path.endsWith('/confirm'));
@@ -153,7 +149,8 @@ describe('banque de démonstration et middleware (chaîne HTTP réelle)', () => 
     )) as UssdReply;
     assertContract(cancelled);
     expect(cancelled.interpretation.intent).toBe('CANCEL');
-    expect(cancelled.transaction.status).toBe('cancelled');
+    expect(cancelled.transaction.status).toBe('none');
+    expect(cancelled.transaction.id).toMatch(/^MBP/);
 
     const balance = (await gateway.handle(turn({ input: { type: 'menu', text: '1' } }))) as UssdReply;
     expect(balance.response.text).toContain('250 000 FCFA');
@@ -371,22 +368,16 @@ describe('language: null — la détection revient au middleware', () => {
   const local = () =>
     new Gateway({ teamKey: 'sbx_test', bankUrl: 'http://127.0.0.1:1', sessions: new InMemorySessions(), bankFactory: () => fake });
 
-  it('reconnaît le fulfulde et poursuit la session dans cette langue', async () => {
-    const gateway = local();
-    const session = 'detect-fub';
-    const first = (await gateway.handle(
-      turn({ session_id: session, language: null, input: { type: 'text', text: 'Mi yiɗi anndude ceede am keddiiɗe' } }),
+  it('reconnaît le fulfulde, comprend la demande et répond dans cette langue', async () => {
+    const reply = (await local().handle(
+      turn({ session_id: 'detect-fub', language: null, input: { type: 'text', text: 'Mi yiɗi anndude ceede am keddiiɗe' } }),
     )) as UssdReply;
-    expect(first.interpretation.language).toBe('fub');
-    // Le rendu GSM-7 translittère ɓ → b : « Suɓo » devient « Subo ».
-    expect(first.response.text).toContain('Subo');
-
-    const balance = (await gateway.handle(
-      turn({ session_id: session, language: null, input: { type: 'text', text: '1' } }),
-    )) as UssdReply;
-    expect(balance.interpretation.language).toBe('fub');
+    assertContract(reply);
+    expect(reply.interpretation).toMatchObject({ language: 'fub', intent: 'BALANCE_INQUIRY' });
     // ɗ → d au rendu GSM-7 : « keddiiɗe » s'affiche « keddiide ».
-    expect(balance.response.text).toContain('Ceede maa keddiide: 1 000 FCFA.');
+    expect(reply.response.text).toContain('Ceede maa keddiide: 1 000 FCFA.');
+    // Le solde clôt la session USSD : rien n'est gardé pour le tour suivant.
+    expect(reply.response.end_session).toBe(true);
   });
 
   it('reconnaît l’anglais', async () => {
@@ -394,7 +385,8 @@ describe('language: null — la détection revient au middleware', () => {
       turn({ language: null, input: { type: 'text', text: 'What is my balance?' } }),
     )) as UssdReply;
     expect(reply.interpretation.language).toBe('en');
-    expect(reply.response.text).toContain('Choose');
+    expect(reply.interpretation.intent).toBe('BALANCE_INQUIRY');
+    expect(reply.response.text).toContain('Your balance is 1 000 FCFA.');
   });
 
   it('reste en français sans indice, et une langue explicite gagne toujours', async () => {
@@ -422,5 +414,87 @@ describe('language: null — la détection revient au middleware', () => {
       turn({ session_id: session, language: null, input: { type: 'text', text: '1' } }),
     )) as UssdReply;
     expect(balance.interpretation.language).toBe('fub');
+  });
+});
+
+describe('texte libre sur USSD : compris par le moteur partagé', () => {
+  let bankUrl = '';
+  let demo: ReturnType<typeof createDemoServer>;
+  const calls: DemoCall[] = [];
+
+  beforeAll(async () => {
+    demo = createDemoServer({ onCall: (call) => calls.push(call) });
+    await new Promise<void>((resolve) => demo.server.listen(0, '127.0.0.1', resolve));
+    bankUrl = `http://127.0.0.1:${(demo.server.address() as AddressInfo).port}/api/v1`;
+  });
+
+  afterAll(async () => {
+    await new Promise<void>((resolve) => demo.server.close(() => resolve()));
+  });
+
+  beforeEach(() => {
+    demo.bank.reset();
+    calls.length = 0;
+  });
+
+  it('« Neldu ujineere jowi ka Aicha » : bénéficiaire et montant en une phrase, confirmation au tour suivant', async () => {
+    const gateway = new Gateway({ teamKey: DEMO_TEAM_KEY, bankUrl, sessions: new InMemorySessions() });
+    const session = 'libre-fub';
+    const summary = (await gateway.handle(
+      turn({ session_id: session, trace_id: 'libre-1', input: { type: 'text', text: 'Neldu ujineere jowi ka Aicha' } }),
+    )) as UssdReply;
+    assertContract(summary);
+    expect(summary.interpretation).toMatchObject({ intent: 'TRANSFER', language: 'fub' });
+    expect(summary.interpretation.parameters).toMatchObject({ amount: 5000, fee: 50, total: 5050, beneficiary_phone: '690000002' });
+    expect(summary.transaction.status).toBe('pending');
+    expect(calls.some((c) => c.path.includes('/beneficiaries') && c.traceId === 'libre-1')).toBe(true);
+    // Un écran = une langue : les options suivent la langue de la réponse.
+    expect(summary.response.options).toEqual(['Tabbitin', 'Haaytu', 'Waylu']);
+
+    const done = (await gateway.handle(turn({ session_id: session, trace_id: 'libre-2', input: { type: 'text', text: '1' } }))) as UssdReply;
+    expect(done.interpretation.intent).toBe('CONFIRM');
+    expect(calls.find((c) => c.path.endsWith('/confirm'))?.traceId).toBe('libre-2');
+  });
+
+  it('montant sans bénéficiaire : on demande, sans deviner, et le jury voit le montant extrait', async () => {
+    const gateway = new Gateway({ teamKey: DEMO_TEAM_KEY, bankUrl, sessions: new InMemorySessions() });
+    const reply = (await gateway.handle(turn({ session_id: 'libre-2', input: { type: 'text', text: 'Envoie 3000' } }))) as UssdReply;
+    assertContract(reply);
+    expect(reply.interpretation.intent).toBe('CLARIFICATION_NEEDED');
+    expect(reply.interpretation.parameters).toMatchObject({ amount: 3000, currency: 'XAF' });
+    expect(calls.some((c) => c.method === 'POST')).toBe(false);
+  });
+
+  it('une saisie incomprise renvoie le menu, jamais une intention inventée', async () => {
+    const gateway = new Gateway({ teamKey: DEMO_TEAM_KEY, bankUrl, sessions: new InMemorySessions() });
+    const reply = (await gateway.handle(turn({ session_id: 'libre-3', input: { type: 'text', text: 'blabla' } }))) as UssdReply;
+    assertContract(reply);
+    expect(reply.interpretation.intent).toBe('CLARIFICATION_NEEDED');
+    expect(reply.response.text).toContain('1. ');
+  });
+
+  it('choix de langue invalide : on reste sur la question de langue', async () => {
+    const gateway = new Gateway({ teamKey: DEMO_TEAM_KEY, bankUrl, sessions: new InMemorySessions() });
+    const session = 'libre-langue';
+    await gateway.handle(turn({ session_id: session, input: { type: 'menu', text: '8' } }));
+    await gateway.handle(turn({ session_id: session, input: { type: 'menu', text: '9' } }));
+    const chosen = (await gateway.handle(turn({ session_id: session, input: { type: 'menu', text: '2' } }))) as UssdReply;
+    expect(chosen.interpretation).toMatchObject({ intent: 'LANGUAGE_SWITCH', language: 'en' });
+  });
+
+  it('mode `lifecycle` : le cycle bancaire brut, à n’activer qu’après validation sur la sandbox', async () => {
+    const gateway = new Gateway({ teamKey: DEMO_TEAM_KEY, bankUrl, sessions: new InMemorySessions(), statusMode: 'lifecycle' });
+    const session = 'libre-cycle';
+    await gateway.handle(turn({ session_id: session, input: { type: 'text', text: 'Neldu ujineere jowi ka Aicha' } }));
+    const done = (await gateway.handle(turn({ session_id: session, input: { type: 'text', text: '1' } }))) as UssdReply;
+    expect(done.transaction.status).toBe('confirmed');
+  });
+
+  it('choix du crédit : la liste traduite n’apparaît qu’une fois', async () => {
+    const gateway = new Gateway({ teamKey: DEMO_TEAM_KEY, bankUrl, sessions: new InMemorySessions() });
+    const reply = (await gateway.handle(turn({ session_id: 'libre-credit', language: 'en', input: { type: 'menu', text: '5' } }))) as UssdReply;
+    assertContract(reply);
+    expect(reply.response.text.match(/My number/g)).toHaveLength(1);
+    expect(reply.response.text).not.toContain('Mon numero');
   });
 });

@@ -81,3 +81,18 @@ describe('bulle — fiche claire multilingue à valeurs verrouillées', () => {
     expect(card.alerts).toEqual([{ level: 'info', text: 'I see no amount and no risky message on this screen.' }]);
   });
 });
+
+describe('sortie USSD GSM-7 (formatForChannel)', () => {
+  it('translittère le fulfulde et tient en 182 septets', async () => {
+    const { CHANNEL_PROFILES } = await import('@nkap/contracts');
+    const { formatForChannel, isGsm7, gsm7Length } = await import('../src');
+    const { harness } = await import('./helpers');
+    const h = harness('fub');
+    const r = await h.say('Neldu ujineere jowi ka Fadimatou', { channel: 'ussd' });
+    const out = formatForChannel(r.reply, CHANNEL_PROFILES.ussd);
+    expect(isGsm7(out)).toBe(true);
+    expect(gsm7Length(out)).toBeLessThanOrEqual(182);
+    expect(out).toContain('5 000 FCFA');
+    expect(r.trace.response).toBe(out);
+  });
+});
