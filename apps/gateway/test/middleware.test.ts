@@ -510,7 +510,7 @@ describe('texte libre sur USSD : compris par le moteur partagé', () => {
   });
 });
 
-describe('écrans mobile/web : traduction clé par clé (kit officiel)', () => {
+describe('écrans mobile/web : règles de la documentation sandbox', () => {
   const screen = (language: string, strings: Record<string, { text: string; max_chars?: number | null }>): InboundTurn => ({
     trace_id: 'ui',
     channel: 'mobile',
@@ -520,35 +520,110 @@ describe('écrans mobile/web : traduction clé par clé (kit officiel)', () => {
     strings,
   });
   const gateway = new Gateway({ teamKey: 'k', bankUrl: '', bankFactory: () => ({}) as BankPort });
+  type Screen = { language: string; strings: Record<string, string> };
 
-  it('une clé sans traduction est omise, le reste part dans la langue demandée', async () => {
-    const strings = Object.fromEntries(
-      ['nav.home', 'nav.transfer', 'nav.pay', 'nav.history', 'common.back', 'common.cancel', 'common.continue', 'shell.secure'].map((k) => [k, { text: k }]),
-    );
-    const reply = (await gateway.handle(screen('fub', strings))) as { language: string; strings: Record<string, string> };
+  it('« Renvoyez toutes les clés » : une clé sans traduction part en français, jamais omise', async () => {
+    const keys = ['nav.home', 'nav.transfer', 'nav.pay', 'nav.history', 'common.back', 'common.cancel', 'common.continue', 'shell.secure'];
+    const reply = (await gateway.handle(screen('fub', Object.fromEntries(keys.map((k) => [k, { text: `fr:${k}` }]))))) as Screen;
     expect(reply.language).toBe('fub');
+    expect(Object.keys(reply.strings).sort()).toEqual([...keys].sort());
     expect(reply.strings['nav.home']).toBe('Fuɗɗorde');
-    expect(reply.strings).not.toHaveProperty('shell.secure');
+    expect(reply.strings['shell.secure']).toBe('fr:shell.secure');
   });
 
-  it('un emplacement cassé ou un dépassement de max_chars n’est jamais envoyé', async () => {
+  it('un emplacement cassé ou un dépassement de max_chars n’est jamais envoyé (texte français à la place)', async () => {
     const reply = (await gateway.handle(
       screen('en', {
         'nav.home': { text: 'Accueil', max_chars: 3 },
         'shell.greeting': { text: 'Bonjour {name}' },
         'common.back': { text: 'Retour' },
         'common.cancel': { text: 'Annuler' },
+        'common.continue': { text: 'Continuer' },
       }),
-    )) as { language: string; strings: Record<string, string> };
+    )) as Screen;
     expect(reply.language).toBe('en');
-    expect(reply.strings).not.toHaveProperty('nav.home');
+    expect(reply.strings['nav.home']).toBe('Accueil');
     expect(reply.strings['shell.greeting']).toBe('Hello {name}');
   });
 
-  it('sous 75 % de clés traduites : tout en français, déclaré `fr`', async () => {
+  it('plus d’un quart de textes identiques au français : tout en français, déclaré `fr` (évite UNTRANSLATED)', async () => {
     const reply = (await gateway.handle(
       screen('fub', { 'shell.secure': { text: 'Connexion sécurisée' }, 'inconnue.a': { text: 'A' }, 'nav.home': { text: 'Accueil' } }),
-    )) as { language: string; strings: Record<string, string> };
+    )) as Screen;
     expect(reply).toEqual({ language: 'fr', strings: { 'shell.secure': 'Connexion sécurisée', 'inconnue.a': 'A', 'nav.home': 'Accueil' } });
   });
 });
+
+describe('scénario jury « correction » : frais RECALCULÉS (doc sandbox)', () => {
+  it('la banque ne renvoie pas de frais à l’update : GET /fees est rappelé, jamais les anciens frais', async () => {
+    const feeCalls: number[] = [];
+    const tx = (amount: number, fee = 0, total = 0) =>
+      ({ ok: true, status: 200, data: { id: 'TX-1', status: 'pending', type: 'transfer', amount, fee, total, to: '690000002' } }) as const;
+    const bank: BankPort = {
+      account: async () => ({ ok: true, status: 200, data: { phone: PHONE, holder: 'Test', balance: 900_000, currency: 'XAF' } }),
+      fees: async (_type, amount) => {
+        feeCalls.push(amount);
+        const fee = officialFee('transfer', amount) ?? 0;
+        return { ok: true, status: 200, data: { amount, fee, total: amount + fee, currency: 'XAF' } };
+      },
+      history: async () => ({ ok: true, status: 200, data: [] }),
+      beneficiaries: async () => ({ ok: true, status: 200, data: [] }),
+      billers: async () => ({ ok: true, status: 200, data: [] }),
+      create: async (input) => tx(input.amount, 50, input.amount + 50),
+      update: async (_id, patch) => tx(patch.amount ?? 0), // ni frais ni total : réponse minimale
+      confirm: async () => tx(0),
+      cancel: async () => tx(0),
+    };
+    const gateway = new Gateway({ teamKey: 'k', bankUrl: '', sessions: new InMemorySessions(), bankFactory: () => bank });
+    const session = 'correction-frais';
+    await gateway.handle(turn({ session_id: session, input: { type: 'menu', text: '2' } }));
+    await gateway.handle(turn({ session_id: session, input: { type: 'menu', text: OTHER } }));
+    await gateway.handle(turn({ session_id: session, input: { type: 'menu', text: '5000' } }));
+    const recap = (await gateway.handle(turn({ session_id: session, input: { type: 'menu', text: '30000' } }))) as UssdReply;
+    expect(recap.interpretation.intent).toBe('CORRECTION');
+    expect(recap.interpretation.parameters).toMatchObject({ amount: 30_000, fee: 400, total: 30_400 });
+    expect(feeCalls).toContain(30_000);
+  });
+});
+
+describe('langues de la sandbox : comprendre sans prétendre répondre', () => {
+  let bankUrl = '';
+  let demo: ReturnType<typeof createDemoServer>;
+  beforeAll(async () => {
+    demo = createDemoServer();
+    await new Promise<void>((resolve) => demo.server.listen(0, '127.0.0.1', resolve));
+    bankUrl = `http://127.0.0.1:${(demo.server.address() as AddressInfo).port}/api/v1`;
+  });
+  afterAll(async () => {
+    await new Promise<void>((resolve) => demo.server.close(() => resolve()));
+  });
+  beforeEach(() => demo.bank.reset());
+
+  it('duala (Helmlinger 1972) : « Lôma 5000 na Aicha » est compris, la réponse française est DÉCLARÉE fr', async () => {
+    const gateway = new Gateway({ teamKey: DEMO_TEAM_KEY, bankUrl, sessions: new InMemorySessions() });
+    const session = 'dua-1';
+    const recap = (await gateway.handle(turn({ session_id: session, language: 'dua', input: { type: 'text', text: 'Lôma 5000 na Aicha' } }))) as UssdReply;
+    assertContract(recap);
+    expect(recap.interpretation.intent).toBe('TRANSFER');
+    expect(recap.interpretation.parameters).toMatchObject({ amount: 5000, beneficiary_phone: '690000002' });
+    // Pas de catalogue duala relu : on ne prétend pas parler duala.
+    expect(recap.interpretation.language).toBe('fr');
+
+    const done = (await gateway.handle(turn({ session_id: session, language: 'dua', input: { type: 'text', text: 'Ee' } }))) as UssdReply;
+    expect(done.interpretation.intent).toBe('CONFIRM');
+    expect(done.transaction.status).toBe('confirmed');
+  });
+
+  it('duala : « kém » annule ; « Non, 3000 » reste une correction', async () => {
+    const gateway = new Gateway({ teamKey: DEMO_TEAM_KEY, bankUrl, sessions: new InMemorySessions() });
+    await gateway.handle(turn({ session_id: 'dua-2', input: { type: 'text', text: 'Lôma 5000 na Aicha' } }));
+    const cancelled = (await gateway.handle(turn({ session_id: 'dua-2', input: { type: 'text', text: 'kém' } }))) as UssdReply;
+    expect(cancelled.interpretation.intent).toBe('CANCEL');
+
+    await gateway.handle(turn({ session_id: 'fr-corr', input: { type: 'text', text: 'Envoie 5000 à Aicha' } }));
+    const corrected = (await gateway.handle(turn({ session_id: 'fr-corr', input: { type: 'text', text: 'Non, 3000' } }))) as UssdReply;
+    expect(corrected.interpretation.intent).toBe('CORRECTION');
+    expect(corrected.interpretation.parameters).toMatchObject({ amount: 3000, fee: 50, total: 3050 });
+  });
+});
+

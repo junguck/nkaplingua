@@ -8,7 +8,7 @@
  */
 
 import { BILLERS, type IntentName } from '@nkap/contracts';
-import { interpret } from '@nkap/core';
+import { CANCEL_CUES, CONFIRM_CUES, fold, interpret, scanNumbers, startsWithCue } from '@nkap/core';
 import { toSafinumIntent, type SafinumIntent } from '@nkap/safinum';
 import type { GatewayLanguage } from './i18n.js';
 
@@ -93,3 +93,21 @@ function toRoute(
       return null;
   }
 }
+
+/** « Oui » dans toutes les langues du lexique (Eey, Owé, Ee, bâmse…), en tête de saisie. */
+export function isConfirmation(text: string): boolean {
+  const folded = fold(text);
+  return CONFIRM_CUES.some(([cue]) => startsWithCue(folded, cue));
+}
+
+/** « Non / annuler » dans toutes les langues du lexique (Ala, Haaytu, kém, wunja…), en tête de saisie. */
+export function isCancellation(text: string): boolean {
+  const folded = fold(text);
+  return CANCEL_CUES.some(([cue]) => startsWithCue(folded, cue)) || startsWithCue(folded, 'haaytu');
+}
+
+/** Montant dans une phrase (« Non, 3000 », « trois mille », « 5k ») ; les numéros de téléphone sont exclus. */
+export function amountIn(text: string): number | null {
+  return scanNumbers(fold(text)).amounts[0] ?? null;
+}
+

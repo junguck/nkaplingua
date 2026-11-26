@@ -1,14 +1,13 @@
 /**
  * Canaux mobile et web : on ne converse pas, on traduit les chaînes d'un écran.
  *
- * Règle du kit officiel SAFINUM, appliquée clé par clé :
- *   - traduction valide (non vide, emplacements `{x}` identiques, `max_chars` respecté) → envoyée ;
- *   - sinon la clé est OMISE : l'appli affiche le français pour cette clé et la sandbox le signale
- *     (`MISSING_STRINGS`). On n'envoie jamais une valeur qui casserait l'écran (`PLACEHOLDER_BROKEN`).
- *
- * Garde-fou d'honnêteté : sous {@link MIN_COVERAGE} de clés traduites, l'écran serait presque
- * français sous une étiquette nationale (et tomberait sous `UNTRANSLATED`) : on renvoie alors tout
- * en français, déclaré `fr`.
+ * Règles de la documentation de la sandbox, appliquées clé par clé :
+ *   - « Renvoyez toutes les clés » : une clé absente s'affiche en français ET la trace est marquée
+ *     `MISSING_STRINGS`. Une clé sans traduction valide part donc avec son texte français ;
+ *   - emplacements `{x}` supprimés ou renommés → `PLACEHOLDER_BROKEN` : jamais envoyés ;
+ *   - `max_chars` dépassé → `OVER_LENGTH` : jamais envoyé ;
+ *   - plus d'un quart des textes identiques au français → `UNTRANSLATED`. Au-delà de ce seuil,
+ *     l'écran est surtout français : on le DÉCLARE `fr` plutôt que de prétendre l'avoir traduit.
  */
 
 import type { InboundTurn, UiReply, UiStringEntry } from '@nkap/safinum';
@@ -21,8 +20,8 @@ export interface UiCoverage {
   readonly tooLong: readonly string[];
 }
 
-/** Part minimale de clés traduites pour déclarer la langue demandée (la sandbox tolère 25 % de français). */
-export const MIN_COVERAGE = 0.75;
+/** Part maximale de textes identiques au français tolérée par la sandbox avant `UNTRANSLATED`. */
+export const MAX_FRENCH_SHARE = 0.25;
 
 const PLACEHOLDER = /\{([a-z_]+)\}/g;
 
@@ -41,13 +40,16 @@ export function translate(
   if (!dictionary) return { language: 'fr', strings: plain(source) };
 
   const strings: Record<string, string> = {};
+  let french = 0;
   for (const [key, entry] of Object.entries(source)) {
     const value = dictionary[key];
-    if (isValidTranslation(entry, value)) strings[key] = value;
+    const text = isValidTranslation(entry, value) ? value : entry.text;
+    if (text === entry.text) french += 1;
+    strings[key] = text;
   }
 
   const total = Object.keys(source).length;
-  if (total > 0 && Object.keys(strings).length / total < MIN_COVERAGE) return { language: 'fr', strings: plain(source) };
+  if (total > 0 && french / total > MAX_FRENCH_SHARE) return { language: 'fr', strings: plain(source) };
   return { language, strings };
 }
 

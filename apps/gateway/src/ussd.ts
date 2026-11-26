@@ -21,7 +21,7 @@ import {
   type UssdReply,
 } from '@nkap/safinum';
 import type { BankFailure, BankPort, FeeType } from './bank.js';
-import { understandFreeText, type Understood } from './free-text.js';
+import { amountIn, isCancellation, isConfirmation, understandFreeText, type Understood } from './free-text.js';
 import {
   MENU_KEYS,
   displayPhone,
@@ -545,7 +545,7 @@ async function atConfirmation(
 
   const value = text.trim().toLowerCase();
 
-  if (value === '1' || ['oui', 'yes', 'eey', 'confirmer', 'confirm', 'tabbitin'].includes(value)) {
+  if (value === '1' || isConfirmation(text)) {
     const contact = pending.type === 'transfer' ? deps.secondLook?.applies(phone, pending.total) : undefined;
     if (deps.secondLook && contact) {
       const request = await deps.secondLook.open(
@@ -604,7 +604,8 @@ async function atConfirmation(
     );
   }
 
-  if (value === '2' || ['non', 'no', 'annuler', 'cancel', 'haaytu'].includes(value)) {
+  // « Non, 3000 » est une CORRECTION (scénario du jury) : une saisie avec un nombre n'annule jamais.
+  if (value === '2' || (isCancellation(text) && !/\d/.test(text))) {
     return cancelPending(state, deps, language);
   }
 
@@ -614,8 +615,8 @@ async function atConfirmation(
     return keep(reply(language, message(language, 'ask.amount'), 'CORRECTION'));
   }
 
-  // L'utilisateur tape directement un nouveau montant après le récapitulatif : c'est une correction.
-  const amount = parseAmount(text);
+  // L'utilisateur tape directement un nouveau montant après le récapitulatif (« 3000 », « Non, 3000 ») : correction.
+  const amount = parseAmount(text) ?? amountIn(text);
   if (amount !== null) {
     const correction = await applyCorrection(state, text, phone, deps, language);
     if (correction) return correction;
@@ -639,19 +640,26 @@ async function applyCorrection(
 ): Promise<Outcome | null> {
   const pending = state.pending;
   if (!pending) return null;
-  const amount = parseAmount(text);
+  const amount = parseAmount(text) ?? amountIn(text);
   if (amount === null) return null;
   if (amount > MAX_AMOUNT) return keep(limitReply(language));
 
   const result = await deps.bank.update(pending.id, { amount });
   if (!result.ok) return failure(result, 'CORRECTION', language, pending.id);
   const tx = result.data;
+  const newAmount = tx.amount || amount;
+
+  // Scénario « correction » du jury : les frais doivent être RECALCULÉS pour le nouveau montant.
+  // On redemande toujours GET /fees (visible dans le journal) ; jamais les frais de l'ancien montant.
+  const fees = await deps.bank.fees(pending.type, newAmount);
+  const quote = fees.ok ? fees.data : fallbackQuote(pending.type, newAmount);
+  const fee = tx.fee && tx.amount === newAmount ? tx.fee : quote.fee;
 
   state.pending = {
     ...pending,
-    amount: tx.amount || amount,
-    fee: tx.fee || pending.fee,
-    total: tx.total || tx.amount + pending.fee,
+    amount: newAmount,
+    fee,
+    total: tx.total && tx.amount === newAmount ? tx.total : newAmount + fee,
   };
   state.step = 'confirm';
 

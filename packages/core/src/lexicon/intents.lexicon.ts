@@ -9,6 +9,16 @@ import type { CueSpec, IntentLexicon } from './types';
  * (statut « proposé », jamais relus par un locuteur). Une intention absente pour ces langues
  * veut dire « aucun mot attesté », pas « aucun mot n'existe » : à compléter avec des locuteurs.
  * Les indices sont comparés après repli (ɔ→o, ə→e, ŋ→ng, tons et apostrophes supprimés).
+ *
+ * Duala (`dua`) : formes ATTESTÉES dans Helmlinger, *Dictionnaire duala-français suivi d'un lexique
+ * français-duala*, Klincksieck, 1972 (texte intégral Internet Archive, identifiant `duala`), lexique
+ * français-duala : argent « mbolo, moni », envoyer « lôma », acheter « anda », aider « ôngwane »,
+ * compte « musongi », confirmer « bâmse », non « kém », annuler (une décision) « wunja ». L'OCR abîme
+ * ɛ/ɔ : seules des formes repliées servent à RECONNAÎTRE une saisie, jamais à afficher du duala.
+ *
+ * Ghomala (`bbj`) : *Dictionnaire Ghomálá'-Français* (PDF, lielatatomdjap.org). Les entrées sont dans une
+ * police à encodage propriétaire ; seules les « 2e formes » imprimées en clair sont reprises : envoyer
+ * « shyaàa », acheter/payer « joà ». « ŋkáp » (argent) figure dans le glossaire de la présélection.
  */
 export const INTENT_CUES: IntentLexicon = {
   CHECK_BALANCE: {
@@ -16,6 +26,9 @@ export const INTENT_CUES: IntentLexicon = {
     en: [['balance', 3], ['how much do i have', 3], ['how much is left', 3]],
     wes: [['balans', 3], ['moni wey remain', 3], ['haw moch i get', 3], ['wetin remain', 3]],
     fub: [['keddii*', 3], ['heddii*', 3], ['ceede am', 1], ['ceede maa', 1]],
+    // Duala : « combien d'argent (me reste-t-il) » — mbolo/moni (argent), musongi (compte), Helmlinger 1972.
+    dua: [['mbolo', 1], ['moni', 1], ['musongi', 2]],
+    bbj: [['nkap', 1], ['ngkap', 1]],
     ewo: [['mɔni a lig', 3], ['lig a nkɔp', 2], ['nkɔp', 1]],
   },
   TRANSFER: {
@@ -23,6 +36,8 @@ export const INTENT_CUES: IntentLexicon = {
     en: [['send', 3], ['transfer', 3], ['give', 1]],
     wes: [['sen', 3], ['sen moni', 3], ['giv', 1]],
     fub: [['neld*', 3], ['hokku', 1]],
+    dua: [['loma*', 3]],
+    bbj: [['shyaa*', 3]],
     ewo: [['lom', 3], ['lom moni', 3]],
     bul: [['lom*', 3], ['lom mone', 3]],
   },
@@ -50,6 +65,7 @@ export const INTENT_CUES: IntentLexicon = {
     en: [['bill', 3], ['pay', 1], ['electricity', 2]],
     wes: [['bill', 3], ['pay', 1], ['light bill', 3], ['wata bill', 3]],
     fub: [['fakture', 3], ['yoɓ*', 1]],
+    bbj: [['joa', 2]],
     ewo: [['yanər', 1]],
     bul: [["ya'ane", 1]],
   },
@@ -78,6 +94,7 @@ export const INTENT_CUES: IntentLexicon = {
     en: [['help', 3], ['menu', 2]],
     wes: [['hep', 3], ['help', 3]],
     fub: [['ballal', 3], ['wallu', 2]],
+    dua: [['ongwane', 3]],
     ewo: [['voili', 3]],
   },
 };
@@ -94,6 +111,7 @@ export const CONFIRM_CUES: readonly CueSpec[] = [
   ['ehen', 3], ['na so', 3], ['confam', 3],
   ['eey', 3], ['ee', 3], ['tabbitin', 3],
   ['owe', 3], // ewondo « Owé » (term.yes)
+  ['bamse', 3], // duala « bâmse » (confirmer), Helmlinger 1972 ; « Ee » (oui) est déjà couvert par « ee »
 ];
 
 export const CANCEL_CUES: readonly CueSpec[] = [
@@ -101,6 +119,7 @@ export const CANCEL_CUES: readonly CueSpec[] = [
   ['no', 3], ['cancel', 3],
   ['cancel am', 3], ['lef am', 3], ['no be dat', 2],
   ['ala', 3], ['accu', 3], ['haɗ', 2],
+  ['kem', 3], ['wunja', 3], // duala « kém » (non), « wunja » (annuler une décision), Helmlinger 1972
 ];
 
 /** Correction en tête d'énoncé : « non, 3000 », « ala, … », « sorry, … ». */
