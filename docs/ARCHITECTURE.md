@@ -21,8 +21,9 @@
 |---|---|---|
 | `@nkap/contracts` | Le **contrat** : intentions canoniques, paramètres, tours, traces, port financier, schémas zod | zod |
 | `@nkap/core` | Le **moteur** : pur TypeScript, sans DOM, sans réseau. Tourne dans Node, le navigateur, React Native | contracts |
-| `@nkap/banking-sim` | Backend simulé conforme au port (comptes, frais, plafonds, idempotence) | contracts |
-| `apps/gateway` *(J1)* | API REST + webhooks USSD/SMS + flux de traces | core |
+| `@nkap/safinum` | Ce que la sandbox impose : protocole, 13 intentions, langues, grille de frais officielle, statuts (§8) | contracts |
+| `@nkap/banking-sim` | Backend simulé conforme au port (comptes, frais officiels, plafonds, idempotence) | contracts, safinum |
+| `apps/gateway` | Middleware SAFINUM (`ussd`, `mobile`, `web`) : menus USSD + texte libre compris par le moteur, `ui_translation`, adaptateur bancaire, mode hors-ligne | core, safinum |
 | `@nkap/client` | Port `NkapClient`, client embarqué, stores partagés, fiche de la bulle | core, banking-sim |
 | `@nkap/react` | Provider + hooks (`useSyncExternalStore`) pour le web et React Native | client |
 | `apps/web` | Banque en ligne simulée + assistant (Next.js, shadcn/ui) | react |

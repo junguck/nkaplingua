@@ -26,7 +26,7 @@ altérer un montant, un nom ou un numéro**.
 | **Contrat** `@nkap/contracts` | intentions canoniques, tours, traces jury (§6.D), port financier, schémas zod |
 | **Banque simulée** `@nkap/banking-sim` | comptes, contacts, grilles de frais, plafonds, historique, codes de retrait |
 | **Mode hors-ligne** | menus USSD pré-traduits servis depuis un cache local quand la banque est injoignable ; corrections mises en file puis synchronisées ([ADR 0005](docs/adr/0005-mode-hors-ligne-ussd.md)) |
-| **Tests** | **102/102**, dont les **10 scénarios standardisés du §7** joués de bout en bout et 18 tests du middleware SAFINUM |
+| **Tests** | **139/139**, dont les **10 scénarios standardisés du §7** joués de bout en bout et 43 tests du middleware SAFINUM |
 
 ## Ce qui est prêt (J2 — clients)
 
@@ -42,20 +42,22 @@ altérer un montant, un nom ou un numéro**.
 
 | | |
 |---|---|
-| **Middleware** `apps/gateway` | `POST /middleware/:channel` pour `ussd`, `mobile` et `web` ; `SafinumBank` (`X-Team-Key`, `X-Trace-Id`), intentions officielles, cycle `pending → confirm`, grille de frais officielle, sortie GSM-7, dictionnaires `ui_translation` |
+| **Middleware** `apps/gateway` | `POST /middleware/:channel` pour `ussd`, `mobile` et `web` ; `SafinumBank` (`X-Team-Key`, `X-Trace-Id`), cycle `pending → confirm` au tour suivant, sortie GSM-7, dictionnaires `ui_translation`, **texte libre compris par le moteur partagé** (« Neldu ujineere jowi ka Aicha » → récapitulatif direct) |
+| **Contrat SAFINUM** `@nkap/safinum` | protocole, 13 intentions officielles, langues, grille de frais (seule copie), statuts conformes au §8 ([ADR 0006](docs/adr/0006-middleware-sur-le-moteur-partage.md)) |
 | **Banque de démonstration** `apps/gateway/src/demo` | mêmes routes et codes d'erreur que l'API SAFINUM, pour tester sans clé d'équipe |
-| **Branchement** | [`docs/GUIDE-SAFINUM.md`](docs/GUIDE-SAFINUM.md) : clé, tunnel, déclaration des trois canaux, dépannage |
+| **Branchement** | [`docs/INNOVATIONS.md`](docs/INNOVATIONS.md) | Quatre pistes d'innovation : anti-arnaque par message, second regard et aller-retour de vérification implémentés ; corrections communautaires à arbitrer |
+| [`docs/GUIDE-SAFINUM.md`](docs/GUIDE-SAFINUM.md) : clé, tunnel, déclaration des trois canaux, dépannage |
 
-Reste : la **clé d'équipe `sbx_…`** pour publier l'endpoint dans la sandbox, la console jury, la voix —
-voir [`docs/ROADMAP.md`](docs/ROADMAP.md).
+Reste : une **clé d'équipe `sbx_…` acceptée par la sandbox** (celle fournie le 26/11 est refusée en 401),
+le tunnel et la déclaration des trois canaux, la console jury, la voix — voir [`docs/ROADMAP.md`](docs/ROADMAP.md).
 
 ## Démarrer
 
 ```bash
 corepack enable            # pnpm 10
 pnpm install
-pnpm test                  # 91 tests, < 3 s
-pnpm typecheck             # TypeScript strict, zéro any (paquets + web + mobile + gateway)
+pnpm test                  # 139 tests, < 5 s
+pnpm typecheck             # TypeScript strict, zéro any (9 projets)
 
 pnpm dev:web               # http://localhost:3000 — banque en ligne + assistant
 pnpm demo:bank             # banque fictive SAFINUM sur http://127.0.0.1:8788/api/v1
@@ -73,9 +75,9 @@ autoriser la superposition et « Lecture d'écran à la demande » → **Lancer 
 | Document | Contenu |
 |---|---|
 | [`docs/BRAINSTORM.md`](docs/BRAINSTORM.md) | De l'idée « Shazam de la finance » au produit : ce qu'on garde, ce qu'on change, pourquoi |
-| [`docs/ROADMAP.md`](docs/ROADMAP.md) | Plan des 3 jours, priorités P0/P1/P2, correspondance avec les livrables §11 |
+| [`docs/ROADMAP.md`](docs/ROADMAP.md) | Ce qui reste à faire, par priorité, et correspondance avec les livrables §11 |
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Architecture, technologie linguistique, intégration, sécurité, scalabilité |
-| [`docs/adr/`](docs/adr/) | Décisions d'architecture et leurs compromis (0001–0005, dont le mode hors-ligne USSD) |
+| [`docs/adr/`](docs/adr/) | Décisions d'architecture et leurs compromis (0001–0006 : moteur, bulle, contrat, clients, hors-ligne USSD, middleware sur le moteur partagé) |
 | [`docs/SANDBOX-SAFINUM.md`](docs/SANDBOX-SAFINUM.md) | Contrat de la sandbox SAFINUM, règles d'évaluation, écarts corrigés |
 | [`docs/GUIDE-SAFINUM.md`](docs/GUIDE-SAFINUM.md) | Brancher le middleware : clé, tunnel, déclaration des trois canaux, dépannage |
 | [`preselection/`](preselection/) | Dossier de la phase de présélection (extension v1.1, vidéo, notes) |
@@ -86,17 +88,18 @@ autoriser la superposition et « Lecture d'écran à la demande » → **Lancer 
 packages/
   contracts/     le contrat partagé par tous les canaux et toutes les institutions
   core/          le moteur linguistique (pur TypeScript : Node, navigateur, React Native)
-    src/text/      normalisation, lecture des montants, formatage déterministe
+    src/text/      normalisation, lecture des montants, formatage déterministe, GSM-7
     src/lexicon/   intentions, messages, terminologie, langues — avec statut de validation
     src/nlu/       langue, entités, intention, interprétation
     src/dialogue/  machine à états, session, fusion des corrections
     src/render/    rendu verrouillé par langue, mise en forme par canal
     src/screen/    lecture ponctuelle d'un écran tiers (bulle, extension) + anti-arnaque
+  safinum/       ce que la sandbox SAFINUM impose : protocole, intentions, langues, frais, statuts
   banking-sim/   backend financier simulé (remplaçable par l'adaptateur SAFINUM)
   client/        port NkapClient, client embarqué, stores partagés web/mobile, libellés d'interface
   react/         provider + hooks React (web et React Native)
 apps/
-  gateway/       middleware SAFINUM : USSD, écrans mobile/web, adaptateur bancaire, banque de démo
+  gateway/       middleware SAFINUM : USSD (menus + texte libre), écrans mobile/web, adaptateur bancaire, banque de démo
   web/           Next.js + shadcn/ui : banque en ligne simulée + assistant
   mobile/        Expo : tableau de bord, assistant, réglages de la bulle
     modules/nkap-bubble/  module natif Kotlin de la bulle (+ jvm-check : compilation sans SDK)
@@ -115,4 +118,4 @@ non validées **doivent** être relues par des locuteurs natifs avant la démons
 **Haoussa (`hau`)** : 65 entrées sur 129 (54 termes et 11 libellés d'interface) ont été ajoutées au glossaire de
 l'extension (`apps/extension/glossary/hau.json`) à partir d'enregistrements audio transcrits automatiquement. Toutes sont
 « proposées » et à relire par des locuteurs natifs ; les phrases `ph.*` restent à traduire (repli français). Le haoussa
-n'est pas encore servi par le middleware.
+n'est pas encore servi par le middleware. Dans le moteur, `hau` est un code de langue du contrat (détection par mots distinctifs, statut « proposé ») : tant que les gabarits ne sont pas traduits, il retombe sur le français et le signale.

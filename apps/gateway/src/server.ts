@@ -13,7 +13,7 @@ import http from 'node:http';
 import { fileURLToPath } from 'node:url';
 import type { AddressInfo } from 'node:net';
 import { Gateway } from './gateway.js';
-import type { InboundTurn } from './contract.js';
+import { statusModeFrom, type InboundTurn, type StatusMode } from '@nkap/safinum';
 import { loadEnv } from './env.js';
 
 loadEnv();
@@ -23,7 +23,7 @@ const MAX_BODY_BYTES = 512 * 1024;
 export interface ServerOptions {
   readonly teamKey: string;
   readonly bankUrl: string;
-  readonly strictStatus?: boolean;
+  readonly statusMode?: StatusMode;
   readonly log?: (line: string) => void;
 }
 
@@ -31,7 +31,7 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
   const gateway = new Gateway({
     teamKey: options.teamKey,
     bankUrl: options.bankUrl,
-    ...(options.strictStatus === undefined ? {} : { strictStatus: options.strictStatus }),
+    ...(options.statusMode === undefined ? {} : { statusMode: options.statusMode }),
   });
   const log = options.log ?? ((line: string) => console.log(line));
 
@@ -56,6 +56,20 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
           teamKeyConfigured: options.teamKey.length > 0,
           bankUrl: options.bankUrl,
         });
+      }
+
+      // Réponse du proche de confiance : POST /second-look/{id}/answer  { "text": "1" }
+      const second = url.pathname.match(/^\/second-look\/([\w-]+)\/answer$/);
+      if (req.method === 'POST' && second) {
+        if (!gateway.secondLook) return json(res, 404, { error: 'Second regard désactivé' });
+        let body: { text?: unknown };
+        try {
+          body = (await readJson(req)) as { text?: unknown };
+        } catch {
+          return json(res, 400, { error: 'JSON invalide' });
+        }
+        const outcome = await gateway.secondLook.answer(second[1] ?? '', typeof body.text === 'string' ? body.text : '');
+        return json(res, outcome === 'unknown' ? 404 : 200, { decision: outcome });
       }
 
       if (req.method !== 'POST') return json(res, 405, { error: 'POST attendu' });
@@ -143,7 +157,7 @@ export function defaultOptions(): ServerOptions {
   return {
     teamKey: process.env.SAFINUM_TEAM_KEY ?? '',
     bankUrl,
-    strictStatus: process.env.SAFINUM_STATUS_STRICT === '1',
+    statusMode: statusModeFrom(process.env.SAFINUM_STATUS),
   };
 }
 

@@ -9,7 +9,7 @@
  * On ne renvoie jamais un écran à moitié traduit en prétendant qu'il est fulfulde.
  */
 
-import type { InboundTurn, UiReply, UiStringEntry } from './contract.js';
+import type { InboundTurn, UiReply, UiStringEntry } from '@nkap/safinum';
 import { dictionaryFor, resolveUiLanguage, type UiLanguage } from './ui-dictionaries.js';
 
 export interface UiCoverage {

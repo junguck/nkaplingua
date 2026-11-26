@@ -38,6 +38,8 @@ export interface SessionState {
   /** D'où vient la langue : la passerelle, la détection, ou le choix explicite du menu 8. */
   languageSource?: 'turn' | 'detected' | 'user';
   draft: {
+    /** Montant déjà donné dans une phrase libre : réutilisé dès que le bénéficiaire est connu. */
+    amount?: number;
     to?: string;
     name?: string;
     candidates?: ReadonlyArray<{ name: string; phone: string }>;

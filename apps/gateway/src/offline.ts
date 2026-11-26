@@ -22,9 +22,9 @@ import type {
   CreateTransactionInput,
   FeeType,
 } from './bank.js';
-import { LANGUAGE_NAMES, message, type GatewayLanguage, type MessageKey } from './i18n.js';
+import { LANGUAGE_NAMES, MENU_KEYS, message, type GatewayLanguage, type MessageKey } from './i18n.js';
 import { UI_DICTIONARIES } from './ui-dictionaries.js';
-import { isGsm7, gsm7Length, toGsm7, truncateGsm7 } from './gsm7.js';
+import { isGsm7, gsm7Length, toGsm7, truncateGsm7 } from '@nkap/core';
 
 export type Charset = 'gsm7' | 'utf8';
 
@@ -137,17 +137,6 @@ export class TranslationCache {
     return truncateGsm7(toGsm7(body), USSD_MAX_CHARS);
   }
 }
-
-const MENU_KEYS = [
-  'menu.balance',
-  'menu.transfer',
-  'menu.fees',
-  'menu.history',
-  'menu.airtime',
-  'menu.bill',
-  'menu.help',
-  'menu.language',
-] as const satisfies readonly MessageKey[];
 
 const USSD_KEYS: readonly MessageKey[] = ['menu.header', ...MENU_KEYS, 'error.UNREACHABLE'];
 

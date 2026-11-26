@@ -8,27 +8,43 @@ export interface LanguageGuess {
   readonly confidence: number;
   /** Somme des indices trouvés : 0 = aucune preuve, on garde la langue de la conversation. */
   readonly evidence: number;
+  /** Écart avec la deuxième langue : 0 = égalité, la décision revient à l'indice de conversation. */
+  readonly margin: number;
+  /** Indices reconnus pour la langue retenue (explicabilité, traces jury). */
+  readonly cues: readonly string[];
 }
 
 const CUE_WEIGHT = 2;
 
 export function detectLanguage(folded: string, hint: LanguageCode): LanguageGuess {
-  const scores = new Map<LanguageCode, number>(LANGUAGES.map((l) => [l, 0]));
-
-  for (const lang of LANGUAGES) {
+  const scored = LANGUAGES.map((lang) => {
     let score = 0;
-    for (const [word, weight] of FUNCTION_WORDS[lang]) if (containsCue(folded, word)) score += weight;
-    for (const table of Object.values(INTENT_CUES)) {
-      for (const [cue] of table?.[lang] ?? []) if (containsCue(folded, cue)) score += CUE_WEIGHT;
+    const cues: string[] = [];
+    for (const [word, weight] of FUNCTION_WORDS[lang]) {
+      if (containsCue(folded, word)) {
+        score += weight;
+        cues.push(word);
+      }
     }
-    scores.set(lang, score);
-  }
+    for (const table of Object.values(INTENT_CUES)) {
+      for (const [cue] of table?.[lang] ?? []) {
+        if (containsCue(folded, cue)) {
+          score += CUE_WEIGHT;
+          cues.push(cue);
+        }
+      }
+    }
+    return { lang, score, cues };
+  });
 
-  const total = [...scores.values()].reduce((a, b) => a + b, 0);
-  if (total === 0) return { lang: hint, confidence: 0, evidence: 0 };
+  const total = scored.reduce((sum, s) => sum + s.score, 0);
+  if (total === 0) return { lang: hint, confidence: 0, evidence: 0, margin: 0, cues: [] };
 
-  const best = Math.max(...scores.values());
-  const tied = LANGUAGES.filter((l) => scores.get(l) === best);
-  const lang = tied.includes(hint) ? hint : (tied[0] ?? hint);
-  return { lang, confidence: best / total, evidence: best };
+  const ranked = [...scored].sort((a, b) => b.score - a.score);
+  const best = ranked[0]?.score ?? 0;
+  const second = ranked[1]?.score ?? 0;
+  const tied = scored.filter((s) => s.score === best);
+  const winner = tied.find((s) => s.lang === hint) ?? tied[0];
+  if (winner === undefined) return { lang: hint, confidence: 0, evidence: 0, margin: 0, cues: [] };
+  return { lang: winner.lang, confidence: best / total, evidence: best, margin: best - second, cues: winner.cues };
 }
