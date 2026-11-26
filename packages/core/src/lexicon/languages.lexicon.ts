@@ -6,6 +6,8 @@ export const LANGUAGE_NAMES: Readonly<Record<LanguageCode, readonly string[]>> =
   en: ['anglais', 'english', 'inglisi'],
   fub: ['fulfulde', 'foulfouldé', 'foulfoulde', 'peul', 'fulani', 'fula', 'pulaar'],
   wes: ['pidgin', 'pidjin', 'kamtok', 'pigin'],
+  ewo: ['ewondo'],
+  bulu: ['bulu'],
 };
 
 /** Verbes de changement de langue. */

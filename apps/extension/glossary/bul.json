@@ -1,0 +1,77 @@
+{
+  "code": "bul",
+  "name": "bulu",
+  "native": "bulu",
+  "flag": "",
+  "region": "",
+  "tts": "fr-FR",
+  "status_note": "Traductions à relire et valider par des locuteurs natifs.",
+  "default_status": "propose",
+  "sources": [],
+  "entries": {
+    "term.money": {
+      "t": "Moné",
+      "s": "propose"
+    },
+    "term.beneficiary": {
+      "t": "Mote a bi moné",
+      "s": "propose"
+    },
+    "term.sender": {
+      "t": "Mote a lom moné",
+      "s": "propose"
+    },
+    "term.transfer": {
+      "t": "lom moné",
+      "s": "propose"
+    },
+    "term.send": {
+      "t": "lom",
+      "s": "propose"
+    },
+    "term.receive": {
+      "t": "bi",
+      "s": "propose"
+    },
+    "term.pay": {
+      "t": "ya'ane",
+      "s": "propose"
+    },
+    "term.warning": {
+      "t": "O tabe ntcheul",
+      "s": "propose"
+    },
+    "term.success": {
+      "t": "nkaba'ane",
+      "s": "propose"
+    },
+    "term.pending": {
+      "t": "yanga'ane",
+      "s": "propose"
+    },
+    "term.insufficient": {
+      "t": "Te ke abui moné",
+      "s": "propose"
+    },
+    "term.name": {
+      "t": "éyolé",
+      "s": "propose"
+    },
+    "term.thanks": {
+      "t": "Akiba",
+      "s": "propose"
+    },
+    "ph.beneficiary_is": {
+      "t": "Mote a nyon",
+      "s": "propose"
+    },
+    "ph.send_to": {
+      "t": "Mia zi lome",
+      "s": "propose"
+    },
+    "ph.received": {
+      "t": "Mia ke bi",
+      "s": "propose"
+    }
+  }
+}

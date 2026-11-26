@@ -12,11 +12,15 @@ export interface TermEntry {
  * Terminologie financière expliquée. Les libellés fulfulde et pidgin viennent du glossaire
  * de présélection (statut « proposé ») ; les phrases d'explication composées pour la finale
  * sont marquées « draft » tant qu'un locuteur ne les a pas relues.
+ *
+ * Ewondo (`ewo`) et bulu (`bul`) : LIBELLÉS recopiés tels quels de ewo.json / bul.json (statut « proposé »,
+ * jamais relus par un locuteur). Aucune explication n'est rédigée dans ces langues : elle retombe sur le
+ * français avec le repli signalé. Un terme sans libellé ewo/bul n'a simplement pas encore été fourni.
  */
 export const TERMS_LEXICON: Readonly<Record<TermId, TermEntry>> = {
   fees: {
-    cues: ['frais', 'commission', 'fee', 'fees', 'charges', 'njoɓdi'],
-    label: { fr: 'Frais', en: 'Fees', fub: 'Njoɓdi', wes: 'Charges' },
+    cues: ['frais', 'commission', 'fee', 'fees', 'charges', 'njoɓdi', 'mɔni ba nɔŋ'],
+    label: { fr: 'Frais', en: 'Fees', fub: 'Njoɓdi', wes: 'Charges', ewo: 'Í mɔ̄ní bá nɔ́ŋ' },
     explanation: {
       fr: "Les frais, c'est l'argent que le service prend pour faire l'opération. Ils s'ajoutent au montant : montant + frais = total.",
       en: 'Fees are the money the service takes to carry out the operation. They are added to the amount: amount + fees = total.',
@@ -25,8 +29,8 @@ export const TERMS_LEXICON: Readonly<Record<TermId, TermEntry>> = {
     },
   },
   balance: {
-    cues: ['solde', 'balance', 'balans', 'ceede keddiiɗe'],
-    label: { fr: 'Solde', en: 'Balance', fub: 'Ceede keddiiɗe', wes: 'Balans' },
+    cues: ['solde', 'balance', 'balans', 'ceede keddiiɗe', 'mɔni a lig a nkɔp'],
+    label: { fr: 'Solde', en: 'Balance', fub: 'Ceede keddiiɗe', wes: 'Balans', ewo: 'Í mɔ̄ní á líg á ǹkɔ́p' },
     explanation: {
       fr: "Le solde, c'est l'argent qui reste sur votre compte maintenant.",
       en: 'The balance is the money left in your account right now.',
@@ -35,8 +39,8 @@ export const TERMS_LEXICON: Readonly<Record<TermId, TermEntry>> = {
     },
   },
   total: {
-    cues: ['total', 'montant total', 'total a debiter', 'fof', 'ol togeda'],
-    label: { fr: 'Total', en: 'Total', fub: 'Fof', wes: 'Total' },
+    cues: ['total', 'montant total', 'total a debiter', 'fof', 'ol togeda', 'mɔni a sə'],
+    label: { fr: 'Total', en: 'Total', fub: 'Fof', wes: 'Total', ewo: 'Mɔ̄ní á sə' },
     explanation: {
       fr: "Le total, c'est tout ce qui sort de votre compte : le montant envoyé plus les frais.",
       en: 'The total is everything that leaves your account: the amount sent plus the fees.',
@@ -45,8 +49,8 @@ export const TERMS_LEXICON: Readonly<Record<TermId, TermEntry>> = {
     },
   },
   beneficiary: {
-    cues: ['beneficiaire', 'destinataire', 'beneficiary', 'recipient', 'mo heɓata'],
-    label: { fr: 'Bénéficiaire', en: 'Beneficiary', fub: 'Mo heɓata ceede', wes: 'Pesin wey go receive' },
+    cues: ['beneficiaire', 'destinataire', 'beneficiary', 'recipient', 'mo heɓata', 'mod a nɔŋ mɔni', 'mote a bi mone'],
+    label: { fr: 'Bénéficiaire', en: 'Beneficiary', fub: 'Mo heɓata ceede', wes: 'Pesin wey go receive', ewo: 'Í mód á nɔ́ŋ mɔ̄ní', bul: 'Mote a bi moné' },
     explanation: {
       fr: "Le bénéficiaire, c'est la personne qui reçoit l'argent. Vérifiez toujours son nom et son numéro.",
       en: 'The beneficiary is the person who receives the money. Always check their name and number.',
@@ -105,8 +109,8 @@ export const TERMS_LEXICON: Readonly<Record<TermId, TermEntry>> = {
     },
   },
   withdraw: {
-    cues: ['retrait', 'withdrawal', 'yaltingo ceede'],
-    label: { fr: 'Retrait', en: 'Withdrawal', fub: 'Yaltingo ceede', wes: 'Comot moni' },
+    cues: ['retrait', 'withdrawal', 'yaltingo ceede', 'nɔŋ mɔni'],
+    label: { fr: 'Retrait', en: 'Withdrawal', fub: 'Yaltingo ceede', wes: 'Comot moni', ewo: 'Á nɔ́ŋ mɔ̄ní' },
     explanation: {
       fr: "Le retrait, c'est sortir votre argent en espèces chez un agent ou au guichet automatique, avec un code.",
       en: 'A withdrawal means taking your money out in cash at an agent or ATM, with a code.',
@@ -115,8 +119,8 @@ export const TERMS_LEXICON: Readonly<Record<TermId, TermEntry>> = {
     },
   },
   deposit: {
-    cues: ['depot', 'deposit', 'naatngo ceede'],
-    label: { fr: 'Dépôt', en: 'Deposit', fub: 'Naatngo ceede e konte', wes: 'Put moni for akaunt' },
+    cues: ['depot', 'deposit', 'naatngo ceede', 'fud mɔni'],
+    label: { fr: 'Dépôt', en: 'Deposit', fub: 'Naatngo ceede e konte', wes: 'Put moni for akaunt', ewo: 'Á fúd mɔ̄ní' },
     explanation: {
       fr: "Le dépôt, c'est mettre de l'argent sur votre compte, chez un agent.",
       en: 'A deposit means putting money into your account at an agent.',
@@ -175,8 +179,8 @@ export const TERMS_LEXICON: Readonly<Record<TermId, TermEntry>> = {
     },
   },
   loan: {
-    cues: ['pret', 'emprunt', 'loan', 'ñamaande'],
-    label: { fr: 'Prêt', en: 'Loan', fub: 'Ñamaande', wes: 'Loan' },
+    cues: ['pret', 'emprunt', 'loan', 'ñamaande', 'kol mɔni'],
+    label: { fr: 'Prêt', en: 'Loan', fub: 'Ñamaande', wes: 'Loan', ewo: 'Í kól mɔ̄ní' },
     explanation: {
       fr: "Un prêt, c'est de l'argent emprunté qu'il faut rembourser, souvent avec des intérêts.",
       en: 'A loan is borrowed money you must pay back, often with interest.',
