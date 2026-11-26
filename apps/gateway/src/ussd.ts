@@ -22,11 +22,11 @@ import {
   message,
   money,
   recipientLabel,
-  resolveLanguage,
   shortDate,
   type GatewayLanguage,
   type MessageKey,
 } from './i18n.js';
+import { resolveTurnLanguage } from './language.js';
 import { toGsm7, truncateGsm7 } from './gsm7.js';
 import type { SessionState, SessionStore, Step } from './session.js';
 
@@ -55,7 +55,15 @@ export interface UssdDeps {
 export async function handleUssd(turn: InboundTurn, deps: UssdDeps): Promise<UssdReply> {
   const key = turn.session_id || turn.phone || 'sans-session';
   const text = readText(turn);
-  const state = deps.sessions.get(key) ?? newState(resolveLanguage(turn.language), turn.language);
+  const state = deps.sessions.get(key) ?? newState();
+
+  // `language: null` est un cas d'évaluation : on détecte, sans jamais écraser un choix explicite.
+  const resolved = resolveTurnLanguage(
+    { requested: turn.language, current: state.language, source: state.languageSource },
+    text,
+  );
+  state.language = resolved.language;
+  if (resolved.source !== 'user') state.languageSource = resolved.source;
   const language = state.language;
 
   const result = await advance(state, text, turn, deps, language);
@@ -66,11 +74,8 @@ export async function handleUssd(turn: InboundTurn, deps: UssdDeps): Promise<Uss
   return result.reply;
 }
 
-function newState(language: GatewayLanguage, requested: string | null | undefined): SessionState {
-  const state: SessionState = { step: 'menu', language, draft: {}, updatedAt: Date.now() };
-  // On mémorise la langue demandée pour la suite de la session, même si on sert du français.
-  if (requested === 'fr' || requested === 'en' || requested === 'fub') state.language = requested;
-  return state;
+function newState(): SessionState {
+  return { step: 'menu', language: 'fr', languageSource: 'detected', draft: {}, updatedAt: Date.now() };
 }
 
 interface Outcome {
@@ -166,7 +171,9 @@ async function advance(
         return keep(reply(language, message(language, 'ask.language'), 'CLARIFICATION_NEEDED'));
       }
       state.language = chosen;
-      return done(
+      state.languageSource = 'user';
+      state.step = 'menu';
+      return keep(
         reply(chosen, `${message(chosen, 'lang.set', { language: chosen })}\n${menuText(chosen)}`, 'LANGUAGE_SWITCH', {
           end: false,
           language: chosen,

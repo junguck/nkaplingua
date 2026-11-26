@@ -35,6 +35,8 @@ export interface PendingTransaction {
 export interface SessionState {
   step: Step;
   language: 'fr' | 'en' | 'fub';
+  /** D'où vient la langue : la passerelle, la détection, ou le choix explicite du menu 8. */
+  languageSource?: 'turn' | 'detected' | 'user';
   draft: {
     to?: string;
     name?: string;

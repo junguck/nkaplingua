@@ -76,6 +76,11 @@ Sans clé, la sandbox répond `422 Équipe inconnue` (constaté le 26/11 : `team
 cloudflared tunnel --url http://localhost:8080   # ou : ngrok http 8080
 ```
 
+**C'est la racine du middleware qu'on tunele** : `http://127.0.0.1:8080`, pas un sous-chemin. Le
+middleware accepte `POST /` et `POST /middleware/{ussd|mobile|web}` avec le même contrat ; `/console`
+reste servi pour la démonstration. Gardez `HOST=127.0.0.1` et `PORT=8080` : le tunnel s'occupe du reste.
+L'URL gratuite change à chaque redémarrage du tunnel — il faut alors redéclarer les trois canaux.
+
 ### 3.3 Déclarer les trois canaux
 
 ```bash
@@ -98,7 +103,20 @@ node apps/gateway/scripts/safinum.mjs turn ussd "1"       # solde
 node apps/gateway/scripts/safinum.mjs ui web              # écran (fub par défaut)
 ```
 
-## 4. Règles à ne pas casser
+## 4. Détection de langue (`language: null`)
+
+La passerelle peut envoyer `language: null` : c'est à nous de trancher. Ordre de priorité :
+
+1. `language` explicite dans le tour (jamais contredit) ;
+2. langue choisie par l'utilisateur au menu 8 (épinglée pour la session) ;
+3. détection sur la saisie — seulement avec des indices suffisants (score ≥ 3, marge ≥ 1) :
+   `fr`, `en`, `fub` (lexiques du dépôt) ;
+4. sinon la langue en cours, par défaut `fr`.
+
+`dua`, `ewo`, `bas`, `bbj`, `byv` n'ont pas de lexique fiable ici : on ne les devine pas, on répond en
+français et `interpretation.language` vaut `fr`. Mieux vaut un repli déclaré qu'une fausse détection.
+
+## 5. Règles à ne pas casser
 
 1. `X-Trace-Id` recopié sur **chaque** appel bancaire, sinon `NO_BANK_CALL` (travail invisible).
 2. Confirmation dans un tour **séparé**, avec un autre `trace_id`.
@@ -110,7 +128,7 @@ node apps/gateway/scripts/safinum.mjs ui web              # écran (fub par déf
 
 `SAFINUM_STATUS_STRICT=1` n'émet que les statuts déjà observés (`none`, `pending`).
 
-## 5. Dépannage
+## 6. Dépannage
 
 | Symptôme | Cause | Geste |
 | --- | --- | --- |
@@ -122,7 +140,7 @@ node apps/gateway/scripts/safinum.mjs ui web              # écran (fub par déf
 | `INVALID_RESPONSE` | intention/statut hors contrat | `pnpm test` |
 | `MISSING_STRINGS` / `UNTRANSLATED` | dictionnaire incomplet | compléter `src/ui-dictionaries.ts` |
 
-## 6. Ce qui a été vérifié
+## 7. Ce qui a été vérifié
 
 - `pnpm test` : 91 tests (18 pour le gateway), chaîne réelle middleware → HTTP → banque.
 - `pnpm typecheck` : 8 projets verts.

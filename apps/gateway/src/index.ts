@@ -4,7 +4,8 @@ export { SafinumBank, type BankPort, type BankResult, type BankAccount, type Ban
 export { handleUssd, parseAmount, MAX_CHARS } from './ussd.js';
 export { handleUi, translate, auditUi } from './ui.js';
 export { UI_DICTIONARIES, type UiLanguage } from './ui-dictionaries.js';
-export { message, money, resolveLanguage, displayPhone, type GatewayLanguage } from './i18n.js';
+export { message, money, resolveLanguage, displayPhone, recipientLabel, type GatewayLanguage } from './i18n.js';
+export { detectLanguage, resolveTurnLanguage, type LanguageGuess } from './language.js';
 export { toGsm7, isGsm7, gsm7Length, truncateGsm7 } from './gsm7.js';
 export { officialFee, officialTotal, MAX_AMOUNT } from './fees.js';
 export { toSafinumIntent, type CanonicalIntent } from './intents.js';

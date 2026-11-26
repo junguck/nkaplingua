@@ -4,6 +4,7 @@ import type { AddressInfo } from 'node:net';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import {
   Gateway,
+  detectLanguage,
   SAFINUM_INTENTS,
   DEMO_TEAM_KEY,
   InMemorySessions,
@@ -337,11 +338,89 @@ describe('règles de la sandbox', () => {
     expect(isGsm7('A jaɓɓaama')).toBe(false);
   });
 
+  it('détecte le fulfulde, l’anglais, et ne devine pas les langues sans lexique', () => {
+    expect(detectLanguage('Mi yiɗi anndude ceede am keddiiɗe').language).toBe('fub');
+    expect(detectLanguage('What is my balance?').language).toBe('en');
+    expect(detectLanguage('Quel est mon solde ?').language).toBe('fr');
+    expect(detectLanguage('2').confidence).toBe(0);
+    // Pas de lexique fiable pour dua, ewo, bas, bbj, byv : on ne devine pas.
+    expect(detectLanguage('Mbolo, na banga njangi').confidence).toBe(0);
+  });
+
   it('respecte 182 septets avec les options comprises', async () => {
     const reply = (await new Gateway({ teamKey: 'sbx_x', bankUrl: 'http://127.0.0.1:1', sessions: new InMemorySessions() }).handle(
       turn({ language: 'fub', input: { type: 'menu', text: '' } }),
     )) as UssdReply;
     expect(gsm7Length(reply.response.text)).toBeLessThanOrEqual(182);
     expect(reply.response.text).toContain('8. Demngal');
+  });
+});
+
+describe('language: null — la détection revient au middleware', () => {
+  const fake: BankPort = {
+    account: async () => ({ ok: true, status: 200, data: { phone: PHONE, holder: 'Amina', balance: 1000, currency: 'XAF' } }),
+    fees: async () => ({ ok: true, status: 200, data: { amount: 0, fee: 0, total: 0, currency: 'XAF' } }),
+    history: async () => ({ ok: true, status: 200, data: [] }),
+    beneficiaries: async () => ({ ok: true, status: 200, data: [] }),
+    billers: async () => ({ ok: true, status: 200, data: [] }),
+    create: async () => ({ ok: false, status: 500, error: 'BANK_ERROR' }),
+    update: async () => ({ ok: false, status: 500, error: 'BANK_ERROR' }),
+    confirm: async () => ({ ok: false, status: 500, error: 'BANK_ERROR' }),
+    cancel: async () => ({ ok: false, status: 500, error: 'BANK_ERROR' }),
+  };
+  const local = () =>
+    new Gateway({ teamKey: 'sbx_test', bankUrl: 'http://127.0.0.1:1', sessions: new InMemorySessions(), bankFactory: () => fake });
+
+  it('reconnaît le fulfulde et poursuit la session dans cette langue', async () => {
+    const gateway = local();
+    const session = 'detect-fub';
+    const first = (await gateway.handle(
+      turn({ session_id: session, language: null, input: { type: 'text', text: 'Mi yiɗi anndude ceede am keddiiɗe' } }),
+    )) as UssdReply;
+    expect(first.interpretation.language).toBe('fub');
+    // Le rendu GSM-7 translittère ɓ → b : « Suɓo » devient « Subo ».
+    expect(first.response.text).toContain('Subo');
+
+    const balance = (await gateway.handle(
+      turn({ session_id: session, language: null, input: { type: 'text', text: '1' } }),
+    )) as UssdReply;
+    expect(balance.interpretation.language).toBe('fub');
+    // ɗ → d au rendu GSM-7 : « keddiiɗe » s'affiche « keddiide ».
+    expect(balance.response.text).toContain('Ceede maa keddiide: 1 000 FCFA.');
+  });
+
+  it('reconnaît l’anglais', async () => {
+    const reply = (await local().handle(
+      turn({ language: null, input: { type: 'text', text: 'What is my balance?' } }),
+    )) as UssdReply;
+    expect(reply.interpretation.language).toBe('en');
+    expect(reply.response.text).toContain('Choose');
+  });
+
+  it('reste en français sans indice, et une langue explicite gagne toujours', async () => {
+    const gateway = local();
+    const neutral = (await gateway.handle(turn({ language: null, input: { type: 'text', text: '2' } }))) as UssdReply;
+    expect(neutral.interpretation.language).toBe('fr');
+
+    const explicit = (await local().handle(
+      turn({ language: 'en', input: { type: 'text', text: 'Mi yiɗi ceede am' } }),
+    )) as UssdReply;
+    expect(explicit.interpretation.language).toBe('en');
+  });
+
+  it('le choix du menu 8 prime sur la détection suivante', async () => {
+    const gateway = local();
+    const session = 'detect-pin';
+    await gateway.handle(turn({ session_id: session, input: { type: 'text', text: '8' } }));
+    const chosen = (await gateway.handle(
+      turn({ session_id: session, input: { type: 'text', text: '3' } }),
+    )) as UssdReply;
+    expect(chosen.interpretation.intent).toBe('LANGUAGE_SWITCH');
+    expect(chosen.interpretation.language).toBe('fub');
+
+    const balance = (await gateway.handle(
+      turn({ session_id: session, language: null, input: { type: 'text', text: '1' } }),
+    )) as UssdReply;
+    expect(balance.interpretation.language).toBe('fub');
   });
 });
