@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NkapLingua — Studio linguistique</title>
+<link rel="stylesheet" href="../ui/tokens.css">
+<link rel="stylesheet" href="options.css">
+</head>
+<body>
+<header>
+  <div class="hrow">
+    <span class="logo">N</span><b class="brand">NkapLingua</b>
+    <nav role="tablist" aria-label="Sections">
+      <button role="tab" data-tab="studio" aria-selected="true">Studio</button>
+      <button role="tab" data-tab="lab">Laboratoire</button>
+      <button role="tab" data-tab="ai">IA (option)</button>
+      <button role="tab" data-tab="repondeur">Répondeur</button>
+      <button role="tab" data-tab="bienvenue">Aide</button>
+    </nav>
+  </div>
+  <h1>Nos langues,<br>validées par leurs locuteurs <svg class="spark" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c.6 4.8 2.6 7.4 8 8-5.4.6-7.4 3.2-8 8-.6-4.8-2.6-7.4-8-8 5.4-.6 7.4-3.2 8-8z" fill="currentColor"/><path d="M19 15c.3 2 1.1 3.1 3 3.4-1.9.3-2.7 1.4-3 3.4-.3-2-1.1-3.1-3-3.4 1.9-.3 2.7-1.4 3-3.4z" fill="currentColor"/></svg></h1>
+</header>
+
+<main>
+<!-- ============================ STUDIO ============================ -->
+<section id="studio" class="tab">
+  <div class="intro">
+    <p><b>Le Studio permet aux locuteurs natifs de corriger, valider et enregistrer chaque entrée du glossaire.</b>
+    Une entrée devient <span class="st valide">validée</span> quand <b>deux validateurs différents</b> l'ont approuvée.
+    Les entrées critiques (pastille corail : sécurité, montants, conditions) sont à traiter en premier.</p>
+  </div>
+  <div class="toolbar">
+    <label>Langue <select id="lang"></select></label>
+    <label>Validateur·rice <input id="validator" placeholder="Votre nom (ex. Aminatou, Ngaoundéré)"></label>
+    <label>Filtre <select id="filter">
+      <option value="all">Tout</option><option value="critical">Critiques</option><option value="todo">À valider</option>
+      <option value="missing">Manquants</option><option value="valid">Validés</option></select></label>
+    <input id="q" type="search" placeholder="Rechercher (solde, PIN…)">
+  </div>
+  <div class="cov" id="cov"></div>
+  <div class="tools">
+    <button id="exportJson">Exporter la langue (JSON)</button>
+    <button id="exportCsv">Exporter tout (CSV)</button>
+    <label class="filebtn">Importer un JSON<input type="file" id="importJson" accept=".json" hidden></label>
+    <button id="resetLang" class="danger">Effacer mes modifications</button>
+  </div>
+  <div id="rows" class="rows"></div>
+</section>
+
+<!-- ============================ LABORATOIRE ============================ -->
+<section id="lab" class="tab" hidden>
+  <div class="intro"><p><b>Testez n'importe quel message</b> (ex. le contenu inédit introduit par le jury) et voyez chaque étape du moteur : verrouillage, reconnaissance, classification, contrôle d'intégrité.</p></div>
+  <div class="labgrid">
+    <div>
+      <textarea id="labIn" rows="5">Vous allez envoyer 25 000 FCFA à Jean-Paul Mballa (677 12 34 56). Des frais de 500 FCFA seront appliqués.</textarea>
+      <div class="samples" id="samples"></div>
+      <label>Langue <select id="labLang"></select></label>
+    </div>
+    <div id="labOut" class="labout"></div>
+  </div>
+</section>
+
+<!-- ============================ IA ============================ -->
+<section id="ai" class="tab" hidden>
+  <div class="intro">
+    <p><b>Option facultative</b> : pour les contenus inédits, NkapLingua fonctionne <b>sans IA</b> (classification + glossaire). Vous pouvez ajouter une traduction IA <i>en complément</i>, toujours étiquetée « à vérifier ».</p>
+    <p>🔐 <b>Confidentialité</b> : avant d'être envoyé, le texte est <b>masqué</b> — montants, noms, numéros et références deviennent ⟦0⟧, ⟦1⟧… Aucune donnée financière personnelle ne quitte le navigateur. La réponse est rejetée si un jeton manque ou si un chiffre apparaît.</p>
+  </div>
+  <form id="aiForm" class="form">
+    <label><input type="checkbox" id="aiOn"> Activer la traduction IA complémentaire</label>
+    <label>Fournisseur <select id="aiProv"><option value="anthropic">Anthropic (Claude)</option><option value="openai">Compatible OpenAI (ex. serveur local Ollama / vLLM)</option></select></label>
+    <label>Modèle <input id="aiModel" placeholder="claude-haiku-5-5"></label>
+    <label>Adresse (OpenAI compatible) <input id="aiEndpoint" placeholder="http://localhost:11434/v1/chat/completions"></label>
+    <label>Clé API <input id="aiKey" type="password" autocomplete="off" placeholder="stockée localement, jamais synchronisée"></label>
+    <button type="submit" class="primary">Enregistrer</button> <span id="aiMsg"></span>
+  </form>
+</section>
+
+<!-- ============================ RÉPONDEUR ============================ -->
+<section id="repondeur" class="tab" hidden>
+  <div class="intro">
+    <p><b>Répondeur vocal de démonstration</b> — menus numérotés (envoyer, retirer, solde, tontine, petit crédit, factures eau/lumière), notifications et rappels. <b>Aucun vrai argent, aucun vrai code secret.</b></p>
+    <p>Une langue n'est <b>prononcée</b> que par un enregistrement humain validé par au moins deux locuteurs. Sinon : français facile + pictogramme. Les montants restent dits en français.</p>
+  </div>
+  <div class="tools">
+    <button type="button" id="openIvr">Ouvrir le répondeur</button>
+    <button type="button" id="openIvrStudio">Studio voix (enregistrements IVR)</button>
+  </div>
+</section>
+
+<!-- ============================ AIDE ============================ -->
+<section id="bienvenue" class="tab" hidden>
+  <div class="hero">
+    <h2>Bienvenue dans NkapLingua</h2>
+    <p>Ouvrez n'importe quelle application bancaire, de paiement ou de microfinance dans le navigateur : NkapLingua ajoute la langue nationale <b>par-dessus</b>, sans rien modifier au service.</p>
+  </div>
+  <div class="cards">
+    <div class="card"><b>🔐 Valeurs verrouillées</b><p>Montants, frais, noms, numéros et références ne sont jamais traduits : ils sont recopiés à l'identique et contrôlés.</p></div>
+    <div class="card"><b>📋 Fiche claire</b><p>Sur un récapitulatif, une fiche résume bénéficiaire, montant, frais et total, montre les billets correspondants et <b>vérifie le calcul</b>.</p></div>
+    <div class="card"><b>🛡️ Bouclier anti-arnaque</b><p>Demande de code PIN, faux gains, « argent envoyé par erreur »… NkapLingua alerte dans votre langue.</p></div>
+    <div class="card"><b>🧭 Guide pas à pas</b><p>Explique chaque étape de l'écran (numéro, montant, frais, confirmation) et met en surbrillance le bon champ.</p></div>
+    <div class="card"><b>🔊 Écoute</b><p>Chaque message peut être lu à voix haute. Les enregistrements des locuteurs (Studio) remplacent la voix de synthèse.</p></div>
+    <div class="card"><b>🆕 Contenu inédit</b><p>Un message jamais vu est classé (erreur, frais, alerte…), ses mots-clés sont traduits et ses interdictions/conditions signalées.</p></div>
+  </div>
+  <h3>Raccourcis clavier</h3>
+  <ul class="keys"><li><kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>N</kbd> activer / pause</li><li><kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>L</kbd> lire la sélection ou la page</li><li><kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>G</kbd> guide</li><li><kbd>Alt</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd> fiche claire</li><li>Répondeur vocal : icône <b>N</b> → *Répondeur vocal* (raccourci facultatif dans <code>chrome://extensions/shortcuts</code>)</li><li>Sélectionner un texte → bulle de traduction · Clic droit → « NkapLingua : comprendre »</li></ul>
+</section>
+</main>
+
+<script src="../glossary/bundle.js"></script>
+<script src="../lib/engine.js"></script>
+<script src="options.js"></script>
+</body>
+</html>

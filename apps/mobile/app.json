@@ -1,0 +1,17 @@
+{
+  "expo": {
+    "name": "NkapLingua",
+    "slug": "nkaplingua",
+    "version": "2.0.0",
+    "orientation": "portrait",
+    "scheme": "nkaplingua",
+    "userInterfaceStyle": "light",
+    "android": {
+      "package": "cm.nkaplingua.app",
+      "predictiveBackGestureEnabled": false
+    },
+    "web": { "output": "single" },
+    "plugins": ["expo-router"],
+    "experiments": { "typedRoutes": false }
+  }
+}

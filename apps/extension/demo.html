@@ -1,0 +1,254 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mboa Pay — interface financière simulée</title>
+<style>
+  :root{--g:#0f766e;--g2:#14b8a6;--ink:#0f172a;--mut:#64748b;--line:#e2e8f0;--bg:#f1f5f9;--red:#dc2626}
+  *{box-sizing:border-box}
+  body{margin:0;font:15px/1.45 "Segoe UI",Roboto,system-ui,sans-serif;color:var(--ink);background:radial-gradient(1200px 600px at 20% -10%,#ccfbf1,transparent),var(--bg);min-height:100vh}
+  .stage{display:flex;flex-wrap:wrap;gap:28px;justify-content:center;align-items:flex-start;padding:28px 16px 80px}
+  .banner{text-align:center;font-size:12px;color:#7c2d12;background:#ffedd5;border-bottom:1px solid #fed7aa;padding:6px}
+  /* Téléphone */
+  .phone{width:390px;max-width:100%;background:#fff;border-radius:34px;box-shadow:0 30px 60px rgba(15,23,42,.18),0 0 0 10px #0f172a;overflow:hidden;position:relative}
+  .appbar{background:linear-gradient(135deg,var(--g),var(--g2));color:#fff;padding:18px 18px 22px}
+  .appbar .top{display:flex;align-items:center;gap:10px}
+  .brand{font-weight:800;font-size:18px;flex:1}
+  .lng{background:rgba(255,255,255,.2);border:0;color:#fff;border-radius:8px;padding:4px 8px;font-weight:700;cursor:pointer}
+  .hello{margin-top:10px;opacity:.9}
+  .screen{padding:16px 18px 22px;min-height:520px}
+  h2{margin:4px 0 12px;font-size:19px}
+  .balance{background:#f0fdfa;border:1px solid #99f6e4;border-radius:18px;padding:14px 16px;margin:-34px 0 14px;position:relative}
+  .balance .lab{color:var(--mut);font-size:13px}
+  .balance .val{font-size:30px;font-weight:800;color:var(--g)}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+  .tile{border:1px solid var(--line);border-radius:16px;padding:12px;background:#fff;cursor:pointer;text-align:left;font:inherit;display:flex;flex-direction:column;gap:6px}
+  .tile:hover{border-color:var(--g2)}
+  .tile .e{font-size:22px}
+  .list{border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  .li{display:flex;justify-content:space-between;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line)}
+  .li:last-child{border-bottom:0}
+  .li .a{font-weight:700;white-space:nowrap}
+  .muted{color:var(--mut);font-size:13px}
+  table{width:100%;border-collapse:collapse;font-size:14px}
+  th,td{padding:9px 8px;border-bottom:1px solid var(--line);text-align:left}
+  th{background:#f8fafc;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--mut)}
+  .field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+  .field label{font-weight:600;font-size:14px}
+  .field input{font:inherit;padding:11px 12px;border:1.5px solid #cbd5e1;border-radius:12px}
+  .field input:focus{outline:none;border-color:var(--g2)}
+  .calc{background:#f8fafc;border-radius:12px;padding:10px 12px;margin:8px 0 14px}
+  .row{display:flex;justify-content:space-between;gap:10px;padding:6px 0}
+  .row .k{color:var(--mut)}
+  .row .v{font-weight:800}
+  .btns{display:flex;gap:10px;margin-top:12px}
+  .btn{flex:1;border:0;border-radius:14px;padding:13px;font:inherit;font-weight:700;cursor:pointer;background:var(--g);color:#fff}
+  .btn.sec{background:#e2e8f0;color:var(--ink)}
+  .back{border:0;background:none;color:var(--g);font:inherit;font-weight:700;cursor:pointer;padding:0;margin-bottom:6px}
+  .alert{border-radius:14px;padding:12px 14px;margin:10px 0}
+  .alert.warn{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412}
+  .alert.err{background:#fef2f2;border:1px solid #fecaca;color:#991b1b}
+  .alert.ok{background:#f0fdf4;border:1px solid #bbf7d0;color:#166534}
+  .big{font-size:44px;text-align:center}
+  .notif{position:absolute;left:12px;right:12px;top:12px;z-index:5;display:flex;flex-direction:column;gap:8px}
+  .msg{background:#0f172a;color:#fff;border-radius:16px;padding:12px 14px;box-shadow:0 10px 30px rgba(0,0,0,.3);position:relative}
+  .msg .from{font-size:11px;opacity:.7}
+  .msg button{position:absolute;right:8px;top:6px;background:none;border:0;color:#fff;cursor:pointer;font-size:16px}
+  /* Console du jury */
+  .jury{width:380px;max-width:100%;background:#fff;border:2px dashed #94a3b8;border-radius:20px;padding:16px}
+  .jury h3{margin:0 0 4px}
+  .jury textarea{width:100%;font:inherit;border:1.5px solid #cbd5e1;border-radius:12px;padding:10px;min-height:90px}
+  .jury .presets{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+  .jury .presets button,.jury .go{font:inherit;text-align:left;border:1px solid var(--line);background:#f8fafc;border-radius:10px;padding:7px 10px;cursor:pointer}
+  .jury .go{background:#0f172a;color:#fff;text-align:center;font-weight:700;width:100%}
+  .jury label{display:flex;gap:8px;align-items:center;font-size:14px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="banner">Interface financière <b>simulée</b> pour la démonstration — marque fictive, aucune transaction ni donnée réelle.</div>
+<div class="stage">
+  <div class="phone" id="phone">
+    <div class="notif" id="notif" aria-live="polite"></div>
+    <div class="appbar">
+      <div class="top"><span class="brand">Mboa Pay</span><button class="lng" id="lng" title="Langue de l'application">FR</button></div>
+      <div class="hello" id="hello"></div>
+    </div>
+    <div class="screen" id="screen"></div>
+  </div>
+
+  <aside class="jury" aria-label="Console de test du jury">
+    <h3>🧪 Console de test (jury)</h3>
+    <p class="muted">Introduit un contenu inédit dans l'application, comme le ferait le jury. Cette console fait partie de l'environnement de test, pas de la solution.</p>
+    <textarea id="inject" placeholder="Tapez un nouveau message…">Les retraits effectués après 18h00 seront traités le lendemain, sauf le dimanche.</textarea>
+    <div class="presets" id="presets"></div>
+    <button class="go" id="go">📨 Injecter dans l'application</button>
+    <label><input type="checkbox" id="tamper"> Simuler un récapitulatif incohérent (total faux)</label>
+  </aside>
+</div>
+
+<script>
+(() => {
+  const I18N = {
+    fr: {
+      hello: 'Bonjour Aïcha Bello', balanceLab: 'Solde disponible', balanceSentence: (b) => `Votre solde est de ${b}.`,
+      send: "Envoyer de l'argent", fees: 'Consulter les frais', history: 'Historique', security: 'Sécurité',
+      recent: 'Transactions récentes', back: '← Retour',
+      feesTitle: 'Grille tarifaire', feesSent: 'Montant envoyé', feesFee: 'Frais',
+      feesNote: 'Les frais sont débités en plus du montant envoyé.', maxNote: 'Montant maximum par transaction : 500 000 FCFA',
+      transferTitle: 'Nouveau transfert', numLab: 'Numéro du bénéficiaire', nameLab: 'Nom du bénéficiaire', amtLab: 'Montant à envoyer (FCFA)',
+      numPh: 'Ex. 677 12 34 56', amtPh: 'Ex. 25 000', feeRow: 'Frais', totalRow: 'Total à débiter', cont: 'Continuer', cancel: 'Annuler',
+      sumTitle: 'Récapitulatif', check: 'Vérifiez les informations avant de confirmer.', ben: 'Bénéficiaire', num: 'Numéro', amt: 'Montant',
+      youSend: (a, n, p) => `Vous allez envoyer ${a} à ${n} (${p}).`, irr: 'Une fois confirmé, le transfert ne peut pas être annulé.',
+      pinLab: 'Entrez votre code PIN pour confirmer', confirm: 'Confirmer',
+      ok: 'Transfert effectué avec succès', sent: (a, n) => `Vous avez envoyé ${a} à ${n}.`, ref: (r) => `Référence : ${r}`, newBal: (b) => `Nouveau solde : ${b}`,
+      insuf: 'Votre solde est insuffisant pour effectuer cette opération.', insufT: 'Transaction échouée', wrongPin: 'Code PIN incorrect. Il vous reste 2 tentatives.',
+      home: 'Accueil', secTitle: 'Conseils de sécurité', s1: 'Attention aux arnaques', s2: 'Ne partagez jamais votre code PIN avec personne.',
+      s3: 'Notre personnel ne vous demandera jamais votre code PIN.', s4: 'Ne communiquez à personne le code reçu par SMS.', s5: 'Plafond journalier : 500 000 FCFA',
+      errNum: 'Numéro invalide', errAmt: 'Entrez le montant'
+    },
+    en: {
+      hello: 'Hello Aïcha Bello', balanceLab: 'Available balance', balanceSentence: (b) => `Your balance is ${b}.`,
+      send: 'Send money', fees: 'Check fees', history: 'History', security: 'Security',
+      recent: 'Recent transactions', back: '← Back',
+      feesTitle: 'Fee schedule', feesSent: 'Amount sent', feesFee: 'Fee',
+      feesNote: 'Fees are charged on top of the amount sent.', maxNote: 'Maximum amount per transaction: 500,000 FCFA',
+      transferTitle: 'New transfer', numLab: 'Recipient number', nameLab: 'Recipient name', amtLab: 'Amount to send (FCFA)',
+      numPh: 'E.g. 677 12 34 56', amtPh: 'E.g. 25,000', feeRow: 'Fee', totalRow: 'Total to be debited', cont: 'Continue', cancel: 'Cancel',
+      sumTitle: 'Summary', check: 'Please check the details before confirming.', ben: 'Beneficiary', num: 'Number', amt: 'Amount',
+      youSend: (a, n, p) => `You are about to send ${a} to ${n} (${p}).`, irr: 'This transaction cannot be undone.',
+      pinLab: 'Enter your PIN to confirm', confirm: 'Confirm',
+      ok: 'Transfer successful', sent: (a, n) => `You have sent ${a} to ${n}.`, ref: (r) => `Reference: ${r}`, newBal: (b) => `New balance ${b}`,
+      insuf: 'Your balance is insufficient for this transaction.', insufT: 'Transaction failed', wrongPin: 'Incorrect PIN. 2 attempts remaining.',
+      home: 'Home', secTitle: 'Security tips', s1: 'Beware of scams', s2: 'Never share your PIN with anyone.',
+      s3: 'Our staff will never ask for your PIN.', s4: 'Do not share the code received by SMS.', s5: 'Daily limit: 500,000 FCFA',
+      errNum: 'Invalid number', errAmt: 'Enter the amount'
+    }
+  };
+  let lang = 'fr', balance = 125500;
+  let tx = { num: '677 12 34 56', name: 'Jean-Paul Mballa', amount: 25000 };
+  const $ = (s) => document.querySelector(s);
+  const T = () => I18N[lang];
+  const fmt = (n) => lang === 'fr' ? `${n.toLocaleString('fr-FR').replace(/ | /g, ' ')} FCFA` : `${n.toLocaleString('en-US')} FCFA`;
+  const fee = (a) => a <= 5000 ? 50 : a <= 25000 ? 250 : a <= 100000 ? 500 : 1500;
+  const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+  const screens = {
+    home() {
+      return `<div class="balance"><div class="lab">${T().balanceLab}</div><div class="val">${fmt(balance)}</div><div class="muted">${T().balanceSentence(fmt(balance))}</div></div>
+      <div class="grid">
+        <button class="tile" data-go="transfer"><span class="e">📤</span><span>${T().send}</span></button>
+        <button class="tile" data-go="fees"><span class="e">🧾</span><span>${T().fees}</span></button>
+        <button class="tile" data-go="home"><span class="e">📜</span><span>${T().history}</span></button>
+        <button class="tile" data-go="security"><span class="e">🛡️</span><span>${T().security}</span></button>
+      </div>
+      <h2 style="font-size:15px">${T().recent}</h2>
+      <div class="list">
+        <div class="li"><span>${lang === 'fr' ? 'Transfert à Paul Ndzana' : 'Transfer to Paul Ndzana'}</span><span class="a">- ${fmt(10000)}</span></div>
+        <div class="li"><span>${lang === 'fr' ? 'Dépôt chez un agent' : 'Agent deposit'}</span><span class="a">+ ${fmt(50000)}</span></div>
+        <div class="li"><span>${lang === 'fr' ? 'Paiement facture ENEO' : 'ENEO bill payment'}</span><span class="a">- ${fmt(8750)}</span></div>
+      </div>`;
+    },
+    fees() {
+      const rows = [[100, 5000, 50], [5001, 25000, 250], [25001, 100000, 500], [100001, 500000, 1500]];
+      return `<button class="back" data-go="home">${T().back}</button><h2>${T().feesTitle}</h2>
+      <table><thead><tr><th>${T().feesSent}</th><th>${T().feesFee}</th></tr></thead><tbody>
+      ${rows.map(([a, b, f]) => `<tr><td>${lang === 'fr' ? `De ${fmt(a)} à ${fmt(b)}` : `${fmt(a)} to ${fmt(b)}`}</td><td><b>${fmt(f)}</b></td></tr>`).join('')}
+      </tbody></table>
+      <div class="alert warn">${T().feesNote}</div><p class="muted">${T().maxNote}</p>`;
+    },
+    transfer() {
+      return `<button class="back" data-go="home">${T().back}</button><h2>${T().transferTitle}</h2>
+      <div class="field"><label for="num">${T().numLab}</label><input id="num" inputmode="tel" placeholder="${T().numPh}" value="${esc(tx.num)}"></div>
+      <div class="field"><label for="nm">${T().nameLab}</label><input id="nm" value="${esc(tx.name)}"></div>
+      <div class="field"><label for="amt">${T().amtLab}</label><input id="amt" inputmode="numeric" placeholder="${T().amtPh}" value="${tx.amount}"></div>
+      <div class="calc" id="calc"></div>
+      <div class="btns"><button class="btn sec" data-go="home">${T().cancel}</button><button class="btn" id="cont">${T().cont}</button></div>`;
+    },
+    summary() {
+      const f = fee(tx.amount);
+      const total = tx.amount + f + ($('#tamper').checked ? 2000 : 0);
+      return `<button class="back" data-go="transfer">${T().back}</button><h2>${T().sumTitle}</h2>
+      <div class="alert warn">${T().check}</div>
+      <div class="calc">
+        <div class="row"><span class="k">${T().ben}</span><span class="v">${esc(tx.name)}</span></div>
+        <div class="row"><span class="k">${T().num}</span><span class="v">${esc(tx.num)}</span></div>
+        <div class="row"><span class="k">${T().amt}</span><span class="v">${fmt(tx.amount)}</span></div>
+        <div class="row"><span class="k">${T().feeRow}</span><span class="v">${fmt(f)}</span></div>
+        <div class="row"><span class="k">${T().totalRow}</span><span class="v">${fmt(total)}</span></div>
+      </div>
+      <p>${T().youSend(fmt(tx.amount), esc(tx.name), esc(tx.num))}</p>
+      <div class="alert err">${T().irr}</div>
+      <div class="field"><label for="pin">${T().pinLab}</label><input id="pin" type="password" inputmode="numeric" maxlength="4" placeholder="••••"></div>
+      <div class="btns"><button class="btn sec" data-go="home">${T().cancel}</button><button class="btn" id="conf">${T().confirm}</button></div>`;
+    },
+    result(kind) {
+      if (kind === 'pin') return `<div class="big">🔒</div><div class="alert err">${T().wrongPin}</div><div class="btns"><button class="btn" data-go="summary">${T().back}</button></div>`;
+      if (kind === 'insuf') return `<div class="big">⛔</div><h2>${T().insufT}</h2><div class="alert err">${T().insuf}</div><div class="btns"><button class="btn" data-go="home">${T().home}</button></div>`;
+      const ref = 'MP-2026-' + Math.random().toString(36).slice(2, 6).toUpperCase().replace(/[^A-Z0-9]/g, '7') + '1';
+      return `<div class="big">✅</div><h2>${T().ok}</h2><div class="alert ok">${T().sent(fmt(tx.amount), esc(tx.name))}</div>
+      <p>${T().ref(ref)}</p><p>${T().newBal(fmt(balance))}</p><div class="btns"><button class="btn" data-go="home">${T().home}</button></div>`;
+    },
+    security() {
+      return `<button class="back" data-go="home">${T().back}</button><h2>${T().secTitle}</h2>
+      <div class="alert warn"><b>${T().s1}</b></div>
+      <div class="list"><div class="li">${T().s2}</div><div class="li">${T().s3}</div><div class="li">${T().s4}</div></div>
+      <p class="muted">${T().s5}</p>`;
+    }
+  };
+
+  let current = 'home';
+  function go(name, arg) {
+    current = name;
+    $('#hello').textContent = T().hello;
+    $('#lng').textContent = lang.toUpperCase();
+    $('#screen').innerHTML = screens[name](arg);
+    if (name === 'transfer') { wireTransfer(); }
+    if (name === 'summary') {
+      $('#conf').onclick = () => {
+        const pin = $('#pin').value;
+        if (pin.length !== 4 || pin === '0000') return go('result', 'pin');
+        const total = tx.amount + fee(tx.amount);
+        if (total > balance) return go('result', 'insuf');
+        balance -= total; go('result', 'ok');
+      };
+    }
+  }
+  function wireTransfer() {
+    const upd = () => {
+      tx.num = $('#num').value.trim(); tx.name = $('#nm').value.trim();
+      tx.amount = parseInt($('#amt').value.replace(/\D/g, ''), 10) || 0;
+      $('#calc').innerHTML = tx.amount ? `<div class="row"><span class="k">${T().feeRow}</span><span class="v">${fmt(fee(tx.amount))}</span></div>
+        <div class="row"><span class="k">${T().totalRow}</span><span class="v">${fmt(tx.amount + fee(tx.amount))}</span></div>` : `<span class="muted">${T().errAmt}</span>`;
+    };
+    ['num', 'nm', 'amt'].forEach((id) => $('#' + id).addEventListener('input', upd));
+    upd();
+    $('#cont').onclick = () => { if (tx.num.replace(/\D/g, '').length < 9) return notify(T().errNum, 'Mboa Pay'); if (!tx.amount) return; go('summary'); };
+  }
+  document.addEventListener('click', (e) => { const b = e.target.closest('[data-go]'); if (b) go(b.dataset.go); });
+  $('#lng').onclick = () => { lang = lang === 'fr' ? 'en' : 'fr'; document.documentElement.lang = lang; go(current === 'result' ? 'home' : current); };
+
+  function notify(text, from = 'SMS +237 699 88 77 66') {
+    const m = document.createElement('div');
+    m.className = 'msg';
+    m.innerHTML = `<div class="from">${esc(from)}</div><div>${esc(text)}</div><button aria-label="Fermer">✕</button>`;
+    m.querySelector('button').onclick = () => m.remove();
+    $('#notif').appendChild(m);
+  }
+  const PRESETS = [
+    ['🚨 SMS d\'arnaque', 'Félicitations ! Vous avez gagné 500 000 FCFA à la tombola Mboa. Envoyez votre code PIN au 699 88 77 66 pour recevoir votre gain.', 'SMS +237 699 88 77 66'],
+    ['🚨 « Envoyé par erreur »', 'Bonjour, je vous ai envoyé 15 000 FCFA par erreur sur votre compte. Renvoyez-moi l\'argent immédiatement svp.', 'SMS +237 655 44 33 22'],
+    ['❗ Condition inédite', 'Au-delà de 500 000 FCFA par jour, les transferts sont soumis à une vérification d\'identité en agence.', 'Mboa Pay'],
+    ['⛔ Erreur réseau', 'Erreur de connexion, veuillez réessayer.', 'Mboa Pay'],
+    ['🇬🇧 Message anglais', 'Your account will be suspended if you do not update your KYC documents before 30/11/2026.', 'Mboa Pay'],
+    ['🎉 Réception', 'Vous avez reçu 7 500 FCFA de Marie Ngo Bassa.', 'Mboa Pay']
+  ];
+  $('#presets').innerHTML = PRESETS.map((p, i) => `<button data-p="${i}">${p[0]}</button>`).join('');
+  $('#presets').addEventListener('click', (e) => { const b = e.target.closest('[data-p]'); if (b) { const p = PRESETS[+b.dataset.p]; $('#inject').value = p[1]; notify(p[1], p[2]); } });
+  $('#go').onclick = () => { const t = $('#inject').value.trim(); if (t) notify(t, 'Mboa Pay'); };
+  $('#tamper').onchange = () => { if (current === 'summary') go('summary'); };
+  go('home');
+})();
+</script>
+</body>
+</html>

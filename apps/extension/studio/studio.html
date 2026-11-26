@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Studio linguistique</title>
+<link rel="stylesheet" href="../repondeur/app.css">
+<style>
+ main{display:block;max-width:960px}
+ table{width:100%;border-collapse:collapse;font-size:.92rem}
+ td,th{border-bottom:1px solid var(--line);padding:6px 4px;text-align:left;vertical-align:top}
+ input[type=text],select{font:inherit;padding:6px 8px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);width:100%}
+ .actions button{padding:4px 8px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--ink);margin:1px}
+ .rec{background:var(--bad)!important;color:#fff!important}
+ .st{font-size:.8rem;color:var(--mute)}.st.ok{color:var(--pri)}
+ label.chk{display:inline-flex;gap:6px;align-items:center;margin:2px 10px 2px 0}
+ .grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}@media(max-width:720px){.grid{grid-template-columns:1fr}}
+ #msg{position:sticky;top:0;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 10px;margin:8px 0;display:none}
+</style>
+</head>
+<body>
+<header><h1>🎙️ Studio <span>linguistique</span></h1>
+<p class="demo">Règle : aucune traduction inventée. Un locuteur natif enregistre, un SECOND locuteur natif valide. Avant ça, le répondeur parle français facile.</p></header>
+<main>
+<div id="msg" role="status"></div>
+<section class="card"><h2>1. Qui êtes-vous ?</h2>
+ <input type="text" id="speaker" placeholder="Votre nom ou pseudo (obligatoire pour enregistrer/valider)">
+ <p class="hint">Un enregistrement est « validé » quand au moins 2 personnes différentes l'ont confirmé.</p></section>
+
+<section class="card"><h2>2. Enregistrer les phrases</h2>
+ <div class="grid"><label>Langue<select id="lang"></select></label>
+ <label>Groupe de phrases<select id="group"></select></label></div>
+ <p class="hint">Phrases avec {AMOUNT}, {NAME}, {PHONE}… : le répondeur les dit encore en français (montants). Enregistrez-les quand même : elles serviront aux fragments de chiffres plus tard. Pour les mots individuels (nombres, salutations), enregistrez une personne qui dit le mot seul.</p>
+ <table><thead><tr><th>Phrase (français facile)</th><th>Texte proposé dans votre langue</th><th>Audio</th></tr></thead><tbody id="rows"></tbody></table></section>
+
+<section class="card"><h2>3. Réglages</h2>
+ <div id="langchecks"></div>
+ <p class="hint">Maximum 4 langues dans le menu vocal (au-delà, les gens se perdent).</p>
+ <label class="chk"><input type="checkbox" id="strictAudio"> Mode strict : ne jouer que l'audio validé par 2 locuteurs</label><br>
+ <label class="chk"><input type="checkbox" id="speakNotif"> Lire les notifications à voix haute</label><br>
+ <label class="chk"><input type="checkbox" id="demoFast"> Démo rapide (rappels en minutes au lieu de jours)</label><br>
+ <label class="chk"><input type="checkbox" id="draftMode"> Mode brouillon : utiliser les brouillons IA (non validés) tant qu'il n'y a pas d'enregistrement validé</label><br>
+ <label class="chk"><input type="checkbox" id="draftVoice"> …et les dire avec une voix française approximative (test seulement, prononciation fausse)</label><br>
+ <label class="chk"><input type="checkbox" id="dailyTip"> Conseil de sécurité chaque jour (notification)</label></section>
+
+<section class="card"><h2>4. Export / import</h2>
+ <button id="exp-prop" class="actions">⬇️ Propositions de texte (JSON → <code>node tools/build-glossary.mjs fichier.json</code>)</button>
+ <button id="exp-rec" class="actions">⬇️ Enregistrements (JSON)</button>
+ <label class="actions">⬆️ Importer des enregistrements <input type="file" id="imp-rec" accept=".json" hidden></label></section>
+</main>
+<script type="module" src="studio.js"></script>
+</body>
+</html>

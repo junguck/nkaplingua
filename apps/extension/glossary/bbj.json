@@ -1,0 +1,17 @@
+{
+  "code": "bbj",
+  "name": "Ghomálá'",
+  "native": "Ghɔmálá'",
+  "flag": "🏔️",
+  "region": "Ouest (Bandjoun, Baham, Bafoussam…)",
+  "tts": "fr-FR",
+  "status_note": "KIT DE DÉMARRAGE : à compléter par locuteurs natifs dans le Studio linguistique. En attendant : français facile + pictogrammes.",
+  "default_status": "propose",
+  "sources": [
+    "Dictionnaire ghomálá' (Commune de Mdeng) — référence à consulter",
+    "Nissim, G. (1981). Le Bamiléké-Ghomálá' (parler de Bandjoun). CNRS"
+  ],
+  "entries": {
+    "term.money": "Nkap"
+  }
+}

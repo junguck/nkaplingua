@@ -1,0 +1,100 @@
+{
+  "manifest_version": 3,
+  "name": "NkapLingua — la finance dans nos langues",
+  "short_name": "NkapLingua",
+  "version": "1.1.0",
+  "description": "Comprend les interfaces financières en langues camerounaises (overlay) et simule un répondeur vocal. Montants verrouillés. Aucun vrai argent.",
+  "icons": {
+    "16": "icons/icon16.png",
+    "32": "icons/icon32.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "action": {
+    "default_popup": "popup/popup.html",
+    "default_title": "NkapLingua",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "32": "icons/icon32.png"
+    }
+  },
+  "options_page": "options/options.html",
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "permissions": [
+    "storage",
+    "contextMenus",
+    "activeTab",
+    "notifications",
+    "alarms",
+    "tts",
+    "offscreen"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "glossary/bundle.js",
+        "lib/engine.js",
+        "content/content.js"
+      ],
+      "css": [
+        "content/content.css"
+      ],
+      "run_at": "document_idle",
+      "all_frames": true
+    }
+  ],
+  "commands": {
+    "toggle": {
+      "suggested_key": {
+        "default": "Alt+Shift+N"
+      },
+      "description": "Activer / mettre en pause NkapLingua"
+    },
+    "read-aloud": {
+      "suggested_key": {
+        "default": "Alt+Shift+L"
+      },
+      "description": "Lire à voix haute la sélection ou la page"
+    },
+    "guide": {
+      "suggested_key": {
+        "default": "Alt+Shift+G"
+      },
+      "description": "Lancer le guide pas à pas"
+    },
+    "factsheet": {
+      "suggested_key": {
+        "default": "Alt+Shift+F"
+      },
+      "description": "Afficher la fiche claire"
+    },
+    "repondeur": {
+      "description": "Ouvrir le répondeur vocal (raccourci à attribuer dans chrome://extensions/shortcuts)"
+    }
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "nkaplingua@safinum.cm",
+      "strict_min_version": "121.0"
+    }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "fonts/*.woff2"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ]
+}
