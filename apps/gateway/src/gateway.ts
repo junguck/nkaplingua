@@ -11,6 +11,7 @@ import { handleUssd } from './ussd.js';
 import { handleUi } from './ui.js';
 import { InMemorySessions, type SessionStore } from './session.js';
 import { Connectivity, ResilientBank, SyncQueue, TranslationCache, type Charset, type SyncSender } from './offline.js';
+import type { SecondLook } from './second-look.js';
 import { resolveLanguage } from './i18n.js';
 import { resolveUiLanguage } from './ui-dictionaries.js';
 
@@ -30,6 +31,8 @@ export interface GatewayOptions {
   readonly fetchImpl?: typeof fetch;
   /** Injection pour les tests : évite tout appel réseau. */
   readonly bankFactory?: (turn: InboundTurn) => BankPort;
+  /** Second regard : un proche valide les gros transferts. Absent = désactivé. */
+  readonly secondLook?: SecondLook;
   /** Mode hors-ligne d'abord. Tout est optionnel : par défaut, cache embarqué et file en mémoire. */
   readonly offline?: {
     readonly cache?: TranslationCache;
@@ -51,6 +54,7 @@ export interface HandledTurn {
 export class Gateway {
   private readonly options: GatewayOptions;
   private readonly sessions: SessionStore;
+  readonly secondLook: SecondLook | undefined;
   readonly cache: TranslationCache;
   readonly queue: SyncQueue;
   readonly connectivity: Connectivity;
@@ -58,6 +62,7 @@ export class Gateway {
   constructor(options: GatewayOptions) {
     this.options = options;
     this.sessions = options.sessions ?? new InMemorySessions();
+    this.secondLook = options.secondLook;
     this.cache = options.offline?.cache ?? TranslationCache.bundled();
     this.queue = options.offline?.queue ?? new SyncQueue();
     this.connectivity = options.offline?.connectivity ?? new Connectivity();
@@ -107,6 +112,7 @@ export class Gateway {
       bank,
       sessions: this.sessions,
       ...(this.options.statusMode === undefined ? {} : { statusMode: this.options.statusMode }),
+      ...(this.options.secondLook ? { secondLook: this.options.secondLook } : {}),
     });
 
     // Banque injoignable : on répond depuis le cache, menu pré-traduit, session ouverte.

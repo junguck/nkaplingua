@@ -17,3 +17,5 @@ export { readScreen, SCREEN_FIELDS, type ScreenField, type ScreenReading, type T
 export { renderScreenCard, type ScreenCard, type ScreenCardRow, type ScreenAlert, type ScreenAlertLevel } from './screen/screen-card';
 export { detectScam, SCAM_REASONS, type ScamReason, type ScamVerdict } from './screen/scam';
 export { gsm7Length, isGsm7, toGsm7, truncateGsm7 } from './text/gsm7';
+export { checkMessage, type MessageCheck, type MessageVerdict } from './screen/message-check';
+export { auditRoundTrip, compareTemplates, verifyRoundTrip, renderVerified, type RoundTripAudit, type RoundTripFinding, type RoundTripProblem, type VerifiedText } from './render/round-trip';

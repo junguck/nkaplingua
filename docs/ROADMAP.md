@@ -29,6 +29,9 @@ Ce qui est livré est décrit dans le [README](../README.md) et les [ADR](adr/) 
 | **SVI** : répondeur de la présélection branché sur le moteur (DTMF + synthèse), menus en fulfulde | |
 | **Extension navigateur** branchée sur la gateway : panneau « demander » sur les simulateurs web SAFINUM | |
 | **Synchronisation hors-ligne** : brancher le `sender` de `SyncQueue` | Aucun point de terminaison documenté par SAFINUM à ce jour ([ADR 0005](adr/0005-mode-hors-ligne-ussd.md)) |
+| **Second regard** : envoi réel des SMS au proche (`Notifier`), saisie du proche et du seuil par l'utilisateur, balayage périodique `sweep()` | Implémenté et testé, désactivé par défaut ([INNOVATIONS](INNOVATIONS.md) §3) |
+| **Alerte anti-arnaque par message** : écran web et entrée SMS, textes fulfulde et pidgin | `checkMessage` existe dans le moteur ; repli français signalé en attendant ([INNOVATIONS](INNOVATIONS.md) §2) |
+| **Boîte à corrections communautaire** | À arbitrer ([INNOVATIONS](INNOVATIONS.md) §1) |
 
 ## P2 — bonus
 

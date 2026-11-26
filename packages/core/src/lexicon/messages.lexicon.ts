@@ -350,6 +350,26 @@ export const MESSAGES = {
   'screen.scam.reason.blockThreat': { fr: 'On menace de bloquer votre compte', en: 'You are threatened with a blocked account' },
   'screen.scam.reason.suspiciousLink': { fr: 'Lien ou adresse suspecte', en: 'Suspicious link or address' },
   'screen.scam.reason.ussdWithData': { fr: 'Code USSD contenant des données à saisir', en: 'USSD code that contains data to enter' },
+  'msgcheck.suspect.title': {
+    fr: 'ARNAQUE PROBABLE : ne répondez pas et ne donnez aucun code.',
+    en: 'LIKELY SCAM: do not reply and do not give any code.',
+  },
+  'msgcheck.suspect.advice': {
+    fr: 'Ne cliquez sur rien et ne payez rien. Un vrai service ne demande jamais votre code secret.',
+    en: 'Do not click anything and do not pay anything. A real service never asks for your PIN.',
+  },
+  'msgcheck.clear.title': {
+    fr: 'Aucun signe d’arnaque détecté. Cela ne prouve pas que le message est sûr.',
+    en: 'No sign of a scam detected. This does not prove the message is safe.',
+  },
+  'msgcheck.clear.advice': {
+    fr: 'En cas de doute, n’envoyez ni code ni argent et appelez le service au numéro officiel.',
+    en: 'If in doubt, send no code and no money, and call the service on its official number.',
+  },
+  'msgcheck.short.title': {
+    fr: 'Message trop court pour être analysé. Collez le message en entier.',
+    en: 'Message too short to analyse. Paste the whole message.',
+  },
 } as const satisfies Readonly<Record<string, TemplateSet>>;
 
 export type MessageKey = keyof typeof MESSAGES;

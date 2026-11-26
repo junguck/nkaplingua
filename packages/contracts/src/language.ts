@@ -3,7 +3,7 @@
  * `fr` et `en` sont les langues des interfaces sources ; `fub` et `wes` sont les langues
  * nationales servies. Ajouter une langue = ajouter un code ici + un fichier de lexique.
  */
-export const LANGUAGES = ['fr', 'en', 'fub', 'wes', 'ewo', 'bul'] as const;
+export const LANGUAGES = ['fr', 'en', 'fub', 'wes', 'ewo', 'bul', 'hau'] as const;
 export type LanguageCode = (typeof LANGUAGES)[number];
 
 export const SOURCE_LANGUAGE: LanguageCode = 'fr';
@@ -33,6 +33,7 @@ export const LANGUAGE_INFO: Readonly<Record<LanguageCode, LanguageInfo>> = {
   wes: { code: 'wes', name: 'Pidgin camerounais', nativeName: 'Kamtok', isNational: true, ttsLocale: 'en-GB', sttLocale: 'en-NG' },
   ewo: { code: 'ewo', name: 'Ewondo', nativeName: 'Ewondo', isNational: true, ttsLocale: 'fr-FR', sttLocale: null },
   bul: { code: 'bul', name: 'Bulu', nativeName: 'Bulu', isNational: true, ttsLocale: 'fr-FR', sttLocale: null },
+  hau: { code: 'hau', name: 'Haoussa', nativeName: 'Hausa', isNational: true, ttsLocale: 'fr-FR', sttLocale: null },
 };
 
 export function isLanguageCode(value: string): value is LanguageCode {

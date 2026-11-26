@@ -33,6 +33,7 @@ import {
   type MessageKey,
 } from './i18n.js';
 import { resolveTurnLanguage } from './language.js';
+import type { SecondLook } from './second-look.js';
 import type { SessionState, SessionStore, Step } from './session.js';
 
 const MAX_CHARS = 182;
@@ -44,6 +45,8 @@ export interface UssdDeps {
   readonly sessions: SessionStore;
   /** `contract` (défaut) : seuls les statuts observés sortent (§8). `lifecycle` : cycle bancaire brut. */
   readonly statusMode?: StatusMode;
+  /** Second regard (optionnel) : un proche valide les gros transferts avant confirmation. */
+  readonly secondLook?: SecondLook;
 }
 
 export async function handleUssd(turn: InboundTurn, deps: UssdDeps): Promise<UssdReply> {
@@ -543,6 +546,39 @@ async function atConfirmation(
   const value = text.trim().toLowerCase();
 
   if (value === '1' || ['oui', 'yes', 'eey', 'confirmer', 'confirm', 'tabbitin'].includes(value)) {
+    const contact = pending.type === 'transfer' ? deps.secondLook?.applies(phone, pending.total) : undefined;
+    if (deps.secondLook && contact) {
+      const request = await deps.secondLook.open(
+        {
+          transactionId: pending.id,
+          userPhone: phone,
+          userLanguage: language,
+          amount: pending.amount,
+          fee: pending.fee,
+          total: pending.total,
+          ...(pending.name === undefined ? {} : { recipientName: pending.name }),
+          ...(pending.to === undefined ? {} : { recipientPhone: pending.to }),
+        },
+        contact,
+        deps.bank,
+      );
+      // Pas encore de forme fulfulde relue : l'écran entier passe en français et le DÉCLARE,
+      // plutôt que d'afficher du français sous l'étiquette `fub`.
+      const shown: GatewayLanguage = language === 'en' ? 'en' : 'fr';
+      const wait =
+        shown === 'en'
+          ? `Waiting for ${contact.name} to approve. You will get an SMS.`
+          : `En attente de ${contact.name}. Vous recevrez un SMS.`;
+      return done(
+        reply(shown, wait, 'CONFIRM', {
+          language: shown,
+          end: true,
+          transaction: { id: pending.id, status: 'pending' },
+          params: { second_look: request.id },
+        }),
+      );
+    }
+
     const result = await deps.bank.confirm(pending.id);
     if (!result.ok) return failure(result, 'CONFIRM', language, pending.id);
 

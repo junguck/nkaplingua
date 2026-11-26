@@ -1,6 +1,6 @@
 # Brancher SAFINUM — mode d'emploi du middleware
 
-> `apps/gateway` · 35 tests dédiés · une seule URL pour `ussd`, `mobile` et `web`.<br>
+> `apps/gateway` · 43 tests dédiés · une seule URL pour `ussd`, `mobile` et `web`.<br>
 > Contrat et règles d'évaluation : [`SANDBOX-SAFINUM.md`](SANDBOX-SAFINUM.md).
 
 ## 1. Ce qui existe
@@ -164,7 +164,7 @@ n'activer qu'après l'avoir vu accepté par la sandbox.
 
 ## 8. Ce qui a été vérifié
 
-- `pnpm test` : 118 tests (35 pour le gateway, dont 6 pour le mode hors-ligne), chaîne réelle middleware → HTTP → banque.
+- `pnpm test` : 139 tests (43 pour le gateway, dont 6 pour le mode hors-ligne et 8 pour le second regard), chaîne réelle middleware → HTTP → banque.
 - `pnpm typecheck` : 9 projets verts.
 - Bundle `dist/server.js` + banque de démo en HTTP : kit officiel (menu, solde, écran web), transfert en
   texte libre fulfulde créé au tour A puis confirmé au tour B, options dans la langue de l'écran.
