@@ -21,10 +21,10 @@ export interface UiCoverage {
 
 const PLACEHOLDER = /\{([a-z_]+)\}/g;
 
-export function handleUi(turn: InboundTurn): UiReply {
+export function handleUi(turn: InboundTurn, overlay?: Readonly<Record<string, string>>): UiReply {
   const source = turn.strings ?? {};
   const requested = resolveUiLanguage(turn.language);
-  const translated = translate(source, requested);
+  const translated = translate(source, requested, overlay);
 
   if (translated.language === requested && requested !== 'fr') {
     return { language: requested, strings: translated.strings };
@@ -40,8 +40,11 @@ export function handleUi(turn: InboundTurn): UiReply {
 export function translate(
   source: Readonly<Record<string, UiStringEntry>>,
   language: UiLanguage,
+  overlay?: Readonly<Record<string, string>>,
 ): { language: UiLanguage; strings: Record<string, string> } {
-  const dictionary = dictionaryFor(language);
+  const base = dictionaryFor(language);
+  // Le cache local (corrections, nouvelles traductions) passe avant le dictionnaire embarqué.
+  const dictionary = base ? { ...base, ...(overlay ?? {}) } : null;
   if (!dictionary) {
     return { language: 'fr', strings: plain(source) };
   }
