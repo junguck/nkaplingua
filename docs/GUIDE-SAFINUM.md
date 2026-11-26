@@ -41,6 +41,10 @@ node apps/gateway/dist/server.js                      # http://127.0.0.1:8080
 curl http://127.0.0.1:8080/health
 ```
 
+Console de test : <http://127.0.0.1:8080/console> — pavé USSD, onglets mobile/web, choix de langue,
+JSON de réponse, compteur de septets et scénario de transfert en quatre tours. Elle appelle le
+middleware sur la même origine : pratique pour montrer la chaîne sans passer par la sandbox.
+
 Payloads du kit officiel (adaptés au compte de démo `237699000003`) :
 
 ```bash

@@ -8,6 +8,7 @@
  * Lancer : `pnpm build && node dist/server.js` (port 8080 par défaut).
  */
 
+import fs from 'node:fs';
 import http from 'node:http';
 import { fileURLToPath } from 'node:url';
 import type { AddressInfo } from 'node:net';
@@ -38,6 +39,14 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
     void (async () => {
       const started = Date.now();
       const url = new URL(req.url ?? '/', 'http://127.0.0.1');
+
+      // Console de test : la même page sert de simulateur USSD / mobile / web en local.
+      if (req.method === 'GET' && (url.pathname === '/console' || url.pathname === '/console/')) {
+        const page = fs.readFileSync(fileURLToPath(new URL('../public/console.html', import.meta.url)), 'utf8');
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+        res.end(page);
+        return;
+      }
 
       if (req.method === 'GET' && (url.pathname === '/' || url.pathname === '/health')) {
         return json(res, 200, {
