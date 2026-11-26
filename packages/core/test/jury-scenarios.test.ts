@@ -30,8 +30,8 @@ describe('§7 — scénarios standardisés du jury', () => {
   it('3. Consultation des frais : frais et total expliqués', async () => {
     const h = harness();
     const r = await h.say('Combien de frais pour envoyer 25 000 ?');
-    expect(r.reply.text).toBe('Pour 25 000 FCFA, les frais sont de 375 FCFA. Total : 25 375 FCFA.');
-    expect(r.trace.params).toMatchObject({ amount: 25000, fee: 375, total: 25375 });
+    expect(r.reply.text).toBe('Pour 25 000 FCFA, les frais sont de 150 FCFA. Total : 25 150 FCFA.');
+    expect(r.trace.params).toMatchObject({ amount: 25000, fee: 150, total: 25150 });
   });
 
   it('4. Historique : les opérations récentes sont restituées', async () => {
@@ -76,7 +76,7 @@ describe('§7 — scénarios standardisés du jury', () => {
     expect(r1.reply.options.map((o) => o.label)).toEqual(['Envoyer de l’argent', 'Retirer', 'Acheter du crédit']);
     const r2 = await h.say('2');
     expect(r2.stage).toBe('confirming');
-    expect(r2.reply.card).toMatchObject({ intent: 'WITHDRAW', amount: 5000, fee: 100 });
+    expect(r2.reply.card).toMatchObject({ intent: 'WITHDRAW', amount: 5000, fee: 50 });
   });
 
   it('7. Solde insuffisant : explication chiffrée, rien n’est débité', async () => {
@@ -86,7 +86,7 @@ describe('§7 — scénarios standardisés du jury', () => {
     expect(r.trace.errors).toContain('INSUFFICIENT_FUNDS');
     expect(r.reply.parts.slice(0, 2)).toEqual([
       "Vous n'avez pas assez d'argent pour cette opération.",
-      'Il faut 81 000 FCFA frais compris, vous avez 50 000 FCFA. Donnez un montant plus petit.',
+      'Il faut 80 400 FCFA frais compris, vous avez 50 000 FCFA. Donnez un montant plus petit.',
     ]);
     // Le bénéficiaire est gardé : il suffit de redonner un montant.
     const r2 = await h.say('20 000');

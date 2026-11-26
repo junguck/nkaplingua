@@ -1,0 +1,85 @@
+/**
+ * Une session USSD dure 180 secondes. On garde en mémoire ce que l'utilisateur a déjà saisi
+ * et la transaction en attente côté banque (son identifiant, jamais un montant recalculé).
+ * Le magasin est volontairement remplaçable : en production, Redis ou une table.
+ */
+
+export type Step =
+  | 'menu'
+  | 'transfer_to'
+  | 'transfer_pick'
+  | 'transfer_amount'
+  | 'airtime_target'
+  | 'airtime_phone'
+  | 'airtime_amount'
+  | 'bill_biller'
+  | 'bill_reference'
+  | 'bill_amount'
+  | 'fees_amount'
+  | 'confirm'
+  | 'help'
+  | 'language';
+
+export interface PendingTransaction {
+  readonly id: string;
+  readonly type: 'transfer' | 'airtime' | 'bill';
+  readonly amount: number;
+  readonly fee: number;
+  readonly total: number;
+  readonly to?: string;
+  readonly name?: string;
+  readonly biller?: string;
+  readonly reference?: string;
+}
+
+export interface SessionState {
+  step: Step;
+  language: 'fr' | 'en' | 'fub';
+  draft: {
+    to?: string;
+    name?: string;
+    candidates?: ReadonlyArray<{ name: string; phone: string }>;
+    biller?: string;
+    billReference?: string;
+  };
+  pending?: PendingTransaction;
+  updatedAt: number;
+}
+
+export interface SessionStore {
+  get(key: string): SessionState | undefined;
+  set(key: string, state: SessionState): void;
+  delete(key: string): void;
+}
+
+const TTL_MS = 180_000;
+
+export class InMemorySessions implements SessionStore {
+  private readonly states = new Map<string, SessionState>();
+
+  get(key: string): SessionState | undefined {
+    const state = this.states.get(key);
+    if (!state) return undefined;
+    if (Date.now() - state.updatedAt > TTL_MS) {
+      this.states.delete(key);
+      return undefined;
+    }
+    return state;
+  }
+
+  set(key: string, state: SessionState): void {
+    state.updatedAt = Date.now();
+    this.states.set(key, state);
+    if (this.states.size > 5_000) this.evict();
+  }
+
+  delete(key: string): void {
+    this.states.delete(key);
+  }
+
+  private evict(): void {
+    for (const [key, state] of this.states) {
+      if (Date.now() - state.updatedAt > TTL_MS) this.states.delete(key);
+    }
+  }
+}

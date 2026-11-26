@@ -14,20 +14,20 @@ Priorités : **P0** = sans ça on est éliminé · **P1** = ce qui fait gagner �
 - [x] `@nkap/banking-sim` : comptes, contacts, grilles de frais, plafonds, idempotence, historique
 - [x] **53 tests** dont les 10 scénarios du §7 joués de bout en bout
 
-## J1 — le middleware SAFINUM (révisé après lecture de la doc sandbox)
+## J1 — le middleware SAFINUM (fait)
 
 > La passerelle SAFINUM appelle NOTRE middleware pour `ussd`, `mobile` et `web` : c'est le chemin évalué.
-> Détail et écarts : [`SANDBOX-SAFINUM.md`](SANDBOX-SAFINUM.md).
+> Détail et écarts : [`SANDBOX-SAFINUM.md`](SANDBOX-SAFINUM.md) ; mode d'emploi : [`GUIDE-SAFINUM.md`](GUIDE-SAFINUM.md).
 
 | P | Tâche | Livrable vérifiable |
 |---|---|---|
-| P0 | **Port financier v2** : `initiate / update / confirm / cancel`, contexte de tour avec `X-Trace-Id` | Tests du dialogue verts sur le nouveau port |
-| P0 | **Adaptateur `SafinumBank`** (`X-Team-Key`, `X-Trace-Id`, `GET /fees`, `GET /beneficiaries`, erreurs → messages) | `GET /accounts/{phone}` visible dans le journal du jury |
-| P0 | **Middleware NestJS** `POST /middleware/:channel` : contrat reçu → `TurnRequest` → réponse au format SAFINUM | Le contrôle de contrat du simulateur passe |
-| P0 | **Correspondance des intentions** + `CLARIFICATION_NEEDED` / `CORRECTION` | Aucune `INVALID_RESPONSE` |
-| P0 | **Sortie GSM-7** sur USSD (translittération ɓ ɗ ŋ ƴ ɛ ɔ ə, ponctuation) | Panneau Diagnostics sans anomalie |
-| P0 | Grille de frais officielle dans `banking-sim` | 25 000 → 25 150 |
-| P0 | Tunnel public + `POST /sandbox/endpoint` pour les 3 canaux | `GET /sandbox/endpoint` renvoie nos URL |
+| ✅ P0 | **Port financier v2** : `initiate / update / confirm / cancel`, contexte de tour avec `X-Trace-Id` | `apps/gateway/src/bank.ts`, testé contre la banque de démonstration |
+| ✅ P0 | **Adaptateur `SafinumBank`** (`X-Team-Key`, `X-Trace-Id`, `GET /fees`, `GET /beneficiaries`, erreurs → messages) | En-têtes vérifiés côté banque dans les tests |
+| ✅ P0 | **Middleware** `POST /middleware/:channel` : contrat reçu → dialogue → réponse au format SAFINUM | 18 tests, dont la chaîne HTTP réelle |
+| ✅ P0 | **Correspondance des intentions** + `CLARIFICATION_NEEDED` / `CORRECTION` | Aucune intention hors liste (vérifié par test) |
+| ✅ P0 | **Sortie GSM-7** sur USSD (translittération ɓ ɗ ŋ ƴ ɛ ɔ ə, ponctuation, septets) | 182 septets vérifiés, options comprises |
+| ✅ P0 | Grille de frais officielle dans `banking-sim` | 25 000 → 25 150 |
+| ⏳ P0 | Tunnel public + `POST /sandbox/endpoint` pour les 3 canaux | Outil prêt (`scripts/safinum.mjs`) ; **bloqué : aucune clé `sbx_…`** |
 | P1 | Flux des traces en direct (console jury locale) | SSE |
 | P1 | Validation linguistique fulfulde (+ duala ou ewondo) avec des locuteurs | Gabarits critiques « validé » |
 
