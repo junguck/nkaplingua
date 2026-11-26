@@ -116,4 +116,4 @@ non validées **doivent** être relues par des locuteurs natifs avant la démons
 **Haoussa (`hau`)** : 65 entrées sur 129 (54 termes et 11 libellés d'interface) ont été ajoutées au glossaire de
 l'extension (`apps/extension/glossary/hau.json`) à partir d'enregistrements audio transcrits automatiquement. Toutes sont
 « proposées » et à relire par des locuteurs natifs ; les phrases `ph.*` restent à traduire (repli français). Le haoussa
-n'est pas encore servi par le middleware.
+n'est pas encore servi par le middleware. Dans le moteur, `hau` est un code de langue du contrat (détection par mots distinctifs, statut « proposé ») : tant que les gabarits ne sont pas traduits, il retombe sur le français et le signale.
