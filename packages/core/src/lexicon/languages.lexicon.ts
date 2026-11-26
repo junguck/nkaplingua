@@ -6,6 +6,8 @@ export const LANGUAGE_NAMES: Readonly<Record<LanguageCode, readonly string[]>> =
   en: ['anglais', 'english', 'inglisi'],
   fub: ['fulfulde', 'foulfouldé', 'foulfoulde', 'peul', 'fulani', 'fula', 'pulaar'],
   wes: ['pidgin', 'pidjin', 'kamtok', 'pigin'],
+  ewo: ['ewondo'],
+  bul: ['bulu'],
   hau: ['haoussa', 'hausa', 'haussa', 'houssa'],
 };
 
@@ -28,6 +30,10 @@ export const FUNCTION_WORDS: Readonly<Record<LanguageCode, ReadonlyArray<readonl
   // Mots distinctifs relevés dans les enregistrements du glossaire ; liste courte, à enrichir avec des locuteurs.
   hau: [['kuɗi', 3], ['kudi', 3], ['aika', 3], ['asusu', 3], ['lambar', 3], ['adadin', 3], ['biya', 3], ['sake', 2], ['barka', 3], ['na gode', 3], ['ina', 1], ['ba', 1]],
   fub: [['mi', 1], ['maa', 3], ['am', 1], ['ka', 2], ['ngam', 3], ['ko', 2], ['ɗum', 3], ['yiɗi', 3], ['ceede', 3], ['njelu', 3], ['ɗoo', 3], ['hande', 3], ['eey', 3], ['ala', 2], ['ujineere', 3], ['jam', 2], ['useni', 3], ['jaraama', 3], ['no', 1], ['e', 1]],
+  // Aucun mot-outil attesté dans ewo.json / bul.json : liste vide plutôt qu'inventée.
+  // Ces langues sont reconnues par leurs indices d'intention ou choisies au menu de langue.
+  ewo: [],
+  bul: [],
 };
 
 /** « Mon solde », « my balance », « ma balans », « ceede am » : l'utilisateur parle de SES valeurs. */

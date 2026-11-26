@@ -21,6 +21,8 @@ export const DEFAULT_STATUS: Readonly<Record<LanguageCode, TranslationStatus>> =
   en: 'reference',
   fub: 'proposed',
   wes: 'proposed',
+  ewo: 'proposed',
+  bul: 'proposed',
   hau: 'proposed',
 };
 
