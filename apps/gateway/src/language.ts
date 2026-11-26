@@ -12,7 +12,7 @@
 
 import type { LanguageCode } from '@nkap/contracts';
 import { detectLanguage as detectWithEngine, fold } from '@nkap/core';
-import type { GatewayLanguage } from './i18n.js';
+import { isServedLanguage, type GatewayLanguage } from './i18n.js';
 
 export interface LanguageGuess {
   readonly language: GatewayLanguage;
@@ -25,7 +25,7 @@ export interface LanguageGuess {
 const MIN_MARGIN = 2;
 
 function isServed(lang: LanguageCode): lang is GatewayLanguage {
-  return lang === 'fr' || lang === 'en' || lang === 'fub';
+  return isServedLanguage(lang);
 }
 
 export function detectLanguage(text: string, fallback: GatewayLanguage = 'fr'): LanguageGuess {
@@ -42,7 +42,7 @@ export function resolveTurnLanguage(
   },
   text: string,
 ): { language: GatewayLanguage; source: 'turn' | 'detected' | 'user'; confidence: number } {
-  if (options.requested === 'fr' || options.requested === 'en' || options.requested === 'fub') {
+  if (isServedLanguage(options.requested)) {
     return { language: options.requested, source: 'turn', confidence: 3 };
   }
   if (options.source === 'user' && options.current) {

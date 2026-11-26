@@ -1,6 +1,6 @@
 # Brancher SAFINUM — mode d'emploi du middleware
 
-> `apps/gateway` · 47 tests dédiés · une seule URL pour `ussd`, `mobile` et `web`.<br>
+> `apps/gateway` · 57 tests dédiés · une seule URL pour `ussd`, `mobile` et `web`.<br>
 > Contrat et règles d'évaluation : [`SANDBOX-SAFINUM.md`](SANDBOX-SAFINUM.md).
 
 ## 1. Ce qui existe
@@ -171,7 +171,7 @@ trop longue n'est jamais envoyée. Sous 75 % de clés traduites, tout l'écran r
 
 ## 8. Ce qui a été vérifié
 
-- `pnpm test` : 143 tests (47 pour le gateway, dont 6 pour le mode hors-ligne et 8 pour le second regard), chaîne réelle middleware → HTTP → banque.
+- `pnpm test` : 153 tests (57 pour le gateway, dont 6 pour le mode hors-ligne et 8 pour le second regard), chaîne réelle middleware → HTTP → banque.
 - `pnpm typecheck` : 9 projets verts.
 - Bundle `dist/server.js` + banque de démo en HTTP : kit officiel (menu, solde, écran web), transfert en
   texte libre fulfulde créé au tour A puis confirmé au tour B, options dans la langue de l'écran.
@@ -179,7 +179,22 @@ trop longue n'est jamais envoyée. Sous 75 % de clés traduites, tout l'écran r
   l'initiation et la confirmation.
 - **Sandbox en direct : non testée** — la sandbox répond, mais refuse la clé d'équipe fournie (401, 26/11).
 
-## 9. Mode hors-ligne (zones blanches)
+## 9. Packs de langue (jour J)
+
+Une langue de la sandbox s'ajoute **sans toucher au code** : `apps/gateway/translations/<code>.json`.
+
+```bash
+pnpm --filter @nkap/gateway i18n modele     # translations/_modele.json : 89 clés d'écran + 56 phrases USSD, fr/en en regard
+cp apps/gateway/translations/_modele.json apps/gateway/translations/dua.json   # puis faire remplir par 2 locuteurs
+pnpm --filter @nkap/gateway i18n verifier   # couverture, emplacements {x}, 182 septets ; code 1 si problème
+pnpm test                                   # refuse tout pack cassé
+```
+
+Servi au redémarrage : USSD si **toutes** les phrases sont traduites (sinon `fr` déclaré) ; écrans dès que ≤ 25 %
+des textes restent en français. La langue apparaît alors au menu 8. `NKAP_TRANSLATIONS_DIR` pointe un autre dossier.
+État des langues et sources : [LANGUES.md](LANGUES.md).
+
+## 10. Mode hors-ligne (zones blanches)
 
 Le middleware garde ses traductions en local (`TranslationCache`, garni au démarrage). Si la banque ne répond
 pas, il répond depuis ce cache sans rien attendre.

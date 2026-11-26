@@ -1,23 +1,78 @@
 {
-  "code": "dua",
-  "name": "Duala",
-  "native": "Duálá",
-  "flag": "🌊",
-  "region": "Littoral (Douala), Moungo",
-  "tts": "fr-FR",
-  "status_note": "KIT DE DÉMARRAGE : formules de base attestées (Omniglot). Le vocabulaire financier doit être fourni par des locuteurs natifs via le Studio linguistique. En attendant : français facile + pictogrammes.",
-  "default_status": "propose",
-  "sources": [
-    "Omniglot — Useful phrases in Duala (Ee, Kɛm, Na sôm, Ongwane mba, Son, Lakisɛ mba, Dina, Pô la ɓwâm)",
-    "Helmlinger, P. (1972). Dictionnaire duala-français. Klincksieck — référence à consulter",
-    "Ittmann, J. (1976). Wörterbuch der Duala-Sprache / Dictionnaire de la langue duala"
-  ],
-  "entries": {
-    "term.yes": {"t": "Ee", "s": "atteste", "src": "Omniglot Duala"},
-    "term.no": {"t": "Kɛm", "s": "atteste", "src": "Omniglot Duala"},
-    "term.thanks": {"t": "Na sôm", "s": "atteste", "src": "Omniglot Duala"},
-    "term.help": {"t": "Ongwane mba", "s": "atteste", "src": "Omniglot Duala ('Aidez-moi !')"},
-    "term.name": {"t": "Dina", "s": "atteste", "src": "Omniglot Duala ('Dina lôngo na njé?')"},
-    "ph.welcome": {"t": "Pô la ɓwâm", "s": "atteste", "src": "Omniglot Duala"}
+ "code": "dua",
+ "name": "Duala",
+ "native": "Duálá",
+ "flag": "🌊",
+ "region": "Littoral (Douala), Moungo",
+ "tts": "fr-FR",
+ "status_note": "KIT DE DÉMARRAGE : formules de base (Omniglot) et vocabulaire financier attesté dans Helmlinger 1972 (OCR : diacritiques à vérifier). Les PHRASES doivent être produites par des locuteurs natifs (packs apps/gateway/translations/dua.json). En attendant : français facile.",
+ "default_status": "propose",
+ "sources": [
+  "Omniglot — Useful phrases in Duala (Ee, Kɛm, Na sôm, Ongwane mba, Son, Lakisɛ mba, Dina, Pô la ɓwâm)",
+  "Helmlinger, P. (1972). Dictionnaire duala-français. Klincksieck — référence à consulter",
+  "Ittmann, J. (1976). Wörterbuch der Duala-Sprache / Dictionnaire de la langue duala",
+  "Helmlinger, P. (1972), texte intégral consulté le 26/11/2026 via Internet Archive (identifiant « duala »)"
+ ],
+ "entries": {
+  "term.yes": {
+   "t": "Ee",
+   "s": "atteste",
+   "src": "Omniglot Duala"
+  },
+  "term.no": {
+   "t": "Kɛm",
+   "s": "atteste",
+   "src": "Omniglot Duala"
+  },
+  "term.thanks": {
+   "t": "Na sôm",
+   "s": "atteste",
+   "src": "Omniglot Duala"
+  },
+  "term.help": {
+   "t": "Ongwane mba",
+   "s": "atteste",
+   "src": "Omniglot Duala ('Aidez-moi !')"
+  },
+  "term.name": {
+   "t": "Dina",
+   "s": "atteste",
+   "src": "Omniglot Duala ('Dina lôngo na njé?')"
+  },
+  "ph.welcome": {
+   "t": "Pô la ɓwâm",
+   "s": "atteste",
+   "src": "Omniglot Duala"
+  },
+  "term.money": {
+   "t": "Mbolo, moni",
+   "s": "atteste",
+   "src": "Helmlinger 1972, lexique français-duala (texte intégral Internet Archive « duala ») — OCR, diacritiques à vérifier (« argent mbolo, moni »)"
+  },
+  "term.send": {
+   "t": "Lôma",
+   "s": "atteste",
+   "src": "Helmlinger 1972, lexique français-duala (texte intégral Internet Archive « duala ») — OCR, diacritiques à vérifier (« envoyer lôma »)"
+  },
+  "term.account": {
+   "t": "Musongi",
+   "s": "atteste",
+   "src": "Helmlinger 1972, lexique français-duala (texte intégral Internet Archive « duala ») — OCR, diacritiques à vérifier (« compte musongi »)"
+  },
+  "term.confirm": {
+   "t": "Bâmse",
+   "s": "atteste",
+   "src": "Helmlinger 1972, lexique français-duala (texte intégral Internet Archive « duala ») — OCR, diacritiques à vérifier (« confirmer bâmse »)"
+  },
+  "term.cancel": {
+   "t": "Wunja",
+   "s": "atteste",
+   "src": "Helmlinger 1972, lexique français-duala (texte intégral Internet Archive « duala ») — OCR, diacritiques à vérifier (« annuler (une décision) wunja »)"
+  },
+  "term.phone": {
+   "t": "Telefon",
+   "s": "atteste",
+   "src": "Helmlinger 1972, lexique français-duala (texte intégral Internet Archive « duala ») — OCR, diacritiques à vérifier (« téléphone telefon (étrg.) »)"
   }
+ }
 }

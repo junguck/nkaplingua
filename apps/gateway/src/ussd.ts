@@ -24,6 +24,8 @@ import type { BankFailure, BankPort, FeeType } from './bank.js';
 import { amountIn, isCancellation, isConfirmation, understandFreeText, type Understood } from './free-text.js';
 import {
   MENU_KEYS,
+  languageName,
+  servedLanguages,
   displayPhone,
   message,
   money,
@@ -156,13 +158,11 @@ async function advance(
       return done(reply(language, message(language, term), 'TERM_EXPLANATION', { end: true, term: text }));
     }
     case 'language': {
-      const choices: Readonly<Record<string, GatewayLanguage>> = { '1': 'fr', '2': 'en', '3': 'fub' };
-      const chosen = choices[text];
+      const index = Number.parseInt(text, 10);
+      const chosen = Number.isInteger(index) ? servedLanguages()[index - 1] : undefined;
       if (!chosen) {
         // On reste sur le choix de langue : sinon la saisie suivante serait lue comme un choix du menu.
-        return keep(
-          reply(language, message(language, 'ask.language'), 'CLARIFICATION_NEEDED'),
-        );
+        return keep(reply(language, languageMenuText(language), 'CLARIFICATION_NEEDED', languageMenuOptions()));
       }
       state.language = chosen;
       state.languageSource = 'user';
@@ -213,7 +213,7 @@ async function menu(
       return keep(reply(language, message(language, 'ask.term'), 'TERM_EXPLANATION'));
     case 'language':
       state.step = 'language';
-      return keep(reply(language, message(language, 'ask.language'), 'LANGUAGE_SWITCH'));
+      return keep(reply(language, languageMenuText(language), 'LANGUAGE_SWITCH', languageMenuOptions()));
     default: {
       if (text === '') return keep(reply(language, menuText(language), 'UNKNOWN', menuOptions(language)));
       const understood = understandFreeText(text, language);
@@ -241,6 +241,10 @@ async function followFreeText(
     case 'help':
     case 'language':
       return menu(state, String(MENU_KEYS.indexOf(`menu.${route.kind}`) + 1), phone, deps, language);
+    case 'term': {
+      const key: MessageKey = route.term === 'fees' ? 'term.fee' : route.term === 'limit' ? 'term.limit' : 'term.beneficiary';
+      return done(reply(language, message(language, key), 'TERM_EXPLANATION', { end: true, term: route.term }));
+    }
     case 'fees':
       if (route.amount !== undefined) return showFees(state, String(route.amount), deps, language);
       return menu(state, '3', phone, deps, language);
@@ -768,6 +772,15 @@ function finalizeText(text: string, options: readonly string[], maxChars: number
   const budget = optionsBlock ? maxChars - gsm7Length(optionsBlock) - 1 : maxChars;
   const body = truncateGsm7(toGsm7(text), Math.max(24, budget));
   return optionsBlock ? `${body}\n${optionsBlock}` : body;
+}
+
+/** Menu 8 : les langues réellement servies (intégrées + packs complets), noms natifs de la sandbox. */
+function languageMenuText(language: GatewayLanguage): string {
+  return `${message(language, 'ask.language')}\n${numbered(servedLanguages().map(languageName))}`;
+}
+
+function languageMenuOptions(): ReplyOptions {
+  return { options: servedLanguages().map(languageName), listedInText: true };
 }
 
 /** Comme le kit officiel : la liste est dans le texte, et ses libellés dans `options`. */

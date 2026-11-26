@@ -4,6 +4,8 @@
  * Le magasin est volontairement remplaçable : en production, Redis ou une table.
  */
 
+import type { GatewayLanguage } from './i18n.js';
+
 export type Step =
   | 'menu'
   | 'transfer_to'
@@ -34,7 +36,7 @@ export interface PendingTransaction {
 
 export interface SessionState {
   step: Step;
-  language: 'fr' | 'en' | 'fub';
+  language: GatewayLanguage;
   /** D'où vient la langue : la passerelle, la détection, ou le choix explicite du menu 8. */
   languageSource?: 'turn' | 'detected' | 'user';
   draft: {

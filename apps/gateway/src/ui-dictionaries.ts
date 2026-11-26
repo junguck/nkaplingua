@@ -9,7 +9,10 @@
  * français et `language` vaut `fr` (sinon la sandbox signalerait `UNTRANSLATED`).
  */
 
-export type UiLanguage = 'fr' | 'en' | 'fub';
+import { isSafinumLanguage, type SafinumLanguage } from '@nkap/safinum';
+import { PACK_LOAD } from './i18n.js';
+
+export type UiLanguage = SafinumLanguage;
 
 type Dictionary = Readonly<Record<string, string>>;
 
@@ -198,13 +201,19 @@ const FUB: Dictionary = {
   'error.GENERIC': 'Golle ndee waɗaaka. Ɗaɓɓit caggal.',
 };
 
-export const UI_DICTIONARIES: Readonly<Record<UiLanguage, Dictionary>> = { fr: {}, en: EN, fub: FUB };
+export const UI_DICTIONARIES: Readonly<Partial<Record<UiLanguage, Dictionary>>> = { fr: {}, en: EN, fub: FUB };
 
-/** Langue servie pour un écran : couverte et connue, sinon français. */
+/** Langue demandée pour un écran si nous avons un dictionnaire (intégré ou pack), sinon français. */
 export function resolveUiLanguage(requested: string | null | undefined): UiLanguage {
-  return requested === 'en' || requested === 'fub' ? requested : 'fr';
+  if (!isSafinumLanguage(requested)) return 'fr';
+  return requested in UI_DICTIONARIES || PACK_LOAD.packs.has(requested) ? requested : 'fr';
 }
 
+/** Dictionnaire intégré complété par le pack de la langue (le pack, plus récent, l'emporte). */
 export function dictionaryFor(language: UiLanguage): Dictionary | null {
-  return language === 'fr' ? null : UI_DICTIONARIES[language];
+  if (language === 'fr') return null;
+  const builtIn = UI_DICTIONARIES[language];
+  const pack = PACK_LOAD.packs.get(language)?.ui;
+  if (!builtIn && !pack) return null;
+  return { ...(builtIn ?? {}), ...(pack ?? {}) };
 }

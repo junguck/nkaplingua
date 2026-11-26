@@ -627,3 +627,13 @@ describe('langues de la sandbox : comprendre sans prétendre répondre', () => {
   });
 });
 
+describe('scénario jury « terminologie »', () => {
+  it('« Que veut dire frais ? » : explication directe, intention TERM_EXPLANATION', async () => {
+    const gateway = new Gateway({ teamKey: 'k', bankUrl: '', sessions: new InMemorySessions(), bankFactory: () => ({}) as BankPort });
+    const reply = (await gateway.handle(turn({ session_id: 'term-1', input: { type: 'text', text: 'Que veut dire frais ?' } }))) as UssdReply;
+    assertContract(reply);
+    expect(reply.interpretation.intent).toBe('TERM_EXPLANATION');
+    expect(reply.response.text).toContain('Les frais sont');
+  });
+});
+

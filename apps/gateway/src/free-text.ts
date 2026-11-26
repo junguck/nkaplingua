@@ -14,10 +14,15 @@ import type { GatewayLanguage } from './i18n.js';
 
 export type FreeTextRoute =
   | { readonly kind: 'balance' | 'history' | 'help' | 'language' }
+  /** Terme que le menu d'aide sait expliquer (scénario « terminologie » du jury). */
+  | { readonly kind: 'term'; readonly term: ExplainedTerm }
   | { readonly kind: 'fees'; readonly amount?: number }
   | { readonly kind: 'transfer'; readonly amount?: number; readonly recipient?: string; readonly phone?: string }
   | { readonly kind: 'airtime'; readonly amount?: number; readonly phone?: string }
   | { readonly kind: 'bill'; readonly amount?: number; readonly biller?: string; readonly reference?: string };
+
+export type ExplainedTerm = 'fees' | 'limit' | 'beneficiary';
+const EXPLAINED: ReadonlySet<string> = new Set<ExplainedTerm>(['fees', 'limit', 'beneficiary']);
 
 export interface Understood {
   readonly route: FreeTextRoute;
@@ -43,7 +48,10 @@ export function understandFreeText(text: string, language: GatewayLanguage): Und
   const interpretation = interpret(text, { hintLang: language, knownNames: [] });
   if (!ROUTABLE.has(interpretation.intent)) return null;
 
-  const { amount, recipientQuery, phone, biller, billReference } = interpretation.slots;
+  const { amount, recipientQuery, phone, biller, billReference, term } = interpretation.slots;
+  if (interpretation.intent === 'EXPLAIN_TERM' && term !== undefined && EXPLAINED.has(term)) {
+    return { route: { kind: 'term', term: term as ExplainedTerm }, intent: 'TERM_EXPLANATION', parameters: { term } };
+  }
   const value = amount?.amount;
   const parameters: Record<string, string | number> = {};
   if (value !== undefined) Object.assign(parameters, { amount: value, currency: 'XAF' });

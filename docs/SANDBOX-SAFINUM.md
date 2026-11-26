@@ -227,3 +227,38 @@ Le kit Node.js remis aux équipes (« respecte déjà le contrat ») tranche plu
 | Erreur bancaire | fin de session, `transaction.status: failed` si une transaction existait | déjà le cas |
 | Clés d'écran de référence | `translations/en.json` : 89 clés | identiques à notre dictionnaire anglais (89/89) |
 
+
+## 10. Les dix scénarios d'évaluation (documentation relue le 26/11)
+
+Source : données de la page `https://safinum.cm/sandbox/docs` (attribut Inertia `data-page`, clé `scenarios`)
+et composant `Docs`. Chaque scénario est joué **sur USSD** (« say » : ce que dit le testeur) **et dans
+l'application** mobile/web (« app » : ce que le testeur ouvre). La langue est **tirée au sort**.
+
+| Scénario | Le jury attend | Le jury surveille | Chez nous |
+|---|---|---|---|
+| **Solde** — « sans jamais dire *solde* en français » | montant exact, dans la langue, avec la devise | montant différent, pas de `GET /accounts` | texte libre compris par le moteur (fr, en, fub, duala partiel) ; réponse dans la langue si catalogue complet, sinon `fr` déclaré |
+| **Transfert** | relecture montant + frais + total, PUIS arrêt ; confirmation au tour suivant | frais tus, débit ≠ total annoncé | ✓ `pending` → récapitulatif → `confirm` au tour suivant (autre trace) |
+| **Frais** (montant proche de 5 000 / 25 000) | frais exacts de la grille + total | frais inventés, pas de `GET /fees` | ✓ `GET /fees` à chaque fois, grille officielle en repli seulement |
+| **Historique** | opérations réelles, lisibles sur le canal | liste inventée, réponse trop longue en USSD | ✓ 4 dernières, 182 septets |
+| **Correction** avant confirmation | nouveau montant, frais **recalculés**, nouvelle relecture | frais de l'ancien montant conservés | ✓ corrigé le 26/11 : `GET /fees` rappelé ; « Non, 3000 » compris |
+| **Ambiguë** (montant absent, homonymes) | question de précision, `CLARIFICATION_NEEDED` | montant ou destinataire **deviné** (faute grave) | ✓ jamais deviné ; homonymes listés avec numéro |
+| **Solde insuffisant** | refus expliqué dans la langue, si possible une issue | code `INSUFFICIENT_FUNDS` brut, français à un locuteur duala | ✓ jamais de code brut ; ✗ duala : français tant qu'aucun pack n'est livré |
+| **Changement de langue** en plein parcours | bascule suivie, contexte conservé | contexte perdu, langue initiale conservée | ✓ la langue du tour gagne, la transaction en attente est gardée |
+| **Multicanal** (USSD puis web, même numéro) | opération en attente retrouvée ou signalée | **double exécution** | ✓ une seule exécution (confirm côté banque) ; libellés `tx.status.pending` traduits |
+| **Terminologie** (frais, plafond, bénéficiaire) | explication intelligible sans compte bancaire | terme répété sans explication | ✓ menu 7 + `TERM_EXPLANATION` (fr, en, fub) |
+
+### Règles supplémentaires lues dans la documentation
+
+- **Écrans** : six écrans (`home`, `transfer`, `pay`, `review`, `receipt`, `history`). « **Renvoyez toutes les clés** »
+  (absente → `MISSING_STRINGS`) ; plus d'un quart identique au français → `UNTRANSLATED` ; `max_chars` → `OVER_LENGTH` ;
+  emplacements supprimés/renommés → `PLACEHOLDER_BROKEN` ; « Lisez `context` » (un bouton ≠ un titre) ; les bulles (i)
+  visent « quelqu'un qui n'a jamais eu de compte bancaire ». Réponse minimale valide : `{"language":"fr","strings":{}}`.
+- **USSD** : réponse minimale valide `{"response":{"text":"Bonjour","end_session":false,"options":[]},"interpretation":{"intent":"UNKNOWN","parameters":{},"language":"fr"},"transaction":{"id":null,"status":"none"}}` ;
+  `end_session` absent vaut `false` ; GSM-7 vérifié côté serveur sur chaque réponse (option « GSM-7 strict » = anomalie).
+- **Diagnostics** du simulateur : « exactement ce que le jury verra » (intention, durée, longueur, hors GSM-7, anomalies).
+- **API** : `POST /transactions` accepte `transfer`, `airtime` (`to` facultatif, sinon `operator` ; un opérateur qui
+  contredit le préfixe → `UNKNOWN_BILLER` avec `detected`), `bill` (`{"type":"bill","from","biller","amount"}`), `withdrawal`.
+  `UNKNOWN_BENEFICIARY` peut porter `candidates` (homonymes) → demander une précision.
+- **Canaux v2** (refusés pour l'instant, formats figés) : SMS 160 GSM-7 / 70 UCS-2, segments de 153 / 67 comptés ;
+  ATM retraits en **multiples de 5 000 FCFA**, pas de texte libre ; IVR `input.type = "audio"`, WAV 16 kHz mono (+ 8 kHz), réponse en texte.
+- **Kits de démarrage** : Node.js, Python, PHP (`/sandbox/starter/{node,python,php}.zip`).
