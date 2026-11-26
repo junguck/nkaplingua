@@ -1,0 +1,348 @@
+{
+ "code": "hau",
+ "name": "Haoussa (Hausa)",
+ "native": "Hausa",
+ "flag": "🌾",
+ "region": "Nord, Extrême-Nord (langue véhiculaire du Grand Nord, diaspora ouest-africaine)",
+ "tts": "fr-FR",
+ "status_note": "Textes obtenus par transcription automatique d'enregistrements audio d'un locuteur. Toutes les entrées sont « propose » : relecture orthographique (ɓ ɗ ƙ ʼ) et validation par au moins deux locuteurs natifs obligatoires. Les phrases (ph.*) ne sont pas encore traduites : repli français.",
+ "default_status": "propose",
+ "sources": [
+  "Enregistrements WhatsApp du 26/11/2026 (2 fichiers), transcrits avec ElevenLabs Scribe (hau)"
+ ],
+ "entries": {
+  "term.balance": {
+   "t": "Ragowar kuɗi a cikin asusunka",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.money": {
+   "t": "Kuɗi",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.amount": {
+   "t": "Adadin kuɗi",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.fees": {
+   "t": "Kuɗin sabis",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.total": {
+   "t": "Jimillar kuɗi",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.beneficiary": {
+   "t": "Mai karɓan kuɗi",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.sender": {
+   "t": "Mai aika kuɗi",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.phone": {
+   "t": "Lambar waya",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.account": {
+   "t": "Asusu",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.transfer": {
+   "t": "Aika kuɗi",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.send": {
+   "t": "Aikawa",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.receive": {
+   "t": "Karɓa",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.withdraw": {
+   "t": "Cire kuɗi",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.deposit": {
+   "t": "Saka kuɗi",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.pay": {
+   "t": "Biya",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.bill": {
+   "t": "Lissafin biya",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.airtime": {
+   "t": "Katin waya",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.savings": {
+   "t": "Ajiyar kuɗi",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.loan": {
+   "t": "Bashi",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.interest": {
+   "t": "Ribar bashi",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.history": {
+   "t": "Tarihin mu'amaloli",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.receipt": {
+   "t": "Resit",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.reference": {
+   "t": "Lambar mu'amala",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.date": {
+   "t": "Kwanan wata",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.confirm": {
+   "t": "Tabbatarwa",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.cancel": {
+   "t": "Sokewa",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.continue": {
+   "t": "Ci gaba",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.back": {
+   "t": "Komawa",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.home": {
+   "t": "Shafin farko",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.login": {
+   "t": "Shiga",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.logout": {
+   "t": "Fita",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.pin": {
+   "t": "Lambar sirri",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)",
+   "note": "à confirmer"
+  },
+  "term.otp": {
+   "t": "Lambar da aka aika sako",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)",
+   "note": "à confirmer"
+  },
+  "term.security": {
+   "t": "Tsaro",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.warning": {
+   "t": "Akula",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)",
+   "note": "transcrit « Akula » (probablement « Kula »)"
+  },
+  "term.error": {
+   "t": "Kuskure",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.success": {
+   "t": "An yi nasara",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.pending": {
+   "t": "Ana jira",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.insufficient": {
+   "t": "Kuɗi ba su isa ba",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.limit": {
+   "t": "Iyakar adadin kuɗi",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.fraud": {
+   "t": "Damfara",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.agent": {
+   "t": "Wakilin sabis",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.never": {
+   "t": "Kadda a taɓa",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)",
+   "note": "transcrit « Kadda » (graphie usuelle « Kada »)"
+  },
+  "term.irreversible": {
+   "t": "Ba za a iya sauya shi ba",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.free": {
+   "t": "Kyauta",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.name": {
+   "t": "Suna",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.help": {
+   "t": "Ɗimako",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)",
+   "note": "transcrit « Ɗimako » (probablement « Taimako »)"
+  },
+  "term.yes": {
+   "t": "E",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)",
+   "note": "transcription très courte, à confirmer"
+  },
+  "term.no": {
+   "t": "O o",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)",
+   "note": "transcrit « O o » (probablement « A'a »)"
+  },
+  "term.thanks": {
+   "t": "Na gode",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.retry": {
+   "t": "Sake gwadawa",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.wrong": {
+   "t": "Ba ɗeɗe ba",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)",
+   "note": "transcrit « Ba ɗeɗe ba » (probablement « Ba daidai ba »)"
+  },
+  "term.blocked": {
+   "t": "An kulle",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "term.check": {
+   "t": "Dubawa",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "ui.next": {
+   "t": "Na gaba",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "ui.original": {
+   "t": "Asalin rubutu",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "ui.listen": {
+   "t": "Saurara",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "ui.unvalidated": {
+   "t": "Har yanzu mai magana bai tabbatar da shi ba",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "ui.factsheet": {
+   "t": "Takardan bayani mai sauƙi",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "ui.notes": {
+   "t": "A cikin takardun kuɗi da tsabar kuɗi",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "ui.keywords": {
+   "t": "Muhimman kalamomi",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "ui.ai": {
+   "t": "Fassaron na'ura ana buƙatar dubawa",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "ui.locked_values": {
+   "t": "A kiyaye lambobi da sunaye yadda suke",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "ph.welcome": {
+   "t": "Barka da zuwa",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  },
+  "cat.info": {
+   "t": "Bayani",
+   "s": "propose",
+   "src": "Audio WhatsApp 26/11/2026 (transcription ElevenLabs hau)"
+  }
+ }
+}
