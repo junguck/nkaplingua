@@ -31,8 +31,8 @@ export const LANGUAGE_INFO: Readonly<Record<LanguageCode, LanguageInfo>> = {
   en: { code: 'en', name: 'Anglais', nativeName: 'English', isNational: false, ttsLocale: 'en-GB', sttLocale: 'en-GB' },
   fub: { code: 'fub', name: 'Fulfulde (Adamaoua)', nativeName: 'Fulfulde', isNational: true, ttsLocale: 'fr-FR', sttLocale: null },
   wes: { code: 'wes', name: 'Pidgin camerounais', nativeName: 'Kamtok', isNational: true, ttsLocale: 'en-GB', sttLocale: 'en-NG' },
-  ewo: { code: 'ewo', name: 'Ewondo', nativeName: 'Ewondo', isNational: true, ttsLocale: 'fr-FR', sttLocale: 'en-NG' },
-  bul: { code: 'bul', name: 'Bulu', nativeName: 'Bulu', isNational: true, ttsLocale: 'fr-FR ', sttLocale: null },
+  ewo: { code: 'ewo', name: 'Ewondo', nativeName: 'Ewondo', isNational: true, ttsLocale: 'fr-FR', sttLocale: null },
+  bul: { code: 'bul', name: 'Bulu', nativeName: 'Bulu', isNational: true, ttsLocale: 'fr-FR', sttLocale: null },
 };
 
 export function isLanguageCode(value: string): value is LanguageCode {
