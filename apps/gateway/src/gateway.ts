@@ -5,7 +5,7 @@
  * `ui_translation` part vers la traduction d'écran, tout le reste est un menu USSD.
  */
 
-import { isUiTranslation, normalizeChannel, type InboundTurn, type SafinumChannel, type StatusMode, type UiReply, type UssdReply } from '@nkap/safinum';
+import { isUiTranslation, normalizeChannel, type InboundTurn, type IvrReply, type SafinumChannel, type StatusMode, type UiReply, type UssdReply } from '@nkap/safinum';
 import { SafinumBank, type BankPort } from './bank.js';
 import { handleUssd } from './ussd.js';
 import { handleUi } from './ui.js';
@@ -46,7 +46,7 @@ export interface GatewayOptions {
 }
 
 export interface HandledTurn {
-  readonly reply: UssdReply | UiReply;
+  readonly reply: UssdReply | UiReply | IvrReply;
   readonly channel: SafinumChannel;
   readonly traceId: string;
 }
@@ -104,7 +104,7 @@ export class Gateway {
 
     const bank = this.bankFactory(turn);
     const reply = await this.ussd(turn, bank);
-    return { reply, channel, traceId };
+    return { reply: channel === 'ivr' ? { ...reply, speech: { text: reply.response.text, language: reply.interpretation.language } } : reply, channel, traceId };
   }
 
   private async ussd(turn: InboundTurn, bank: BankPort): Promise<UssdReply> {

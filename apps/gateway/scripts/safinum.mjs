@@ -54,7 +54,9 @@ async function turn(channel, text) {
     phone: PHONE,
     language: process.env.SAFINUM_LANGUAGE ?? null,
     input: { type: 'text', text, ussd_text: text },
-    constraints: { max_chars: 182, charset: 'gsm7', mode: 'menu', timeout_ms: 3000 },
+    constraints: channel === 'ussd'
+      ? { max_chars: 182, charset: 'gsm7', mode: 'menu', timeout_ms: 3000 }
+      : { max_chars: null, charset: 'utf8', mode: 'ui_translation', timeout_ms: 10000 },
   };
   const result = await call('POST', `/channel/${channel}`, payload);
   console.log(result.status, JSON.stringify(result.body, null, 2));

@@ -19,6 +19,8 @@ export interface TraceValidation {
   readonly integrity: boolean;
   readonly translationStatus: TranslationStatus;
   readonly fallback: boolean;
+  /** Résultat du contrôle lexical des invariants de traduction. */
+  readonly roundTrip: 'ok' | 'to_check';
 }
 
 /**

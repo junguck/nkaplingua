@@ -4,6 +4,8 @@
 > Contrat et règles d'évaluation : [`SANDBOX-SAFINUM.md`](SANDBOX-SAFINUM.md).
 > Documentation publique consultable : [safinum.cm/sandbox/docs](https://safinum.cm/sandbox/docs). Les essais d'équipe nécessitent la clé et le `team_id` attribués.
 
+> Comparaison effectuée avec `~/Downloads/safinum-starter-node` le 26/11/2026 : le middleware reprend son contrat et ses appels bancaires dans `Gateway`/`BankClient`; la console locale reproduit les tours USSD et `ui_translation`. La console et `scripts/safinum.mjs` transmettent maintenant des contraintes conformes par canal (182/GSM-7/3 s pour USSD, UTF-8/10 s pour mobile et web). Le serveur conserve aussi `GET /` pour la vérification de santé du kit.
+
 ## 1. Ce qui existe
 
 ```
@@ -172,7 +174,7 @@ trop longue n'est jamais envoyée. Sous 75 % de clés traduites, tout l'écran r
 
 ## 8. Ce qui a été vérifié
 
-- `pnpm test` : 153 tests (57 pour le gateway, dont 6 pour le mode hors-ligne et 8 pour le second regard), chaîne réelle middleware → HTTP → banque.
+- `pnpm test` : 154 tests au dernier contrôle local (38 du middleware gateway dans la suite active) ; les essais sandbox de bout en bout nécessitent qu'une URL publique soit déclarée.
 - `pnpm typecheck` : 9 projets verts.
 - Bundle `dist/server.js` + banque de démo en HTTP : kit officiel (menu, solde, écran web), transfert en
   texte libre fulfulde créé au tour A puis confirmé au tour B, options dans la langue de l'écran.

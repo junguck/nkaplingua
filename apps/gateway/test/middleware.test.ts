@@ -294,6 +294,20 @@ describe('banque de démonstration et middleware (chaîne HTTP réelle)', () => 
     }
   });
 
+  it('sert un tour IVR avec la même interprétation financière et le texte à prononcer', async () => {
+    const ivr = await gateway.handleWithMeta(turn({
+      channel: 'ivr',
+      language: 'fr',
+      input: { type: 'audio', text: 'Quel est mon solde ?' },
+    }));
+    expect(ivr.channel).toBe('ivr');
+    expect(ivr.reply).toMatchObject({
+      interpretation: { intent: 'BALANCE_INQUIRY' },
+      speech: { language: 'fr' },
+    });
+    expect((ivr.reply as { speech: { text: string } }).speech.text).toContain('solde');
+  });
+
   it('accepte un port injecté pour les tests', async () => {
     const fake: BankPort = {
       account: async () => ({ ok: true, status: 200, data: { phone: PHONE, holder: 'Test', balance: 1000, currency: 'XAF' } }),

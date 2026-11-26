@@ -1,5 +1,6 @@
 /** API du middleware. Le protocole SAFINUM vient de `@nkap/safinum`, le GSM-7 et la langue de `@nkap/core`. */
 export { Gateway, type GatewayOptions, type HandledTurn } from './gateway.js';
+export type { IvrReply } from '@nkap/safinum';
 export { createMiddlewareServer, startMiddleware, defaultOptions, type ServerOptions } from './server.js';
 export { SafinumBank, type BankPort, type BankResult, type BankAccount, type BankFeeQuote, type BankTransaction, type BankHistoryEntry, type BankBeneficiary, type BankBiller, type CreateTransactionInput } from './bank.js';
 export { handleUssd, parseAmount, MAX_CHARS } from './ussd.js';

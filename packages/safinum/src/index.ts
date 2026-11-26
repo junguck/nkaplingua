@@ -6,6 +6,7 @@ export {
   normalizeChannel,
   normalizePhone,
   type InboundTurn,
+  type IvrReply,
   type SafinumChannel,
   type SafinumIntent,
   type SafinumLanguage,

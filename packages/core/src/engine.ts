@@ -75,7 +75,7 @@ export class NkapEngine {
       plan = await this.dialogue.step(session, { ...interpretation, intent: 'HELP' }, contacts);
     }
 
-    const { reply, integrity } = renderPlan(plan, session.lang);
+    const { reply, integrity, roundTrip } = renderPlan(plan, session.lang);
     session.lastOptions = reply.options.map((o) => o.input);
     await this.sessions.save(session);
 
@@ -95,7 +95,7 @@ export class NkapEngine {
       status: plan.status,
       latencyMs: Date.now() - startedAt,
       errors: [...plan.errors, ...errors],
-      validation: { integrity, translationStatus: reply.status, fallback: reply.fallback },
+      validation: { integrity, translationStatus: reply.status, fallback: reply.fallback, roundTrip },
     };
     this.options.onTrace?.(trace);
 

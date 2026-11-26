@@ -5,10 +5,11 @@ import type { TransactionStatus } from './status';
  *
  * Deux familles de tours arrivent sur la même URL :
  *   - USSD          : `input.text` (menu numéroté), session de 180 s, 182 septets GSM-7, 3 s de délai ;
+ *   - IVR (prévu)   : `input.type: "audio"`, WAV 16 kHz mono ; la passerelle attend une réponse texte ;
  *   - mobile / web  : `type: "ui_translation"`, on traduit les chaînes d'un écran, 10 s de délai.
  */
 
-export type SafinumChannel = 'ussd' | 'mobile' | 'web';
+export type SafinumChannel = 'ussd' | 'mobile' | 'web' | 'ivr';
 
 /** Intentions officielles. Casse exacte : une faute rend la réponse invalide. */
 export const SAFINUM_INTENTS = [
@@ -45,7 +46,7 @@ export interface InboundTurn {
   readonly language?: string | null;
   readonly source_language?: string;
   readonly screen?: string;
-  readonly input?: { readonly type?: string; readonly text?: string; readonly ussd_text?: string };
+  readonly input?: { readonly type?: string; readonly text?: string; readonly ussd_text?: string; readonly audio?: string };
   readonly strings?: Readonly<Record<string, UiStringEntry>>;
   readonly constraints?: {
     readonly max_chars?: number | null;
@@ -79,6 +80,11 @@ export interface UiReply {
   strings: Record<string, string>;
 }
 
+/** Le sandbox IVR accepte un texte à prononcer ; les commandes DTMF réutilisent le dialogue USSD. */
+export interface IvrReply extends UssdReply {
+  readonly speech: { readonly text: string; readonly language: SafinumLanguage };
+}
+
 const SAFINUM_LANGUAGE_SET: ReadonlySet<string> = new Set(SAFINUM_LANGUAGES);
 
 export function isSafinumLanguage(value: unknown): value is SafinumLanguage {
@@ -86,7 +92,7 @@ export function isSafinumLanguage(value: unknown): value is SafinumLanguage {
 }
 
 export function normalizeChannel(value: unknown): SafinumChannel {
-  return value === 'mobile' || value === 'web' ? value : 'ussd';
+  return value === 'mobile' || value === 'web' || value === 'ivr' ? value : 'ussd';
 }
 
 /** Un tour d'écran est reconnaissable à son `type`, pas à son canal : la même URL sert les trois. */

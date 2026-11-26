@@ -1,9 +1,10 @@
 /**
- * Serveur HTTP du middleware : une seule URL sert les trois canaux.
+ * Serveur HTTP du middleware : une seule URL sert les trois canaux SAFINUM et l'adaptateur IVR.
  *
- *   POST /middleware/ussd     POST /middleware/mobile     POST /middleware/web
+ *   POST /middleware/ussd     POST /middleware/mobile     POST /middleware/web     POST /middleware/ivr
  *   POST /                    (même chose, canal déduit du corps)
  *   GET  /health              (pour vérifier que le tunnel arrive jusqu'ici)
+ *   GET  /                     (compatibilité avec le kit officiel)
  *
  * Lancer : `pnpm build && node dist/server.js` (port 8080 par défaut).
  */
@@ -52,7 +53,7 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
         return json(res, 200, {
           ok: true,
           service: 'nkaplingua-safinum-middleware',
-          channels: ['ussd', 'mobile', 'web'],
+          channels: ['ussd', 'mobile', 'web', 'ivr'],
           teamKeyConfigured: options.teamKey.length > 0,
           bankUrl: options.bankUrl,
         });
@@ -73,7 +74,7 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
       }
 
       if (req.method !== 'POST') return json(res, 405, { error: 'POST attendu' });
-      if (url.pathname !== '/' && !url.pathname.startsWith('/middleware/')) {
+      if (url.pathname !== '/' && !url.pathname.startsWith('/middleware/') && url.pathname !== '/channel/ivr') {
         return json(res, 404, { error: 'Route inconnue' });
       }
 
@@ -85,14 +86,15 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
         return json(res, message === 'TOO_LARGE' ? 413 : 400, { error: message === 'TOO_LARGE' ? 'Corps trop volumineux' : 'JSON invalide' });
       }
 
-      const pathChannel = url.pathname.split('/')[2];
+      const pathChannel = url.pathname.startsWith('/middleware/') ? url.pathname.split('/')[2] : undefined;
+      const requestChannel = pathChannel ?? payload.channel ?? (url.pathname === '/channel/ivr' ? 'ivr' : undefined);
       // Kit officiel : la passerelle envoie l'identifiant du tour dans l'en-tête `X-Trace-Id`, le corps
       // n'est qu'un repli. Une trace erronée sur nos appels bancaires = NO_BANK_CALL (travail invisible).
       const traceId = traceFrom(req.headers['x-trace-id'], payload.trace_id);
       const turn: InboundTurn = {
         ...payload,
         ...(traceId === undefined ? {} : { trace_id: traceId }),
-        ...(pathChannel ? { channel: payload.channel ?? pathChannel } : {}),
+        ...(requestChannel ? { channel: payload.channel ?? requestChannel } : {}),
       };
 
       try {

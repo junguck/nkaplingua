@@ -230,9 +230,8 @@
       session_id: state.session,
       phone: '237699000003',
       language: state.language || null,
-      input: { type: 'text', text, ussd_text: text },
+      input: { type: 'menu', text, ussd_text: text },
       constraints: { max_chars: 182, charset: 'gsm7', mode: 'menu', timeout_ms: 3000 },
-      bank_api: { base_url: 'https://safinum.cm/api/v1' }
     };
     await post('/middleware/ussd', body, text);
   }
@@ -246,6 +245,7 @@
       session_id: state.session,
       phone: '237699000003',
       language: state.language || 'fub',
+      constraints: { max_chars: null, charset: 'utf8', mode: 'ui_translation', timeout_ms: 10000 },
       source_language: 'fr',
       screen: 'home',
       strings: {

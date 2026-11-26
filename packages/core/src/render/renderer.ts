@@ -3,6 +3,7 @@ import { MESSAGES } from '../lexicon/messages.lexicon';
 import { TERMS_LEXICON } from '../lexicon/terms.lexicon';
 import { resolveTemplate, type TemplateSet } from '../lexicon/types';
 import type { MessageParams, Plan, PlanPart } from '../dialogue/plan';
+import { verifyRoundTrip } from './round-trip';
 
 export interface RenderedText {
   readonly text: string;
@@ -10,6 +11,8 @@ export interface RenderedText {
   readonly fallback: boolean;
   /** Toutes les valeurs verrouillées se retrouvent à l'identique dans le texte. */
   readonly integrity: boolean;
+  /** `ok` = invariants déterministes passées ; `to_check` = repli FR pour anomalie ou langue non auditée. */
+  readonly roundTrip: 'ok' | 'to_check';
   readonly key: string;
 }
 
@@ -42,15 +45,20 @@ function checkIntegrity(template: string, output: string, params: MessageParams)
 export function renderTemplate(set: TemplateSet, lang: LanguageCode, params: MessageParams, key: string): RenderedText {
   const reference = set.fr;
   const target = resolveTemplate(set, lang);
+  const audit = lang === 'fr' ? [] : verifyRoundTrip(key as import('../lexicon/messages.lexicon').MessageKey, lang);
+  if (audit.length > 0) {
+    const text = fill(reference, params);
+    return { text, status: 'reference', fallback: true, integrity: checkIntegrity(reference, text, params), roundTrip: 'to_check', key };
+  }
   // Un gabarit traduit qui n'a pas exactement les mêmes emplacements que la référence est rejeté.
   if (target && placeholdersOf(target.text) === placeholdersOf(reference)) {
     const text = fill(target.text, params);
     if (checkIntegrity(target.text, text, params)) {
-      return { text, status: target.status, fallback: false, integrity: true, key };
+      return { text, status: target.status, fallback: false, integrity: true, roundTrip: 'ok', key };
     }
   }
   const text = fill(reference, params);
-  return { text, status: 'reference', fallback: lang !== 'fr', integrity: checkIntegrity(reference, text, params), key };
+  return { text, status: 'reference', fallback: lang !== 'fr', integrity: checkIntegrity(reference, text, params), roundTrip: lang === 'fr' ? 'ok' : 'to_check', key };
 }
 
 export function renderPart(part: PlanPart, lang: LanguageCode): RenderedText {
@@ -65,6 +73,7 @@ export function renderPart(part: PlanPart, lang: LanguageCode): RenderedText {
     status: weakestStatus([label.status, explanation.status]),
     fallback: label.fallback || explanation.fallback,
     integrity: label.integrity && explanation.integrity,
+    roundTrip: label.roundTrip === 'ok' && explanation.roundTrip === 'ok' ? 'ok' : 'to_check',
     key: `term.${part.term}`,
   };
 }
@@ -72,6 +81,7 @@ export function renderPart(part: PlanPart, lang: LanguageCode): RenderedText {
 export interface RenderedPlan {
   readonly reply: Reply;
   readonly integrity: boolean;
+  readonly roundTrip: 'ok' | 'to_check';
 }
 
 export function renderPlan(plan: Plan, lang: LanguageCode): RenderedPlan {
@@ -85,6 +95,7 @@ export function renderPlan(plan: Plan, lang: LanguageCode): RenderedPlan {
   const all = [...parts, ...optionTexts];
   return {
     integrity: all.every((r) => r.integrity),
+    roundTrip: all.every((r) => r.roundTrip === 'ok') ? 'ok' : 'to_check',
     reply: {
       lang,
       text: parts.map((p) => p.text).join(' '),
