@@ -9,6 +9,10 @@ export const LANGUAGE_NAMES: Readonly<Record<LanguageCode, readonly string[]>> =
   ewo: ['ewondo'],
   bul: ['bulu'],
   hau: ['haoussa', 'hausa', 'haussa', 'houssa'],
+  dua: ['duala', 'douala', 'dualla'],
+  bas: ['basaa', 'bassa', 'basa'],
+  bbj: ['ghomala', 'ghomálá', 'bandjoun'],
+  byv: ['medumba', 'bangangte'],
 };
 
 /** Verbes de changement de langue. */
@@ -34,6 +38,13 @@ export const FUNCTION_WORDS: Readonly<Record<LanguageCode, ReadonlyArray<readonl
   // Ces langues sont reconnues par leurs indices d'intention ou choisies au menu de langue.
   ewo: [],
   bul: [],
+  // Duala : pas de mot-outil fiable relevé (« na » est aussi pidgin) ; reconnu par ses indices d'intention.
+  dua: [],
+  // Basaa, medumba : aucune source primaire lisible depuis l'environnement (SIL sous connexion, Kemelang
+  // refuse les robots) — rien d'inventé, à remplir avec des locuteurs (docs/LANGUES.md).
+  bas: [],
+  bbj: [],
+  byv: [],
 };
 
 /** « Mon solde », « my balance », « ma balans », « ceede am » : l'utilisateur parle de SES valeurs. */

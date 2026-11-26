@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
-import { Connectivity, Gateway, SyncQueue, TranslationCache, gsm7Length, isGsm7, type BankPort, type InboundTurn, type UssdReply } from '../src/index.js';
+import { gsm7Length, isGsm7 } from '@nkap/core';
+import type { InboundTurn, UssdReply } from '@nkap/safinum';
+import { Connectivity, Gateway, SyncQueue, TranslationCache, type BankPort } from '../src/index.js';
 
 const DOWN = { ok: false, status: 0, error: 'UNREACHABLE', message: 'réseau coupé' } as const;
 const deadBank = new Proxy({}, { get: () => async () => DOWN }) as unknown as BankPort;

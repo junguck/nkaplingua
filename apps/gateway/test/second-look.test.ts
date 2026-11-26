@@ -1,19 +1,20 @@
 import type { AddressInfo } from 'node:net';
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
-import { DEMO_TEAM_KEY, Gateway, InMemorySessions, SecondLook, createDemoServer, type InboundTurn, type UssdReply } from '../src/index.js';
+import type { InboundTurn, UssdReply } from '@nkap/safinum';
+import { DEMO_TEAM_KEY, Gateway, InMemorySessions, SecondLook, createDemoServer } from '../src/index.js';
 
 const PHONE = '237699000003';
 const OTHER = '237690000002';
 const CONTACT_PHONE = '237677000009';
 
-function turn(session: string, text: string): InboundTurn {
+function turn(session: string, text: string, language = 'fr'): InboundTurn {
   return {
     trace_id: `t-${session}-${text}`,
     team_id: 'nkaplingua',
     channel: 'ussd',
     session_id: session,
     phone: PHONE,
-    language: 'fr',
+    language,
     input: { type: 'menu', text },
     constraints: { max_chars: 182, charset: 'gsm7', mode: 'menu', timeout_ms: 3000 },
   };
@@ -61,7 +62,9 @@ describe('second regard', () => {
 
   it('un petit transfert part sans proche', async () => {
     const reply = await transfer('s-petit', '5 000');
-    expect(reply.transaction.status).toBe('confirmed');
+    // Exécuté tout de suite : pas de demande au proche. (Statut §8 : `pending` + id, comme toute exécution.)
+    expect(reply.interpretation.parameters).not.toHaveProperty('second_look');
+    expect(reply.response.text).toMatch(/MBP\d+/);
     expect(sms).toHaveLength(0);
   });
 
@@ -116,6 +119,18 @@ describe('second regard', () => {
     await g.handle(turn('s-solo', OTHER));
     await g.handle(turn('s-solo', '150 000'));
     const reply = (await g.handle(turn('s-solo', '1'))) as UssdReply;
-    expect(reply.transaction.status).toBe('confirmed');
+    expect(reply.interpretation.parameters).not.toHaveProperty('second_look');
+    expect(reply.response.text).toMatch(/MBP\d+/);
+  });
+
+  it('utilisateur en fulfulde : message d’attente sans forme relue → écran entier en français, déclaré `fr`', async () => {
+    const session = 's-fub';
+    await gateway.handle(turn(session, '2', 'fub'));
+    await gateway.handle(turn(session, OTHER, 'fub'));
+    await gateway.handle(turn(session, '150 000', 'fub'));
+    const reply = (await gateway.handle(turn(session, '1', 'fub'))) as UssdReply;
+    expect(reply.interpretation.parameters).toHaveProperty('second_look');
+    expect(reply.interpretation.language).toBe('fr');
+    expect(reply.response.text).toContain('En attente de Papa');
   });
 });

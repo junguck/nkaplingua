@@ -11,7 +11,7 @@
 
 import type { BankPort } from './bank.js';
 import { money, displayPhone, recipientLabel, type GatewayLanguage } from './i18n.js';
-import { toGsm7, truncateGsm7 } from './gsm7.js';
+import { toGsm7, truncateGsm7 } from '@nkap/core';
 
 export interface TrustedContact {
   readonly name: string;

@@ -73,7 +73,7 @@ des éléments verrouillés et des marqueurs de négation ; statut supplémentai
 | Idée | Code | Tests | Pas encore fait |
 |---|---|---|---|
 | 2. Alerte anti-arnaque | `checkMessage(texte, langue)` dans `packages/core/src/screen/message-check.ts` ; textes `msgcheck.*` en français et en anglais | `packages/core/test/innovations.test.ts` | écran web / entrée SMS ; textes fulfulde et pidgin (repli français signalé) |
-| 3. Second regard | `apps/gateway/src/second-look.ts` ; option `secondLook` de `Gateway` ; route `POST /second-look/{id}/answer` ; branché à la confirmation USSD d'un transfert | `apps/gateway/test/second-look.test.ts` (7 cas, avec la banque de démo) | envoi réel des SMS (`Notifier` injecté), saisie du proche et du seuil par l'utilisateur, balayage périodique `sweep()` |
+| 3. Second regard | `apps/gateway/src/second-look.ts` ; option `secondLook` de `Gateway` ; route `POST /second-look/{id}/answer` ; branché à la confirmation USSD d'un transfert | `apps/gateway/test/second-look.test.ts` (8 cas, avec la banque de démo) | envoi réel des SMS (`Notifier` injecté), saisie du proche et du seuil par l'utilisateur, balayage périodique `sweep()` |
 | 4. Aller-retour | `auditRoundTrip`, `compareTemplates`, `renderVerified` dans `packages/core/src/render/round-trip.ts` | `packages/core/test/innovations.test.ts` | rendu automatique par le moteur (`renderVerified` est à appeler explicitement) |
 
 Réglage du second regard : `new Gateway({ ..., secondLook: new SecondLook({ thresholdXAF, ttlMs, contactFor }, notify) })`.

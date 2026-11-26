@@ -13,7 +13,7 @@ import http from 'node:http';
 import { fileURLToPath } from 'node:url';
 import type { AddressInfo } from 'node:net';
 import { Gateway } from './gateway.js';
-import type { InboundTurn } from './contract.js';
+import { statusModeFrom, type InboundTurn, type StatusMode } from '@nkap/safinum';
 import { loadEnv } from './env.js';
 
 loadEnv();
@@ -23,7 +23,7 @@ const MAX_BODY_BYTES = 512 * 1024;
 export interface ServerOptions {
   readonly teamKey: string;
   readonly bankUrl: string;
-  readonly strictStatus?: boolean;
+  readonly statusMode?: StatusMode;
   readonly log?: (line: string) => void;
 }
 
@@ -31,7 +31,7 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
   const gateway = new Gateway({
     teamKey: options.teamKey,
     bankUrl: options.bankUrl,
-    ...(options.strictStatus === undefined ? {} : { strictStatus: options.strictStatus }),
+    ...(options.statusMode === undefined ? {} : { statusMode: options.statusMode }),
   });
   const log = options.log ?? ((line: string) => console.log(line));
 
@@ -86,7 +86,14 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
       }
 
       const pathChannel = url.pathname.split('/')[2];
-      const turn: InboundTurn = pathChannel ? { ...payload, channel: payload.channel ?? pathChannel } : payload;
+      // Kit officiel : la passerelle envoie l'identifiant du tour dans l'en-tête `X-Trace-Id`, le corps
+      // n'est qu'un repli. Une trace erronée sur nos appels bancaires = NO_BANK_CALL (travail invisible).
+      const traceId = traceFrom(req.headers['x-trace-id'], payload.trace_id);
+      const turn: InboundTurn = {
+        ...payload,
+        ...(traceId === undefined ? {} : { trace_id: traceId }),
+        ...(pathChannel ? { channel: payload.channel ?? pathChannel } : {}),
+      };
 
       try {
         const handled = await gateway.handleWithMeta(turn);
@@ -134,6 +141,14 @@ function readJson(req: http.IncomingMessage): Promise<InboundTurn> {
   });
 }
 
+/** En-tête `X-Trace-Id` d'abord (kit officiel), `trace_id` du corps en repli. */
+export function traceFrom(header: string | string[] | undefined, body: string | undefined): string | undefined {
+  const fromHeader = (Array.isArray(header) ? header[0] : header)?.trim();
+  if (fromHeader) return fromHeader;
+  const fromBody = body?.trim();
+  return fromBody ? fromBody : undefined;
+}
+
 function json(res: http.ServerResponse, status: number, body: unknown): void {
   res.writeHead(status, { 'Content-Type': 'application/json; charset=utf-8' });
   res.end(JSON.stringify(body));
@@ -157,7 +172,7 @@ export function defaultOptions(): ServerOptions {
   return {
     teamKey: process.env.SAFINUM_TEAM_KEY ?? '',
     bankUrl,
-    strictStatus: process.env.SAFINUM_STATUS_STRICT === '1',
+    statusMode: statusModeFrom(process.env.SAFINUM_STATUS),
   };
 }
 

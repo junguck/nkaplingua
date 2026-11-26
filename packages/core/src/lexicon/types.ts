@@ -24,6 +24,10 @@ export const DEFAULT_STATUS: Readonly<Record<LanguageCode, TranslationStatus>> =
   ewo: 'proposed',
   bul: 'proposed',
   hau: 'proposed',
+  dua: 'proposed',
+  bas: 'proposed',
+  bbj: 'proposed',
+  byv: 'proposed',
 };
 
 export function resolveTemplate(set: TemplateSet, lang: LanguageCode): { text: string; status: TranslationStatus } | null {

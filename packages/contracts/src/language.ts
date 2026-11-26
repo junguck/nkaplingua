@@ -3,7 +3,8 @@
  * `fr` et `en` sont les langues des interfaces sources ; `fub` et `wes` sont les langues
  * nationales servies. Ajouter une langue = ajouter un code ici + un fichier de lexique.
  */
-export const LANGUAGES = ['fr', 'en', 'fub', 'wes', 'ewo', 'bul', 'hau'] as const;
+/** Toutes les langues de la sandbox SAFINUM (dua, ewo, bas, bbj, byv, fub, fr, en) + pidgin, bulu, haoussa. */
+export const LANGUAGES = ['fr', 'en', 'fub', 'wes', 'ewo', 'bul', 'hau', 'dua', 'bas', 'bbj', 'byv'] as const;
 export type LanguageCode = (typeof LANGUAGES)[number];
 
 export const SOURCE_LANGUAGE: LanguageCode = 'fr';
@@ -34,6 +35,11 @@ export const LANGUAGE_INFO: Readonly<Record<LanguageCode, LanguageInfo>> = {
   ewo: { code: 'ewo', name: 'Ewondo', nativeName: 'Ewondo', isNational: true, ttsLocale: 'fr-FR', sttLocale: null },
   bul: { code: 'bul', name: 'Bulu', nativeName: 'Bulu', isNational: true, ttsLocale: 'fr-FR', sttLocale: null },
   hau: { code: 'hau', name: 'Haoussa', nativeName: 'Hausa', isNational: true, ttsLocale: 'fr-FR', sttLocale: null },
+  // Noms natifs : ceux de la documentation de la sandbox SAFINUM.
+  dua: { code: 'dua', name: 'Duala', nativeName: 'Duálá', isNational: true, ttsLocale: 'fr-FR', sttLocale: null },
+  bas: { code: 'bas', name: 'Basaa', nativeName: 'Ɓasaá', isNational: true, ttsLocale: 'fr-FR', sttLocale: null },
+  bbj: { code: 'bbj', name: 'Ghomala', nativeName: 'Ghɔmálá', isNational: true, ttsLocale: 'fr-FR', sttLocale: null },
+  byv: { code: 'byv', name: 'Medumba', nativeName: 'Mə̀dûmbà', isNational: true, ttsLocale: 'fr-FR', sttLocale: null },
 };
 
 export function isLanguageCode(value: string): value is LanguageCode {

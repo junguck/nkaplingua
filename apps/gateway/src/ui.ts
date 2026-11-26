@@ -1,15 +1,16 @@
 /**
  * Canaux mobile et web : on ne converse pas, on traduit les chaînes d'un écran.
  *
- * La sandbox vérifie quatre choses : toutes les clés présentes, emplacements (`{amount}`,
- * `{name}`…) intacts, `max_chars` respecté par clé, et pas plus d'un quart des textes
- * identiques au français quand on déclare une autre langue.
- *
- * D'où la règle : traduction complète ou repli complet en français déclaré `fr`.
- * On ne renvoie jamais un écran à moitié traduit en prétendant qu'il est fulfulde.
+ * Règles de la documentation de la sandbox, appliquées clé par clé :
+ *   - « Renvoyez toutes les clés » : une clé absente s'affiche en français ET la trace est marquée
+ *     `MISSING_STRINGS`. Une clé sans traduction valide part donc avec son texte français ;
+ *   - emplacements `{x}` supprimés ou renommés → `PLACEHOLDER_BROKEN` : jamais envoyés ;
+ *   - `max_chars` dépassé → `OVER_LENGTH` : jamais envoyé ;
+ *   - plus d'un quart des textes identiques au français → `UNTRANSLATED`. Au-delà de ce seuil,
+ *     l'écran est surtout français : on le DÉCLARE `fr` plutôt que de prétendre l'avoir traduit.
  */
 
-import type { InboundTurn, UiReply, UiStringEntry } from './contract.js';
+import type { InboundTurn, UiReply, UiStringEntry } from '@nkap/safinum';
 import { dictionaryFor, resolveUiLanguage, type UiLanguage } from './ui-dictionaries.js';
 
 export interface UiCoverage {
@@ -19,63 +20,43 @@ export interface UiCoverage {
   readonly tooLong: readonly string[];
 }
 
+/** Part maximale de textes identiques au français tolérée par la sandbox avant `UNTRANSLATED`. */
+export const MAX_FRENCH_SHARE = 0.25;
+
 const PLACEHOLDER = /\{([a-z_]+)\}/g;
 
 export function handleUi(turn: InboundTurn, overlay?: Readonly<Record<string, string>>): UiReply {
-  const source = turn.strings ?? {};
-  const requested = resolveUiLanguage(turn.language);
-  const translated = translate(source, requested, overlay);
-
-  if (translated.language === requested && requested !== 'fr') {
-    return { language: requested, strings: translated.strings };
-  }
-
-  // Repli honnête : l'écran entier reste en français, et on le DÉCLARE.
-  const strings: Record<string, string> = {};
-  for (const [key, entry] of Object.entries(source)) strings[key] = entry.text;
-  return { language: 'fr', strings };
+  return translate(turn.strings ?? {}, resolveUiLanguage(turn.language), overlay);
 }
 
-/** Traduit toutes les clés, ou aucune : le repli est décidé par l'appelant. */
 export function translate(
   source: Readonly<Record<string, UiStringEntry>>,
   language: UiLanguage,
   overlay?: Readonly<Record<string, string>>,
-): { language: UiLanguage; strings: Record<string, string> } {
+): UiReply {
   const base = dictionaryFor(language);
   // Le cache local (corrections, nouvelles traductions) passe avant le dictionnaire embarqué.
   const dictionary = base ? { ...base, ...(overlay ?? {}) } : null;
-  if (!dictionary) {
-    return { language: 'fr', strings: plain(source) };
-  }
+  if (!dictionary) return { language: 'fr', strings: plain(source) };
 
   const strings: Record<string, string> = {};
-  const missing: string[] = [];
-  const broken: string[] = [];
-  const long: string[] = [];
-
+  let french = 0;
   for (const [key, entry] of Object.entries(source)) {
     const value = dictionary[key];
-    if (typeof value !== 'string' || value.trim() === '') {
-      missing.push(key);
-      strings[key] = entry.text;
-      continue;
-    }
-    if (placeholders(entry.text) !== placeholders(value)) {
-      broken.push(key);
-      strings[key] = entry.text;
-      continue;
-    }
-    if (typeof entry.max_chars === 'number' && [...value].length > entry.max_chars) {
-      long.push(key);
-      strings[key] = entry.text;
-      continue;
-    }
-    strings[key] = value;
+    const text = isValidTranslation(entry, value) ? value : entry.text;
+    if (text === entry.text) french += 1;
+    strings[key] = text;
   }
 
-  const complete = missing.length === 0 && broken.length === 0 && long.length === 0;
-  return { language: complete ? language : 'fr', strings: complete ? strings : plain(source) };
+  const total = Object.keys(source).length;
+  if (total > 0 && french / total > MAX_FRENCH_SHARE) return { language: 'fr', strings: plain(source) };
+  return { language, strings };
+}
+
+function isValidTranslation(entry: UiStringEntry, value: string | undefined): value is string {
+  if (typeof value !== 'string' || value.trim() === '') return false;
+  if (placeholders(entry.text) !== placeholders(value)) return false;
+  return typeof entry.max_chars !== 'number' || [...value].length <= entry.max_chars;
 }
 
 /** Diagnostic pour les journaux du middleware : ce qui aurait empêché une traduction complète. */

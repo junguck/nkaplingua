@@ -4,12 +4,15 @@
  * Le français est la langue source ; `en` est complet ; `fub` couvre l'écran d'accueil et le
  * parcours de paiement (formes proposées, à valider par un locuteur).
  *
- * Règle de repli : si UNE SEULE clé demandée manque, l'écran entier part en français et
- * `language` vaut `fr`. Mieux vaut un écran cohérent en français qu'un écran moitié traduit
- * présenté comme fulfulde — c'est exactement ce que la sandbox signale `UNTRANSLATED`.
+ * Règle de repli (voir `ui.ts`) : clé par clé comme le kit officiel — une clé absente est omise et
+ * l'appli affiche le français pour elle ; sous 75 % de clés traduites, l'écran entier part en
+ * français et `language` vaut `fr` (sinon la sandbox signalerait `UNTRANSLATED`).
  */
 
-export type UiLanguage = 'fr' | 'en' | 'fub';
+import { isSafinumLanguage, type SafinumLanguage } from '@nkap/safinum';
+import { PACK_LOAD } from './i18n.js';
+
+export type UiLanguage = SafinumLanguage;
 
 type Dictionary = Readonly<Record<string, string>>;
 
@@ -111,6 +114,9 @@ const FUB: Dictionary = {
   'nav.pay': 'Yoɓ',
   'nav.history': 'Golle',
   'shell.greeting': 'A jaɓɓaama {name}',
+  // Glossaire fub.json : term.logout « Yaltu » (proposé). « Connexion sécurisée » n'a pas d'équivalent
+  // relu : la clé `shell.secure` reste absente → repli français clé par clé.
+  'shell.logout': 'Yaltu',
   'common.back': 'Rutto',
   'common.continue': 'Jokku',
   'common.cancel': 'Haaytu',
@@ -195,13 +201,19 @@ const FUB: Dictionary = {
   'error.GENERIC': 'Golle ndee waɗaaka. Ɗaɓɓit caggal.',
 };
 
-export const UI_DICTIONARIES: Readonly<Record<UiLanguage, Dictionary>> = { fr: {}, en: EN, fub: FUB };
+export const UI_DICTIONARIES: Readonly<Partial<Record<UiLanguage, Dictionary>>> = { fr: {}, en: EN, fub: FUB };
 
-/** Langue servie pour un écran : couverte et connue, sinon français. */
+/** Langue demandée pour un écran si nous avons un dictionnaire (intégré ou pack), sinon français. */
 export function resolveUiLanguage(requested: string | null | undefined): UiLanguage {
-  return requested === 'en' || requested === 'fub' ? requested : 'fr';
+  if (!isSafinumLanguage(requested)) return 'fr';
+  return requested in UI_DICTIONARIES || PACK_LOAD.packs.has(requested) ? requested : 'fr';
 }
 
+/** Dictionnaire intégré complété par le pack de la langue (le pack, plus récent, l'emporte). */
 export function dictionaryFor(language: UiLanguage): Dictionary | null {
-  return language === 'fr' ? null : UI_DICTIONARIES[language];
+  if (language === 'fr') return null;
+  const builtIn = UI_DICTIONARIES[language];
+  const pack = PACK_LOAD.packs.get(language)?.ui;
+  if (!builtIn && !pack) return null;
+  return { ...(builtIn ?? {}), ...(pack ?? {}) };
 }

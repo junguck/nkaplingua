@@ -21,7 +21,7 @@ import type {
   CreateTransactionInput,
   FeeType,
 } from '../bank.js';
-import { MAX_AMOUNT, officialFee } from '../fees.js';
+import { MAX_AMOUNT, officialFee } from '@nkap/safinum';
 
 interface DemoAccount {
   phone: string;
@@ -128,7 +128,11 @@ export class DemoBank implements BankPort {
     const needle = query.trim().toLowerCase();
     if (!needle) return ok([]);
     const matched = [...this.accounts.values()]
-      .filter((account) => account.holder.toLowerCase().includes(needle) || account.phone.includes(keyOf(needle)))
+      .filter((account) => {
+        // Une recherche par nom n'a pas de chiffres : sans ce garde, `includes('')` renverrait tous les comptes.
+        const digits = keyOf(needle);
+        return account.holder.toLowerCase().includes(needle) || (digits.length >= 3 && account.phone.includes(digits));
+      })
       .map((account): BankBeneficiary => ({ name: account.holder, phone: account.phone }));
     return ok(matched);
   }
