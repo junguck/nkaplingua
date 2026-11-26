@@ -17,7 +17,8 @@ export interface Entities {
 }
 
 /** Mots qui introduisent le bénéficiaire, par langue (repliés). */
-const RECIPIENT_CUES = new Set(['a', 'pour', 'chez', 'to', 'for', 'give', 'ka']);
+// « na » : « à » en duala (Helmlinger 1972, « à prép. na ») et en pidgin.
+const RECIPIENT_CUES = new Set(['a', 'pour', 'chez', 'to', 'for', 'give', 'ka', 'na']);
 
 /** Mots qui ne peuvent pas être un prénom inconnu. */
 const NOT_A_NAME = new Set([

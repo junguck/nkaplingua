@@ -8,16 +8,21 @@
  */
 
 import { BILLERS, type IntentName } from '@nkap/contracts';
-import { interpret } from '@nkap/core';
+import { CANCEL_CUES, CONFIRM_CUES, fold, interpret, scanNumbers, startsWithCue } from '@nkap/core';
 import { toSafinumIntent, type SafinumIntent } from '@nkap/safinum';
 import type { GatewayLanguage } from './i18n.js';
 
 export type FreeTextRoute =
   | { readonly kind: 'balance' | 'history' | 'help' | 'language' }
+  /** Terme que le menu d'aide sait expliquer (scénario « terminologie » du jury). */
+  | { readonly kind: 'term'; readonly term: ExplainedTerm }
   | { readonly kind: 'fees'; readonly amount?: number }
   | { readonly kind: 'transfer'; readonly amount?: number; readonly recipient?: string; readonly phone?: string }
   | { readonly kind: 'airtime'; readonly amount?: number; readonly phone?: string }
   | { readonly kind: 'bill'; readonly amount?: number; readonly biller?: string; readonly reference?: string };
+
+export type ExplainedTerm = 'fees' | 'limit' | 'beneficiary';
+const EXPLAINED: ReadonlySet<string> = new Set<ExplainedTerm>(['fees', 'limit', 'beneficiary']);
 
 export interface Understood {
   readonly route: FreeTextRoute;
@@ -43,7 +48,10 @@ export function understandFreeText(text: string, language: GatewayLanguage): Und
   const interpretation = interpret(text, { hintLang: language, knownNames: [] });
   if (!ROUTABLE.has(interpretation.intent)) return null;
 
-  const { amount, recipientQuery, phone, biller, billReference } = interpretation.slots;
+  const { amount, recipientQuery, phone, biller, billReference, term } = interpretation.slots;
+  if (interpretation.intent === 'EXPLAIN_TERM' && term !== undefined && EXPLAINED.has(term)) {
+    return { route: { kind: 'term', term: term as ExplainedTerm }, intent: 'TERM_EXPLANATION', parameters: { term } };
+  }
   const value = amount?.amount;
   const parameters: Record<string, string | number> = {};
   if (value !== undefined) Object.assign(parameters, { amount: value, currency: 'XAF' });
@@ -93,3 +101,21 @@ function toRoute(
       return null;
   }
 }
+
+/** « Oui » dans toutes les langues du lexique (Eey, Owé, Ee, bâmse…), en tête de saisie. */
+export function isConfirmation(text: string): boolean {
+  const folded = fold(text);
+  return CONFIRM_CUES.some(([cue]) => startsWithCue(folded, cue));
+}
+
+/** « Non / annuler » dans toutes les langues du lexique (Ala, Haaytu, kém, wunja…), en tête de saisie. */
+export function isCancellation(text: string): boolean {
+  const folded = fold(text);
+  return CANCEL_CUES.some(([cue]) => startsWithCue(folded, cue)) || startsWithCue(folded, 'haaytu');
+}
+
+/** Montant dans une phrase (« Non, 3000 », « trois mille », « 5k ») ; les numéros de téléphone sont exclus. */
+export function amountIn(text: string): number | null {
+  return scanNumbers(fold(text)).amounts[0] ?? null;
+}
+

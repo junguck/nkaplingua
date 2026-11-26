@@ -18,3 +18,4 @@ apps/mobile/modules/nkap-bubble/jvm-check/build/
 .kotlin/
 apps/mobile/dist/
 apps/mobile/expo-env.d.ts
+.i18n-*/

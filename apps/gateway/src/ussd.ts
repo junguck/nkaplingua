@@ -21,9 +21,11 @@ import {
   type UssdReply,
 } from '@nkap/safinum';
 import type { BankFailure, BankPort, FeeType } from './bank.js';
-import { understandFreeText, type Understood } from './free-text.js';
+import { amountIn, isCancellation, isConfirmation, understandFreeText, type Understood } from './free-text.js';
 import {
   MENU_KEYS,
+  languageName,
+  servedLanguages,
   displayPhone,
   message,
   money,
@@ -43,7 +45,7 @@ const FALLBACK_BILLERS = ['ENEO', 'CAMWATER', 'CANAL', 'CAMTEL'];
 export interface UssdDeps {
   readonly bank: BankPort;
   readonly sessions: SessionStore;
-  /** `contract` (défaut) : seuls les statuts observés sortent (§8). `lifecycle` : cycle bancaire brut. */
+  /** `lifecycle` (défaut, comme le kit officiel) : cycle bancaire. `contract` : repli none/pending. */
   readonly statusMode?: StatusMode;
   /** Second regard (optionnel) : un proche valide les gros transferts avant confirmation. */
   readonly secondLook?: SecondLook;
@@ -68,7 +70,7 @@ export async function handleUssd(turn: InboundTurn, deps: UssdDeps): Promise<Uss
   if (result.keep) deps.sessions.set(key, state);
   else deps.sessions.delete(key);
 
-  // Un seul point de sortie pour le statut : jamais une valeur hors contrat vers la passerelle.
+  // Un seul point de sortie pour le statut (cycle bancaire par défaut, repli `contract` configurable).
   const { transaction } = result.reply;
   return { ...result.reply, transaction: { ...transaction, status: toContractStatus(transaction.status, deps.statusMode) } };
 }
@@ -156,13 +158,11 @@ async function advance(
       return done(reply(language, message(language, term), 'TERM_EXPLANATION', { end: true, term: text }));
     }
     case 'language': {
-      const choices: Readonly<Record<string, GatewayLanguage>> = { '1': 'fr', '2': 'en', '3': 'fub' };
-      const chosen = choices[text];
+      const index = Number.parseInt(text, 10);
+      const chosen = Number.isInteger(index) ? servedLanguages()[index - 1] : undefined;
       if (!chosen) {
         // On reste sur le choix de langue : sinon la saisie suivante serait lue comme un choix du menu.
-        return keep(
-          reply(language, message(language, 'ask.language'), 'CLARIFICATION_NEEDED'),
-        );
+        return keep(reply(language, languageMenuText(language), 'CLARIFICATION_NEEDED', languageMenuOptions()));
       }
       state.language = chosen;
       state.languageSource = 'user';
@@ -176,7 +176,7 @@ async function advance(
     }
     default:
       state.step = 'menu';
-      return keep(reply(language, menuText(language), 'UNKNOWN'));
+      return keep(reply(language, menuText(language), 'UNKNOWN', menuOptions(language)));
   }
 }
 
@@ -213,12 +213,12 @@ async function menu(
       return keep(reply(language, message(language, 'ask.term'), 'TERM_EXPLANATION'));
     case 'language':
       state.step = 'language';
-      return keep(reply(language, message(language, 'ask.language'), 'LANGUAGE_SWITCH'));
+      return keep(reply(language, languageMenuText(language), 'LANGUAGE_SWITCH', languageMenuOptions()));
     default: {
-      if (text === '') return keep(reply(language, menuText(language), 'UNKNOWN'));
+      if (text === '') return keep(reply(language, menuText(language), 'UNKNOWN', menuOptions(language)));
       const understood = understandFreeText(text, language);
       if (understood) return withExtracted(await followFreeText(state, understood, phone, deps, language), understood);
-      return keep(reply(language, `${message(language, 'invalid.choice')}\n${menuText(language)}`, 'CLARIFICATION_NEEDED'));
+      return keep(reply(language, `${message(language, 'invalid.choice')}\n${menuText(language)}`, 'CLARIFICATION_NEEDED', menuOptions(language)));
     }
   }
 }
@@ -241,6 +241,10 @@ async function followFreeText(
     case 'help':
     case 'language':
       return menu(state, String(MENU_KEYS.indexOf(`menu.${route.kind}`) + 1), phone, deps, language);
+    case 'term': {
+      const key: MessageKey = route.term === 'fees' ? 'term.fee' : route.term === 'limit' ? 'term.limit' : 'term.beneficiary';
+      return done(reply(language, message(language, key), 'TERM_EXPLANATION', { end: true, term: route.term }));
+    }
     case 'fees':
       if (route.amount !== undefined) return showFees(state, String(route.amount), deps, language);
       return menu(state, '3', phone, deps, language);
@@ -540,12 +544,12 @@ async function atConfirmation(
   const pending = state.pending;
   if (!pending) {
     state.step = 'menu';
-    return keep(reply(language, menuText(language), 'UNKNOWN'));
+    return keep(reply(language, menuText(language), 'UNKNOWN', menuOptions(language)));
   }
 
   const value = text.trim().toLowerCase();
 
-  if (value === '1' || ['oui', 'yes', 'eey', 'confirmer', 'confirm', 'tabbitin'].includes(value)) {
+  if (value === '1' || isConfirmation(text)) {
     const contact = pending.type === 'transfer' ? deps.secondLook?.applies(phone, pending.total) : undefined;
     if (deps.secondLook && contact) {
       const request = await deps.secondLook.open(
@@ -604,7 +608,8 @@ async function atConfirmation(
     );
   }
 
-  if (value === '2' || ['non', 'no', 'annuler', 'cancel', 'haaytu'].includes(value)) {
+  // « Non, 3000 » est une CORRECTION (scénario du jury) : une saisie avec un nombre n'annule jamais.
+  if (value === '2' || (isCancellation(text) && !/\d/.test(text))) {
     return cancelPending(state, deps, language);
   }
 
@@ -614,8 +619,8 @@ async function atConfirmation(
     return keep(reply(language, message(language, 'ask.amount'), 'CORRECTION'));
   }
 
-  // L'utilisateur tape directement un nouveau montant après le récapitulatif : c'est une correction.
-  const amount = parseAmount(text);
+  // L'utilisateur tape directement un nouveau montant après le récapitulatif (« 3000 », « Non, 3000 ») : correction.
+  const amount = parseAmount(text) ?? amountIn(text);
   if (amount !== null) {
     const correction = await applyCorrection(state, text, phone, deps, language);
     if (correction) return correction;
@@ -639,19 +644,26 @@ async function applyCorrection(
 ): Promise<Outcome | null> {
   const pending = state.pending;
   if (!pending) return null;
-  const amount = parseAmount(text);
+  const amount = parseAmount(text) ?? amountIn(text);
   if (amount === null) return null;
   if (amount > MAX_AMOUNT) return keep(limitReply(language));
 
   const result = await deps.bank.update(pending.id, { amount });
   if (!result.ok) return failure(result, 'CORRECTION', language, pending.id);
   const tx = result.data;
+  const newAmount = tx.amount || amount;
+
+  // Scénario « correction » du jury : les frais doivent être RECALCULÉS pour le nouveau montant.
+  // On redemande toujours GET /fees (visible dans le journal) ; jamais les frais de l'ancien montant.
+  const fees = await deps.bank.fees(pending.type, newAmount);
+  const quote = fees.ok ? fees.data : fallbackQuote(pending.type, newAmount);
+  const fee = tx.fee && tx.amount === newAmount ? tx.fee : quote.fee;
 
   state.pending = {
     ...pending,
-    amount: tx.amount || amount,
-    fee: tx.fee || pending.fee,
-    total: tx.total || tx.amount + pending.fee,
+    amount: newAmount,
+    fee,
+    total: tx.total && tx.amount === newAmount ? tx.total : newAmount + fee,
   };
   state.step = 'confirm';
 
@@ -727,6 +739,8 @@ interface ReplyOptions {
   readonly params?: Record<string, string | number | boolean | null>;
   readonly term?: string;
   readonly language?: GatewayLanguage;
+  /** Le texte écrit déjà la liste numérotée (menu) : `options` ne sert qu'aux boutons du simulateur. */
+  readonly listedInText?: boolean;
 }
 
 function reply(
@@ -736,7 +750,7 @@ function reply(
   options: ReplyOptions = {},
 ): UssdReply {
   const optionLabels = options.options ?? [];
-  const body = finalizeText(text, optionLabels, MAX_CHARS);
+  const body = options.listedInText ? truncateGsm7(toGsm7(text), MAX_CHARS) : finalizeText(text, optionLabels, MAX_CHARS);
   const params: Record<string, string | number | boolean | null> = { ...(options.params ?? {}) };
   if (options.term) params.term = options.term;
 
@@ -758,6 +772,20 @@ function finalizeText(text: string, options: readonly string[], maxChars: number
   const budget = optionsBlock ? maxChars - gsm7Length(optionsBlock) - 1 : maxChars;
   const body = truncateGsm7(toGsm7(text), Math.max(24, budget));
   return optionsBlock ? `${body}\n${optionsBlock}` : body;
+}
+
+/** Menu 8 : les langues réellement servies (intégrées + packs complets), noms natifs de la sandbox. */
+function languageMenuText(language: GatewayLanguage): string {
+  return `${message(language, 'ask.language')}\n${numbered(servedLanguages().map(languageName))}`;
+}
+
+function languageMenuOptions(): ReplyOptions {
+  return { options: servedLanguages().map(languageName), listedInText: true };
+}
+
+/** Comme le kit officiel : la liste est dans le texte, et ses libellés dans `options`. */
+function menuOptions(language: GatewayLanguage): ReplyOptions {
+  return { options: MENU_KEYS.map((key) => message(language, key)), listedInText: true };
 }
 
 function menuText(language: GatewayLanguage): string {

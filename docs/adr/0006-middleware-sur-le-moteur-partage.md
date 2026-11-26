@@ -20,8 +20,10 @@ phrase comme « Neldu ujineere jowi ka Fadimatou » était comprise sur le web m
 4. **Texte libre sur USSD** : quand la saisie n'est pas un choix du menu, `interpret` du moteur la comprend
    et `free-text.ts` la transforme en point d'entrée du dialogue USSD, qui reste propriétaire du cycle
    `pending → confirm` au tour suivant. Le menu numéroté reste la voie principale.
-5. **Statut de transaction** : par défaut, uniquement les valeurs observées (`none`, `pending`), selon
-   SANDBOX-SAFINUM §8. Le cycle brut est disponible avec `SAFINUM_STATUS=lifecycle`.
+5. **Statut de transaction** : le cycle bancaire (`pending`, `confirmed`, `cancelled`, `failed`), comme le
+   kit de démarrage officiel. *Révision* : une première version n'émettait que `none` / `pending` (hypothèse
+   de SANDBOX-SAFINUM §8, faite sans source) ; le kit l'a démentie. Le repli reste possible avec
+   `SAFINUM_STATUS=contract`.
 6. **Build par bundle esbuild** : `dist/server.js` embarque les paquets TypeScript du monorepo et
    démarre sans aucune dépendance npm à l'exécution.
 

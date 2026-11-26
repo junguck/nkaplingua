@@ -12,11 +12,12 @@ Ce qui est livré est décrit dans le [README](../README.md) et les [ADR](adr/) 
 |---|---|---|
 | **Clé d'équipe `sbx_…` et `team_id` valides** | Organisation SAFINUM : la clé fournie le 26/11 est refusée (`401`), `team_id: nkaplingua` est inconnu (`422`) | `node apps/gateway/scripts/safinum.mjs status` répond `200` |
 | **Test en direct sur la sandbox** (3 canaux) | clé ci-dessus | Simulateurs USSD, mobile et web sans `INVALID_RESPONSE`, `NO_BANK_CALL` ni `TIMEOUT` ; `X-Trace-Id` visible dans le journal du jury |
-| **Valider le statut de transaction** renvoyé après confirmation et annulation | clé ci-dessus | La sandbox accepte la correspondance §8 (défaut) ; sinon essayer `SAFINUM_STATUS=lifecycle` |
+| **Valider le statut de transaction** renvoyé après confirmation et annulation | clé ci-dessus | La sandbox accepte le cycle du kit officiel (`confirmed`, `cancelled`, défaut) ; sinon `SAFINUM_STATUS=contract` |
 | **Tunnel public + `POST /sandbox/endpoint`** pour `ussd`, `mobile`, `web` | clé ci-dessus | `GET /sandbox/endpoint` renvoie nos URL — **avant** le passage (`CONFIG_LOCKED` pendant l'évaluation) |
-| **Relecture par des locuteurs natifs** des gabarits fulfulde critiques (confirmation, frais, erreurs) | Locuteurs à recruter | Statut « validé » dans les lexiques ; le reste affiché « proposé » |
+| **Packs de langue relus par deux locuteurs** : écrans (89 clés) puis USSD (56 phrases) pour **dua, ewo, bas, bbj, byv** ; relecture des formes fulfulde critiques | Locuteurs à recruter ; aucune source écrite accessible pour bas et byv ([LANGUES](LANGUES.md)) | `pnpm --filter @nkap/gateway i18n verifier` vert ; la langue tirée par le jury est servie ou repliée en `fr` déclaré |
+| **Préparer le jour J** : tunnel nommé, machine de secours, vidéo de secours, rôles | — | Déroulé [JOUR-J](JOUR-J.md) répété une fois |
 | **Spécification API** (`docs/API.md`, générée depuis zod) et documentation finale | — | Livrable §11 « Spécifications API » |
-| **Répétition chronométrée ×3** avec scénarios §7 tirés au hasard, vidéo et build de secours | — | Trois passages sans incident |
+| **Répétition chronométrée ×3** avec les dix scénarios de la sandbox ([SANDBOX §10](SANDBOX-SAFINUM.md)) et une langue tirée au sort | clé ci-dessus | Trois passages sans incident dans le panneau Diagnostics |
 
 ## P1 — ce qui fait gagner
 
@@ -25,7 +26,7 @@ Ce qui est livré est décrit dans le [README](../README.md) et les [ADR](adr/) 
 | **Unifier le dialogue USSD et le `DialogueManager` du moteur** | Port financier v2 dans `@nkap/contracts` (`initiate / update / confirm / cancel` + contexte `X-Trace-Id`), le moteur l'utilise, le middleware délègue son dialogue au moteur ([ADR 0006](adr/0006-middleware-sur-le-moteur-partage.md)) |
 | **Console jury locale** : traces en direct (SSE) + matrice de cohérence (une requête → 6 canaux) | Démonstration du §8 ; le tableau de bord évalué reste celui de SAFINUM |
 | **Brancher web et mobile sur le middleware** | Endpoint `POST /v1/turns` côté gateway + `NkapClient` HTTP ; aucun écran ne change (ADR 0004) |
-| **Deuxième langue de la sandbox sur USSD** (ewondo, ou duala) | Catalogue USSD complet relu par des locuteurs, sinon repli français déclaré (règle : jamais d'écran à moitié traduit) |
+| **Étendre la compréhension** (mots-clés) en duala, ewondo, ghomala, basaa, medumba | Sources imprimées à consulter (Njock, Domche-Téko, Tsala…) ou locuteurs ; conversion de la police du dictionnaire ghomala ([LANGUES](LANGUES.md)) |
 | **SVI** : répondeur de la présélection branché sur le moteur (DTMF + synthèse), menus en fulfulde | |
 | **Extension navigateur** branchée sur la gateway : panneau « demander » sur les simulateurs web SAFINUM | |
 | **Synchronisation hors-ligne** : brancher le `sender` de `SyncQueue` | Aucun point de terminaison documenté par SAFINUM à ce jour ([ADR 0005](adr/0005-mode-hors-ligne-ussd.md)) |
@@ -62,4 +63,4 @@ Ce qui est livré est décrit dans le [README](../README.md) et les [ADR](adr/) 
 - Agréger de vrais comptes MTN/Orange/banques (agrément, accès API).
 - Lire l'écran en continu sur Android (sécurité, politique Play Store).
 - Prétendre à une reconnaissance vocale fulfulde : Android, iOS et Chrome n'en fournissent pas (piste : modèles MMS / Omnilingual ASR de Meta côté serveur).
-- Servir une langue à moitié traduite : sans catalogue complet et relu, le middleware répond en français et le déclare.
+- Servir un écran USSD à moitié traduit : sans catalogue complet et relu, le middleware répond en français et le déclare (les écrans mobile/web suivent la règle clé par clé du kit, avec un seuil de 75 %).

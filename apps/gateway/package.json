@@ -10,7 +10,8 @@
     "build": "node scripts/build.mjs",
     "start": "node dist/server.js",
     "demo": "node dist/demo/server.js",
-    "dev": "pnpm build && node dist/server.js"
+    "dev": "pnpm build && node dist/server.js",
+    "i18n": "node scripts/i18n.mjs"
   },
   "dependencies": {
     "@nkap/contracts": "workspace:*",

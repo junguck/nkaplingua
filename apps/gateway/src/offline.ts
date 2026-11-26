@@ -22,7 +22,7 @@ import type {
   CreateTransactionInput,
   FeeType,
 } from './bank.js';
-import { LANGUAGE_NAMES, MENU_KEYS, message, type GatewayLanguage, type MessageKey } from './i18n.js';
+import { MENU_KEYS, message, servedLanguages, type GatewayLanguage, type MessageKey } from './i18n.js';
 import { UI_DICTIONARIES } from './ui-dictionaries.js';
 import { isGsm7, gsm7Length, toGsm7, truncateGsm7 } from '@nkap/core';
 
@@ -61,7 +61,7 @@ export class TranslationCache {
   /** Un cache déjà garni avec les catalogues USSD (gsm7, 182) et écrans (utf8) embarqués. */
   static bundled(): TranslationCache {
     const cache = new TranslationCache();
-    for (const language of Object.keys(LANGUAGE_NAMES) as GatewayLanguage[]) {
+    for (const language of servedLanguages()) {
       for (const key of USSD_KEYS) {
         const text = message(language, key);
         cache.map.set(cacheKey(language, key), { text, max_chars: USSD_MAX_CHARS, charset: 'gsm7' });

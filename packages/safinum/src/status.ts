@@ -1,11 +1,13 @@
 /**
  * Statut de transaction renvoyé à la passerelle.
  *
- * La documentation ne garantit que `none` et `pending` ; une valeur hors contrat rend toute la
- * réponse `INVALID_RESPONSE`. Par défaut on applique donc la correspondance de SANDBOX-SAFINUM §8 :
- * l'identifiant de la transaction porte l'information, le statut reste dans les valeurs observées.
- * Le mode `lifecycle` (variable `SAFINUM_STATUS=lifecycle`) renvoie le cycle bancaire brut, à n'activer
- * qu'après l'avoir vu accepté par la sandbox.
+ * Source : le kit de démarrage officiel SAFINUM (« respecte déjà le contrat ») renvoie le cycle
+ * bancaire tel quel — `pending` au récapitulatif, `confirmed` après confirmation, `cancelled` après
+ * annulation, `failed` sur erreur bancaire. C'est le défaut (`lifecycle`).
+ *
+ * Le mode `contract` (variable `SAFINUM_STATUS=contract`) ne garde que `none` / `pending` : c'était une
+ * hypothèse prudente faite AVANT de disposer du kit (SANDBOX-SAFINUM §8). Conservé uniquement comme
+ * repli si la sandbox venait à refuser une valeur.
  */
 export type ContractStatus = 'none' | 'pending';
 export type LifecycleStatus = 'none' | 'pending' | 'confirmed' | 'cancelled' | 'failed';
@@ -21,10 +23,10 @@ const CONTRACT: Readonly<Record<LifecycleStatus, ContractStatus>> = {
   failed: 'none',
 };
 
-export function toContractStatus(status: LifecycleStatus, mode: StatusMode = 'contract'): TransactionStatus {
+export function toContractStatus(status: LifecycleStatus, mode: StatusMode = 'lifecycle'): TransactionStatus {
   return mode === 'lifecycle' ? status : CONTRACT[status];
 }
 
 export function statusModeFrom(value: string | undefined): StatusMode {
-  return value === 'lifecycle' ? 'lifecycle' : 'contract';
+  return value === 'contract' ? 'contract' : 'lifecycle';
 }

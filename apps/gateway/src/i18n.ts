@@ -7,7 +7,12 @@
  * ses formes sont **proposées** (glossaire de présélection) et doivent être relues par un locuteur.
  */
 
-export type GatewayLanguage = 'fr' | 'en' | 'fub';
+import { LANGUAGE_INFO } from '@nkap/contracts';
+import type { SafinumLanguage } from '@nkap/safinum';
+import { loadPacks, type PackLoad } from './packs.js';
+
+/** Toute langue de la sandbox peut être servie, dès qu'elle a un catalogue complet (intégré ou pack). */
+export type GatewayLanguage = SafinumLanguage;
 
 export type MessageKey =
   | 'menu.header'
@@ -102,7 +107,7 @@ const FR: Catalogue = {
   'ask.biller': 'Choisissez le facturier:',
   'ask.billReference': 'Numero de facture:',
   'ask.term': 'Quel terme ?\n1. Frais\n2. Plafond\n3. Beneficiaire\n4. Confirmation',
-  'ask.language': 'Choisissez la langue:\n1. Francais\n2. English\n3. Fulfulde',
+  'ask.language': 'Choisissez la langue:',
   'confirm.transfer': 'Envoi de {amount} a {recipient}. Frais {fee}. Total {total}.',
   'confirm.airtime': 'Credit de {amount} pour le {phone}. Frais {fee}. Total {total}.',
   'confirm.bill': 'Facture {biller} {reference}: {amount}. Frais {fee}. Total {total}.',
@@ -161,7 +166,7 @@ const EN: Catalogue = {
   'ask.biller': 'Choose the service:',
   'ask.billReference': 'Bill number:',
   'ask.term': 'Which term?\n1. Fee\n2. Limit\n3. Beneficiary\n4. Confirmation',
-  'ask.language': 'Choose the language:\n1. Francais\n2. English\n3. Fulfulde',
+  'ask.language': 'Choose the language:',
   'confirm.transfer': 'Sending {amount} to {recipient}. Fee {fee}. Total {total}.',
   'confirm.airtime': 'Airtime of {amount} for {phone}. Fee {fee}. Total {total}.',
   'confirm.bill': 'Bill {biller} {reference}: {amount}. Fee {fee}. Total {total}.',
@@ -224,7 +229,7 @@ const FUB: Catalogue = {
   'ask.biller': 'Suɓo fakture:',
   'ask.billReference': 'Lammba fakture:',
   'ask.term': 'Ko honɗum?\n1. Njoɓdi\n2. Keɓal\n3. Keɓoowo\n4. Tabbitgol',
-  'ask.language': 'Suɓo ɗemngal:\n1. Francais\n2. English\n3. Fulfulde',
+  'ask.language': 'Suɓo ɗemngal:',
   'confirm.transfer': 'Neldugol {amount} ka {recipient}. Njoɓdi {fee}. Fof {total}.',
   'confirm.airtime': 'Kerdii {amount} ngam {phone}. Njoɓdi {fee}. Fof {total}.',
   'confirm.bill': 'Fakture {biller} {reference}: {amount}. Njoɓdi {fee}. Fof {total}.',
@@ -262,25 +267,52 @@ const FUB: Catalogue = {
   'error.GENERIC': 'Golle ndee waɗaaka. Ɗaɓɓit caggal.',
 };
 
-const CATALOGUES: Readonly<Record<GatewayLanguage, Catalogue>> = { fr: FR, en: EN, fub: FUB };
+const BUILT_IN: Readonly<Partial<Record<GatewayLanguage, Catalogue>>> = { fr: FR, en: EN, fub: FUB };
 
-/** Langue réellement servie : les langues que nous n'avons pas relues restent en français. */
-export function resolveLanguage(requested: string | null | undefined): GatewayLanguage {
-  return requested === 'en' || requested === 'fub' || requested === 'fr' ? requested : 'fr';
+/** Packs de langue livrés par les locuteurs (`translations/<code>.json`), lus une fois au démarrage. */
+export const PACK_LOAD: PackLoad = loadPacks();
+
+/** Référence des phrases USSD (français) : clés et emplacements que tout pack doit respecter. */
+export const USSD_REFERENCE: Readonly<Record<MessageKey, string>> = FR;
+/** Version anglaise, donnée en aide aux traducteurs dans le modèle. */
+export const USSD_ENGLISH: Readonly<Record<MessageKey, string>> = EN;
+
+function catalogueOf(language: GatewayLanguage): Catalogue | null {
+  const builtIn = BUILT_IN[language];
+  if (builtIn) return builtIn;
+  const pack = PACK_LOAD.packs.get(language);
+  if (!pack) return null;
+  const keys = Object.keys(FR) as MessageKey[];
+  // Une langue n'est servie sur USSD que si TOUTES les phrases sont traduites.
+  return keys.every((key) => key in pack.ussd) ? (pack.ussd as Catalogue) : null;
 }
 
-export const LANGUAGE_NAMES: Readonly<Record<GatewayLanguage, string>> = {
-  fr: 'Francais',
-  en: 'English',
-  fub: 'Fulfulde',
-};
+export function isServedLanguage(language: unknown): language is GatewayLanguage {
+  return typeof language === 'string' && catalogueOf(language as GatewayLanguage) !== null;
+}
+
+/** Langues proposées au menu 8, dans un ordre stable : intégrées puis packs complets. */
+export function servedLanguages(): GatewayLanguage[] {
+  const packs = [...PACK_LOAD.packs.keys()].filter((l) => !(l in BUILT_IN) && isServedLanguage(l)).sort();
+  return ['fr', 'en', 'fub', ...packs];
+}
+
+/** Langue réellement servie : une langue sans catalogue complet reste en français. */
+export function resolveLanguage(requested: string | null | undefined): GatewayLanguage {
+  return isServedLanguage(requested) ? requested : 'fr';
+}
+
+/** Nom affiché d'une langue : le nom natif de la documentation de la sandbox. */
+export function languageName(language: GatewayLanguage): string {
+  return LANGUAGE_INFO[language].nativeName;
+}
 
 export function message(
   language: GatewayLanguage,
   key: MessageKey,
   vars: Readonly<Record<string, string | number>> = {},
 ): string {
-  const template = CATALOGUES[language][key];
+  const template = (catalogueOf(language) ?? FR)[key];
   return template.replace(/\{([a-z_]+)\}/gi, (match, name: string) =>
     Object.prototype.hasOwnProperty.call(vars, name) ? String(vars[name]) : match,
   );
