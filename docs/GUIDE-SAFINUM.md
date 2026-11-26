@@ -1,6 +1,6 @@
 # Brancher SAFINUM — mode d'emploi du middleware
 
-> `apps/gateway` · 18 tests dédiés · une seule URL pour `ussd`, `mobile` et `web`.<br>
+> `apps/gateway` · 35 tests dédiés · une seule URL pour `ussd`, `mobile` et `web`.<br>
 > Contrat et règles d'évaluation : [`SANDBOX-SAFINUM.md`](SANDBOX-SAFINUM.md).
 
 ## 1. Ce qui existe
@@ -9,7 +9,8 @@
 passerelle SAFINUM ──POST──► apps/gateway ──X-Team-Key + X-Trace-Id──► API bancaire
                                │
                                ├─ ussd          menus, solde, transfert, frais, historique,
-                               │                crédit, facture, aide, langue
+                               │                crédit, facture, aide, langue + texte libre
+                               │                compris par @nkap/core (même moteur que web/mobile)
                                ├─ mobile / web  ui_translation (en, fub, repli fr déclaré)
                                └─ demo/         banque fictive aux mêmes routes, sans clé
 ```
@@ -17,18 +18,19 @@ passerelle SAFINUM ──POST──► apps/gateway ──X-Team-Key + X-Trace-I
 | Fichier | Rôle |
 | --- | --- |
 | `src/bank.ts` | `SafinumBank` : en-têtes du tour sur chaque appel, délai 2,2 s, erreurs traduites |
-| `src/ussd.ts` | dialogue à états : création `pending`, puis `confirm` **au tour suivant** |
+| `src/ussd.ts` | dialogue à états : création `pending`, puis `confirm` **au tour suivant** ; statut de sortie conforme au §8 |
+| `src/free-text.ts` | phrase libre → interprétation du moteur (`@nkap/core`) → point d'entrée du dialogue USSD |
+| `src/language.ts` | détection du moteur + prudence du middleware (langues servies, écart net) |
 | `src/ui.ts` | écrans : emplacements intacts, `max_chars` par clé, repli complet en `fr` |
-| `src/intents.ts` | nos intentions → les 13 intentions officielles |
-| `src/fees.ts` | grille officielle (repli si `GET /fees` échoue) |
-| `src/gsm7.ts` | translittération ɓ ɗ ŋ ƴ ɛ ɔ ə, septets, troncature à 182 |
 | `src/demo/` | banque de démonstration (comptes, frais, `pending → confirm`) |
+| `@nkap/safinum` | protocole, 13 intentions officielles, langues, grille de frais (seule copie), statuts |
+| `@nkap/core` (GSM-7) | translittération ɓ ɗ ŋ ƴ ɛ ɔ ə, septets, troncature à 182 |
 
 ## 2. Local, sans clé
 
 ```bash
 cd nkaplingua
-pnpm --filter @nkap/gateway build
+pnpm --filter @nkap/gateway build                     # bundle esbuild : paquets du monorepo inclus
 
 # terminal 1 : banque fictive
 node apps/gateway/dist/demo/server.js                 # http://127.0.0.1:8788/api/v1
@@ -59,6 +61,10 @@ Comptes fictifs : `237699000003` Fadimatou (250 000) · `237690000002` Aicha (80
 ## 3. Brancher la sandbox
 
 ### 3.1 La clé (seul prérequis manquant aujourd'hui)
+
+État au 26/11 : la sandbox répond, mais la clé enregistrée pour l'équipe est refusée
+(`401 Clé d'API absente ou invalide`) sur toutes les routes bancaires, et `team_id: nkaplingua` donne
+`422 Équipe inconnue` sur `/channel/*`. Il faut une clé `sbx_…` et un `team_id` confirmés par l'organisation.
 
 ```bash
 cp apps/gateway/.env.example apps/gateway/.env
@@ -103,20 +109,32 @@ node apps/gateway/scripts/safinum.mjs turn ussd "1"       # solde
 node apps/gateway/scripts/safinum.mjs ui web              # écran (fub par défaut)
 ```
 
-## 4. Détection de langue (`language: null`)
+## 4. Texte libre sur USSD
+
+Le menu numéroté reste la voie principale. Toute autre saisie est confiée au moteur partagé :
+
+| Saisie | Réponse |
+| --- | --- |
+| `Neldu ujineere jowi ka Aicha` | recherche du bénéficiaire, création `pending`, récapitulatif en fulfulde ; `1` au tour suivant confirme |
+| `What is my balance?` | solde en anglais (`BALANCE_INQUIRY`) |
+| `Envoie 3000` | demande du bénéficiaire (`CLARIFICATION_NEEDED`, `amount: 3000` visible du jury), aucun appel `POST` |
+| `blabla` | message d'erreur + menu, jamais une intention inventée |
+
+## 5. Détection de langue (`language: null`)
 
 La passerelle peut envoyer `language: null` : c'est à nous de trancher. Ordre de priorité :
 
 1. `language` explicite dans le tour (jamais contredit) ;
 2. langue choisie par l'utilisateur au menu 8 (épinglée pour la session) ;
-3. détection sur la saisie — seulement avec des indices suffisants (score ≥ 3, marge ≥ 1) :
-   `fr`, `en`, `fub` (lexiques du dépôt) ;
+3. détection sur la saisie par le **détecteur du moteur** (`@nkap/core`), retenue seulement si la langue
+   est servie en entier sur USSD (`fr`, `en`, `fub`) et avec un écart net sur la deuxième (≥ 2) ;
 4. sinon la langue en cours, par défaut `fr`.
 
-`dua`, `ewo`, `bas`, `bbj`, `byv` n'ont pas de lexique fiable ici : on ne les devine pas, on répond en
-français et `interpretation.language` vaut `fr`. Mieux vaut un repli déclaré qu'une fausse détection.
+`dua`, `ewo`, `bas`, `bbj`, `byv` n'ont pas de catalogue USSD complet : on ne les sert pas à moitié, on
+répond en français et `interpretation.language` vaut `fr`. Mieux vaut un repli déclaré qu'une fausse
+détection. L'ewondo a des libellés proposés dans le moteur, mais il lui manque un catalogue de menus relu.
 
-## 5. Règles à ne pas casser
+## 6. Règles à ne pas casser
 
 1. `X-Trace-Id` recopié sur **chaque** appel bancaire, sinon `NO_BANK_CALL` (travail invisible).
 2. Confirmation dans un tour **séparé**, avec un autre `trace_id`.
@@ -126,9 +144,12 @@ français et `interpretation.language` vaut `fr`. Mieux vaut un repli déclaré 
 6. Langue déclarée honnête : repli complet en `fr`, jamais un écran moitié traduit.
 7. Jamais de code d'erreur bancaire brut à l'utilisateur.
 
-`SAFINUM_STATUS_STRICT=1` n'émet que les statuts déjà observés (`none`, `pending`).
+Statut de transaction : par défaut, seulement `none` et `pending` (SANDBOX-SAFINUM §8). Une opération
+confirmée renvoie `pending` avec l'identifiant de la transaction, une annulation renvoie `none` avec cet
+identifiant. `SAFINUM_STATUS=lifecycle` renvoie le cycle brut (`confirmed`, `cancelled`, `failed`) : à
+n'activer qu'après l'avoir vu accepté par la sandbox.
 
-## 6. Dépannage
+## 7. Dépannage
 
 | Symptôme | Cause | Geste |
 | --- | --- | --- |
@@ -141,15 +162,17 @@ français et `interpretation.language` vaut `fr`. Mieux vaut un repli déclaré 
 | Menu « Service momentanement indisponible » | banque injoignable : mode hors-ligne | relancer la banque ; sonde toutes les 15 s |
 | `MISSING_STRINGS` / `UNTRANSLATED` | dictionnaire incomplet | compléter `src/ui-dictionaries.ts` |
 
-## 7. Ce qui a été vérifié
+## 8. Ce qui a été vérifié
 
-- `pnpm test` : 102 tests (29 pour le gateway, dont 6 pour le mode hors-ligne), chaîne réelle middleware → HTTP → banque.
-- `pnpm typecheck` : 8 projets verts.
+- `pnpm test` : 118 tests (35 pour le gateway, dont 6 pour le mode hors-ligne), chaîne réelle middleware → HTTP → banque.
+- `pnpm typecheck` : 9 projets verts.
+- Bundle `dist/server.js` + banque de démo en HTTP : kit officiel (menu, solde, écran web), transfert en
+  texte libre fulfulde créé au tour A puis confirmé au tour B, options dans la langue de l'écran.
 - En-têtes `X-Team-Key` et `X-Trace-Id` observés côté banque, `trace_id` différent entre
   l'initiation et la confirmation.
-- **Sandbox en direct : non testée**, aucune clé d'équipe disponible.
+- **Sandbox en direct : non testée** — la sandbox répond, mais refuse la clé d'équipe fournie (401, 26/11).
 
-## 8. Mode hors-ligne (zones blanches)
+## 9. Mode hors-ligne (zones blanches)
 
 Le middleware garde ses traductions en local (`TranslationCache`, garni au démarrage). Si la banque ne répond
 pas, il répond depuis ce cache sans rien attendre.
