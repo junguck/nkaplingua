@@ -133,4 +133,4 @@ Provenance déclarée : à compléter
 | phrases acceptées / corrigées | | |
 | signature | | |
 
-Après la séance : reporter les corrections dans `translations/fub.json` (ou dans la base de mots), passer `pnpm --filter @nkap/gateway i18n verifier`, puis `pnpm test`.
+Après la séance : reporter les corrections dans le catalogue intégré (`apps/gateway/src/i18n.ts`, constante `FUB`) — un fichier `translations/fub.json` ne serait pas lu pour cette langue. Passer `pnpm test`, puis revalider.

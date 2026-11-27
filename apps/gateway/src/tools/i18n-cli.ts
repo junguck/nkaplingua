@@ -66,6 +66,8 @@ export function fiche(language: GatewayLanguage): string {
   fs.mkdirSync(dir, { recursive: true });
   const file = path.join(dir, `${language}.md`);
   const pack = PACK_LOAD.packs.get(language);
+  // fr, en et fub sont dans le code : un fichier `translations/<code>.json` ne serait PAS lu pour eux.
+  const builtIn = language === 'fr' || language === 'en' || language === 'fub';
   const catalog = (USSD_REFERENCE ?? {}) as Readonly<Record<string, string>>;
   const keys = Object.keys(catalog).sort();
   const phrases = keys.map((key) => ({
@@ -132,7 +134,15 @@ export function fiche(language: GatewayLanguage): string {
   lines.push('| phrases acceptées / corrigées | | |');
   lines.push('| signature | | |');
   lines.push('');
-  lines.push('Après la séance : reporter les corrections dans `translations/' + language + '.json` (ou dans la base de mots), passer `pnpm --filter @nkap/gateway i18n verifier`, puis `pnpm test`.');
+  lines.push(
+    builtIn
+      ? 'Après la séance : reporter les corrections dans le catalogue intégré (`apps/gateway/src/i18n.ts`, constante `' +
+          language.toUpperCase() +
+          '`) — un fichier `translations/' +
+          language +
+          '.json` ne serait pas lu pour cette langue. Passer `pnpm test`, puis revalider.'
+      : 'Après la séance : reporter les corrections dans `translations/' + language + '.json`, passer `pnpm --filter @nkap/gateway i18n verifier`, puis `pnpm test`.',
+  );
   lines.push('');
 
   fs.writeFileSync(file, lines.join('\n'));

@@ -82,6 +82,11 @@ autoriser la superposition et « Lecture d'écran à la demande » → **Lancer 
 | [`docs/GUIDE-SAFINUM.md`](docs/GUIDE-SAFINUM.md) | Brancher le middleware : clé, tunnel, déclaration des trois canaux, dépannage |
 | [`docs/LANGUES.md`](docs/LANGUES.md) | État réel de chaque langue de la sandbox, sources lues, packs de langue à faire remplir par des locuteurs |
 | [`docs/JOUR-J.md`](docs/JOUR-J.md) | Déroulé de la présentation : rôles, veille, matin, scénarios, plans de secours |
+| [`docs/GUIDE-ACTIONS-JOUR-J.md`](docs/GUIDE-ACTIONS-JOUR-J.md) | Les dix actions humaines du jour J, commande par commande, avec les pièges connus |
+| [`docs/TUNNEL-NOMME.md`](docs/TUNNEL-NOMME.md) | Tunnel nommé (URL figée) : création Cloudflare, jeton, lancement, dépannage |
+| [`docs/PRESENTATION-CAPTURES.md`](docs/PRESENTATION-CAPTURES.md) | Démonstration capture par capture : cinq canaux, administration des langues, parcours de 6 minutes |
+| [`docs/relecture/fub.md`](docs/relecture/fub.md) | Fiche de relecture fulfulde à faire signer par deux locuteurs |
+| [`docs/IVR-VOIX.md`](docs/IVR-VOIX.md) | Ce qui est proposé pour l'IVR et les canaux vocaux (DTMF, enregistrements, ASR) |
 | [`preselection/`](preselection/) | Dossier de la phase de présélection (extension v1.1, vidéo, notes) |
 
 ## Structure
