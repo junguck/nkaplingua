@@ -7,7 +7,7 @@
  * Rien n'est deviné : un paramètre absent de la phrase reste absent, le dialogue le demandera.
  */
 
-import { BILLERS, type IntentName } from '@nkap/contracts';
+import { BILLERS, type IntentName, type LanguageCode } from '@nkap/contracts';
 import { CANCEL_CUES, CONFIRM_CUES, fold, interpret, scanNumbers, startsWithCue } from '@nkap/core';
 import { toSafinumIntent, type SafinumIntent } from '@nkap/safinum';
 import type { GatewayLanguage } from './i18n.js';
@@ -29,6 +29,8 @@ export interface Understood {
   readonly intent: SafinumIntent;
   /** Paramètres extraits, tels que le jury les verra dans `interpretation.parameters`. */
   readonly parameters: Readonly<Record<string, string | number>>;
+  /** Langue visée quand la phrase demande un changement de langue (« parle fulfulde »). */
+  readonly targetLanguage?: LanguageCode;
 }
 
 /** Intentions sans parcours USSD (retrait, salutation…) : on renvoie le menu plutôt que d'improviser. */
@@ -48,7 +50,7 @@ export function understandFreeText(text: string, language: GatewayLanguage): Und
   const interpretation = interpret(text, { hintLang: language, knownNames: [] });
   if (!ROUTABLE.has(interpretation.intent)) return null;
 
-  const { amount, recipientQuery, phone, biller, billReference, term } = interpretation.slots;
+  const { amount, recipientQuery, phone, biller, billReference, term, targetLanguage } = interpretation.slots;
   if (interpretation.intent === 'EXPLAIN_TERM' && term !== undefined && EXPLAINED.has(term)) {
     return { route: { kind: 'term', term: term as ExplainedTerm }, intent: 'TERM_EXPLANATION', parameters: { term } };
   }
@@ -61,7 +63,13 @@ export function understandFreeText(text: string, language: GatewayLanguage): Und
   if (billReference !== undefined) parameters.reference = billReference;
 
   const route = toRoute(interpretation.intent, { value, recipientQuery, phone, biller, billReference });
-  return route === null ? null : { route, intent: toSafinumIntent(interpretation.intent), parameters };
+  if (route === null) return null;
+  return {
+    route,
+    intent: toSafinumIntent(interpretation.intent),
+    parameters,
+    ...(targetLanguage === undefined ? {} : { targetLanguage }),
+  };
 }
 
 function toRoute(

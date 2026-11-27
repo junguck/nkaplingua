@@ -1,0 +1,17 @@
+{
+  "_lisez_moi": "Base de mots de NkapLingua. Ajoutez une langue ou des mots avec : pnpm --filter @nkap/gateway lang ajouter|mot|mot-outil|exporter. Le lexique TypeScript (packages/core/src/lexicon) reste la RÉFÉRENCE documentée ; cette base s'y ajoute. « remplace: true » (produit par « lang exporter <code> ») fait venir la langue entièrement d'ici : à partir de là, on modifie et on supprime sans toucher au code. Poids de 1 (indice faible) à 5 (mot sans ambiguïté).",
+  "_exemple": {
+    "dua": {
+      "nom": "Duala",
+      "alias": ["douala", "dualla"],
+      "remplace": false,
+      "sources": ["Helmlinger 1972 (lexique français-duala)", "Session de relecture : 2 locuteurs, Douala, 27/11/2026"],
+      "mots_outils": [["na", 1]],
+      "mots": {
+        "CHECK_BALANCE": [["musongi", 2]],
+        "TRANSFER": [["loma", 3]]
+      }
+    }
+  },
+  "langues": {}
+}

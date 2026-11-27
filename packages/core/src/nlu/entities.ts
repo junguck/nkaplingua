@@ -1,6 +1,5 @@
 import { BILLERS, LANGUAGES, TERMS, type BillerId, type LanguageCode, type TermId } from '@nkap/contracts';
-import { INTENT_CUES } from '../lexicon/intents.lexicon';
-import { LANGUAGE_NAMES } from '../lexicon/languages.lexicon';
+import { intentCuesOf, languageNamesOf } from '../lexicon/runtime';
 import { TERMS_LEXICON } from '../lexicon/terms.lexicon';
 import { containsCue, fold, tokenize } from '../text/normalize';
 import { scanNumbers } from '../text/numbers';
@@ -45,7 +44,7 @@ export function extractEntities(raw: string, knownNames: readonly string[]): Ent
     term: findTerm(folded),
     biller: BILLERS.find((b) => containsCue(folded, b.toLowerCase())) ?? null,
     billReference,
-    targetLanguage: LANGUAGES.find((l) => LANGUAGE_NAMES[l].some((n) => containsCue(folded, n))) ?? null,
+    targetLanguage: LANGUAGES.find((l) => languageNamesOf(l).some((n) => containsCue(folded, n))) ?? null,
   };
 }
 
@@ -79,14 +78,20 @@ function findRecipient(folded: string, knownNames: readonly string[]): string | 
   return null;
 }
 
-/** Mots du lexique d'intentions (« envoyer », « retirer »…) : jamais pris pour un prénom. */
-const LEXICON_WORDS: ReadonlyArray<{ readonly word: string; readonly stem: boolean }> = Object.values(INTENT_CUES)
-  .flatMap((table) => Object.values(table ?? {}).flatMap((list) => (list ?? []).map(([cue]) => cue)))
-  .filter((cue) => !cue.includes(' '))
-  .map((cue) => ({ word: fold(cue.replace(/\*$/, '')), stem: cue.endsWith('*') }));
-
+/**
+ * Mots du lexique d'intentions (« envoyer », « retirer »…) : jamais pris pour un prénom.
+ * Relu à chaque appel pour inclure les mots ajoutés par la base (`data/langues.json`).
+ */
 function isLexiconWord(token: string): boolean {
-  return LEXICON_WORDS.some(({ word, stem }) => (stem ? token.startsWith(word) : token === word));
+  for (const lang of LANGUAGES) {
+    for (const [cue] of intentCuesOf(lang)) {
+      if (cue.includes(' ')) continue;
+      const stem = cue.endsWith('*');
+      const word = fold(stem ? cue.slice(0, -1) : cue);
+      if (stem ? token.startsWith(word) : token === word) return true;
+    }
+  }
+  return false;
 }
 
 function findTerm(folded: string): TermId | null {

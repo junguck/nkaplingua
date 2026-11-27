@@ -1,0 +1,11 @@
+{
+    "trace_id": "essai-local-0002",
+    "team_id": "votre-equipe",
+    "channel": "ussd",
+    "session_id": "essai-session-1",
+    "phone": "237690000000",
+    "language": null,
+    "input": { "type": "text", "text": "1", "ussd_text": "1" },
+    "constraints": { "max_chars": 182, "charset": "gsm7", "mode": "menu", "timeout_ms": 3000 },
+    "bank_api": { "base_url": "https://safinum.cm/api/v1" }
+}

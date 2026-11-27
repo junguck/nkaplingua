@@ -1,0 +1,374 @@
+{
+  "genere_le": "2026-11-27T14:26:01.852Z",
+  "banque": "démonstration locale (sbx_demo_local)",
+  "telephone": "237699000003",
+  "scenarios": [
+    {
+      "id": "1-solde",
+      "titre": "Consultation du solde (fulfulde, langue non précisée)",
+      "tours": [
+        {
+          "tour": 1,
+          "entree": "Mi yiɗi anndude ceede am keddiiɗe",
+          "canal": "ussd",
+          "langue_demandee": "null (détection)",
+          "http": 200,
+          "intention": "BALANCE_INQUIRY",
+          "parametres": {
+            "balance": 250000,
+            "currency": "XAF"
+          },
+          "statut": "none",
+          "langue_reponse": "fub",
+          "trace": "1-solde-t1-6wko2i",
+          "ms": 70,
+          "reponse": "Ceede maa keddiide: 250 000 FCFA."
+        }
+      ]
+    },
+    {
+      "id": "2-transfert",
+      "titre": "Transfert : récapitulatif puis confirmation au tour suivant",
+      "tours": [
+        {
+          "tour": 1,
+          "entree": "Envoie 5000 à Aicha",
+          "canal": "ussd",
+          "langue_demandee": "fr",
+          "http": 200,
+          "intention": "TRANSFER",
+          "parametres": {
+            "amount": 5000,
+            "fee": 50,
+            "total": 5050,
+            "beneficiary": "Aicha Njoya",
+            "beneficiary_phone": "690000002",
+            "transaction_id": "MBP00000001"
+          },
+          "statut": "pending",
+          "langue_reponse": "fr",
+          "trace": "2-transfert-t1-r8fexu",
+          "ms": 21,
+          "reponse": "Envoi de 5 000 FCFA a Aicha Njoya (690 000 002). Frais 50 FCFA. Total 5 050 FCFA.\n1. Confirmer\n2. Annuler\n3. Modifier"
+        },
+        {
+          "tour": 2,
+          "entree": "1",
+          "canal": "ussd",
+          "langue_demandee": "fr",
+          "http": 200,
+          "intention": "CONFIRM",
+          "parametres": {
+            "amount": 5000,
+            "transaction_id": "MBP00000001"
+          },
+          "statut": "confirmed",
+          "langue_reponse": "fr",
+          "trace": "2-transfert-t2-gp5qmw",
+          "ms": 18,
+          "reponse": "5 000 FCFA envoye a Aicha Njoya (690 000 002). Ref MBP00000001. Solde 244 950 FCFA."
+        }
+      ]
+    },
+    {
+      "id": "3-frais",
+      "titre": "Frais pour 25 000 (valeur lue, pas devinée)",
+      "tours": [
+        {
+          "tour": 1,
+          "entree": "Combien de frais pour 25 000 ?",
+          "canal": "ussd",
+          "langue_demandee": "fr",
+          "http": 200,
+          "intention": "FEE_INQUIRY",
+          "parametres": {
+            "amount": 25000,
+            "fee": 150,
+            "total": 25150
+          },
+          "statut": "none",
+          "langue_reponse": "fr",
+          "trace": "3-frais-t1-4vc8ez",
+          "ms": 22,
+          "reponse": "Pour 25 000 FCFA: frais 150 FCFA. Total 25 150 FCFA."
+        }
+      ]
+    },
+    {
+      "id": "4-correction",
+      "titre": "Correction du montant avant exécution",
+      "tours": [
+        {
+          "tour": 1,
+          "entree": "Envoie 5000 à Aicha",
+          "canal": "ussd",
+          "langue_demandee": "fr",
+          "http": 200,
+          "intention": "TRANSFER",
+          "parametres": {
+            "amount": 5000,
+            "fee": 50,
+            "total": 5050,
+            "beneficiary": "Aicha Njoya",
+            "beneficiary_phone": "690000002",
+            "transaction_id": "MBP00000002"
+          },
+          "statut": "pending",
+          "langue_reponse": "fr",
+          "trace": "4-correction-t1-idpy0u",
+          "ms": 33,
+          "reponse": "Envoi de 5 000 FCFA a Aicha Njoya (690 000 002). Frais 50 FCFA. Total 5 050 FCFA.\n1. Confirmer\n2. Annuler\n3. Modifier"
+        },
+        {
+          "tour": 2,
+          "entree": "Non, 3000",
+          "canal": "ussd",
+          "langue_demandee": "fr",
+          "http": 200,
+          "intention": "CORRECTION",
+          "parametres": {
+            "amount": 3000,
+            "fee": 50,
+            "total": 3050,
+            "beneficiary": "Aicha Njoya",
+            "beneficiary_phone": "690000002",
+            "transaction_id": "MBP00000002"
+          },
+          "statut": "pending",
+          "langue_reponse": "fr",
+          "trace": "4-correction-t2-er9g49",
+          "ms": 31,
+          "reponse": "Envoi de 3 000 FCFA a Aicha Njoya (690 000 002). Frais 50 FCFA. Total 3 050 FCFA.\n1. Confirmer\n2. Annuler\n3. Modifier"
+        }
+      ]
+    },
+    {
+      "id": "5-beneficiaire-inconnu",
+      "titre": "Bénéficiaire inconnu : on demande le numéro, rien n’est inventé",
+      "tours": [
+        {
+          "tour": 1,
+          "entree": "Envoie 2000 à Moussa",
+          "canal": "ussd",
+          "langue_demandee": "fr",
+          "http": 200,
+          "intention": "CLARIFICATION_NEEDED",
+          "parametres": {
+            "amount": 2000,
+            "currency": "XAF",
+            "beneficiary": "moussa"
+          },
+          "statut": "none",
+          "langue_reponse": "fr",
+          "trace": "5-beneficiaire-inconnu-t1-jfggw4",
+          "ms": 16,
+          "reponse": "Beneficiaire introuvable. Verifiez le numero."
+        },
+        {
+          "tour": 2,
+          "entree": "690000002",
+          "canal": "ussd",
+          "langue_demandee": "fr",
+          "http": 200,
+          "intention": "TRANSFER",
+          "parametres": {
+            "amount": 2000,
+            "fee": 50,
+            "total": 2050,
+            "beneficiary": "690000002",
+            "beneficiary_phone": "690000002",
+            "transaction_id": "MBP00000003"
+          },
+          "statut": "pending",
+          "langue_reponse": "fr",
+          "trace": "5-beneficiaire-inconnu-t2-rrczfa",
+          "ms": 20,
+          "reponse": "Envoi de 2 000 FCFA a 690 000 002. Frais 50 FCFA. Total 2 050 FCFA.\n1. Confirmer\n2. Annuler\n3. Modifier"
+        }
+      ]
+    },
+    {
+      "id": "6-solde-insuffisant",
+      "titre": "Solde insuffisant : explication, aucun débit",
+      "tours": [
+        {
+          "tour": 1,
+          "entree": "Envoie 300000 à Aicha",
+          "canal": "ussd",
+          "langue_demandee": "fr",
+          "http": 200,
+          "intention": "TRANSFER",
+          "parametres": {
+            "error": "INSUFFICIENT_FUNDS"
+          },
+          "statut": "none (INSUFFICIENT_FUNDS)",
+          "langue_reponse": "fr",
+          "trace": "6-solde-insuffisant-t1-5ooe2a",
+          "ms": 36,
+          "reponse": "Solde insuffisant pour cette operation."
+        }
+      ]
+    },
+    {
+      "id": "7-changement-langue",
+      "titre": "Changement de langue en cours d’opération",
+      "tours": [
+        {
+          "tour": 1,
+          "entree": "Envoie 5000 à Aicha",
+          "canal": "ussd",
+          "langue_demandee": "fr",
+          "http": 200,
+          "intention": "TRANSFER",
+          "parametres": {
+            "amount": 5000,
+            "fee": 50,
+            "total": 5050,
+            "beneficiary": "Aicha Njoya",
+            "beneficiary_phone": "690000002",
+            "transaction_id": "MBP00000004"
+          },
+          "statut": "pending",
+          "langue_reponse": "fr",
+          "trace": "7-changement-langue-t1-4bn7p8",
+          "ms": 52,
+          "reponse": "Envoi de 5 000 FCFA a Aicha Njoya (690 000 002). Frais 50 FCFA. Total 5 050 FCFA.\n1. Confirmer\n2. Annuler\n3. Modifier"
+        },
+        {
+          "tour": 2,
+          "entree": "Parle-moi en fulfulde",
+          "canal": "ussd",
+          "langue_demandee": "fr",
+          "http": 200,
+          "intention": "LANGUAGE_SWITCH",
+          "parametres": {
+            "amount": 5000,
+            "fee": 50,
+            "total": 5050,
+            "beneficiary": "Aicha Njoya",
+            "beneficiary_phone": "690000002",
+            "transaction_id": "MBP00000004",
+            "target_language": "fub",
+            "served_language": "fub"
+          },
+          "statut": "pending",
+          "langue_reponse": "fub",
+          "trace": "7-changement-langue-t2-sz3wc2",
+          "ms": 21,
+          "reponse": "Neldugol 5 000 FCFA ka Aicha Njoya (690 000 002). Njobdi 50 FCFA. Fof 5 050 FCFA.\n1. Tabbitin\n2. Haaytu\n3. Waylu"
+        }
+      ]
+    },
+    {
+      "id": "8-multicanal",
+      "titre": "Même demande sur les trois canaux : même interprétation",
+      "tours": [
+        {
+          "tour": 1,
+          "entree": "Envoie 5000 à Aicha",
+          "canal": "ussd",
+          "langue_demandee": "fr",
+          "http": 200,
+          "intention": "TRANSFER",
+          "parametres": {
+            "amount": 5000,
+            "fee": 50,
+            "total": 5050,
+            "beneficiary": "Aicha Njoya",
+            "beneficiary_phone": "690000002",
+            "transaction_id": "MBP00000005"
+          },
+          "statut": "pending",
+          "langue_reponse": "fr",
+          "trace": "8-multicanal-t1-iom78y",
+          "ms": 52,
+          "reponse": "Envoi de 5 000 FCFA a Aicha Njoya (690 000 002). Frais 50 FCFA. Total 5 050 FCFA.\n1. Confirmer\n2. Annuler\n3. Modifier"
+        },
+        {
+          "tour": 2,
+          "entree": "Envoie 5000 à Aicha",
+          "canal": "mobile",
+          "langue_demandee": "fr",
+          "http": 200,
+          "intention": "TRANSFER",
+          "parametres": {
+            "amount": 5000,
+            "fee": 50,
+            "total": 5050,
+            "beneficiary": "Aicha Njoya",
+            "beneficiary_phone": "690000002",
+            "transaction_id": "MBP00000006"
+          },
+          "statut": "pending",
+          "langue_reponse": "fr",
+          "trace": "8-multicanal-t2-i0nkwz",
+          "ms": 42,
+          "reponse": "Envoi de 5 000 FCFA a Aicha Njoya (690 000 002). Frais 50 FCFA. Total 5 050 FCFA.\n1. Confirmer\n2. Annuler\n3. Modifier"
+        },
+        {
+          "tour": 3,
+          "entree": "Envoie 5000 à Aicha",
+          "canal": "web",
+          "langue_demandee": "fr",
+          "http": 200,
+          "intention": "TRANSFER",
+          "parametres": {
+            "amount": 5000,
+            "fee": 50,
+            "total": 5050,
+            "beneficiary": "Aicha Njoya",
+            "beneficiary_phone": "690000002",
+            "transaction_id": "MBP00000007"
+          },
+          "statut": "pending",
+          "langue_reponse": "fr",
+          "trace": "8-multicanal-t3-mcvmmt",
+          "ms": 47,
+          "reponse": "Envoi de 5 000 FCFA a Aicha Njoya (690 000 002). Frais 50 FCFA. Total 5 050 FCFA.\n1. Confirmer\n2. Annuler\n3. Modifier"
+        }
+      ]
+    },
+    {
+      "id": "9-historique",
+      "titre": "Historique des opérations",
+      "tours": [
+        {
+          "tour": 1,
+          "entree": "Montre-moi mon historique",
+          "canal": "ussd",
+          "langue_demandee": "fr",
+          "http": 200,
+          "intention": "TRANSACTION_HISTORY",
+          "parametres": {},
+          "statut": "none",
+          "langue_reponse": "fr",
+          "trace": "9-historique-t1-coz0mg",
+          "ms": 86,
+          "reponse": "Vos dernieres operations:\n27/11 A 690000002 -5 000 FCFA\n27/11 A 690000002 -5 000 FCFA\n27/11 A 690000002 -5 000 FCFA\n27/11 A 690000002 -5 000 FCFA"
+        }
+      ]
+    },
+    {
+      "id": "10-terminologie",
+      "titre": "Explication d’un terme (pidgin)",
+      "tours": [
+        {
+          "tour": 1,
+          "entree": "Wetin be charges?",
+          "canal": "ussd",
+          "langue_demandee": "wes",
+          "http": 200,
+          "intention": "TERM_EXPLANATION",
+          "parametres": {
+            "term": "fees"
+          },
+          "statut": "none",
+          "langue_reponse": "fr",
+          "trace": "10-terminologie-t1-6bmhwn",
+          "ms": 15,
+          "reponse": "Les frais sont ce que la banque retient pour executer une operation."
+        }
+      ]
+    }
+  ]
+}

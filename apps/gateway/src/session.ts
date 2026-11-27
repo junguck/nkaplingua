@@ -60,6 +60,34 @@ export interface SessionStore {
 
 const TTL_MS = 180_000;
 
+/** Petit magasin à durée de vie : utilisé par les canaux locaux (`ivr`, `atm`). */
+export class TtlStore<T> {
+  private readonly states = new Map<string, { value: T; updatedAt: number }>();
+
+  constructor(
+    private readonly ttlMs: number = TTL_MS,
+    private readonly now: () => number = Date.now,
+  ) {}
+
+  get(key: string): T | undefined {
+    const entry = this.states.get(key);
+    if (!entry) return undefined;
+    if (this.now() - entry.updatedAt > this.ttlMs) {
+      this.states.delete(key);
+      return undefined;
+    }
+    return entry.value;
+  }
+
+  set(key: string, value: T): void {
+    this.states.set(key, { value, updatedAt: this.now() });
+  }
+
+  delete(key: string): void {
+    this.states.delete(key);
+  }
+}
+
 export class InMemorySessions implements SessionStore {
   private readonly states = new Map<string, SessionState>();
 
