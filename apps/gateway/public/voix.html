@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NkapLingua · voix MMS-TTS</title>
+<style>
+  :root {
+    --bg: #0b0f14; --panel: #121821; --panel-2: #172029; --line: #243040;
+    --text: #e8eef6; --muted: #8fa1b6; --accent: #f0b429; --good: #2f9e77;
+    --warn: #d9a01f; --bad: #d9584a; --mono: ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: radial-gradient(1200px 600px at 20% -10%, #16202b, var(--bg)); color: var(--text); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; padding: 16px 22px; border-bottom: 1px solid var(--line); background: #0e1a24cc; position: sticky; top: 0; backdrop-filter: blur(6px); }
+  h1 { font-size: 16px; margin: 0; }
+  h1 span { color: var(--accent); }
+  a { color: var(--accent); }
+  main { padding: 18px 22px 40px; display: grid; gap: 18px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  .panel h2 { margin: 0; padding: 12px 14px; font-size: 12px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); border-bottom: 1px solid var(--line); background: var(--panel-2); }
+  .panel .body { padding: 14px; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip { font: 12px/1 var(--mono); padding: 6px 9px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); color: var(--muted); }
+  .chip.ok { color: #8fe3c1; border-color: #2f9e7755; background: #2f9e771a; }
+  .chip.warn { color: #f3d28a; border-color: #d9a01f55; background: #d9a01f14; }
+  .clip { display: grid; grid-template-columns: 1fr 260px; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid #1d2836; }
+  .clip:last-child { border-bottom: none; }
+  .clip b { font: 12px/1.4 var(--mono); color: var(--muted); display: block; font-weight: 500; }
+  .clip span { font-size: 14px; }
+  .clip em { font: 11px/1 var(--mono); color: var(--muted); font-style: normal; }
+  audio { width: 100%; height: 34px; }
+  .note { color: var(--muted); font-size: 13px; }
+  .warnbox { border: 1px solid #d9a01f55; background: #d9a01f14; border-radius: 10px; padding: 10px 12px; color: #f3d28a; font-size: 13px; }
+  code { font-family: var(--mono); color: #cfe3f5; }
+  @media (max-width: 760px) { .clip { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>NkapLingua <span>·</span> voix du canal téléphonique — <code>facebook/mms-tts</code></h1>
+  <div class="chips" id="chips"><span class="chip">chargement…</span></div>
+</header>
+
+<main>
+  <section class="panel">
+    <div class="body">
+      <p class="note" style="margin:0">
+        Chaque clip est la phrase exacte que l'IVR prononce, synthétisée hors ligne par
+        <code>pnpm --filter @nkap/gateway tts</code>. Les messages à emplacement
+        (<code>{amount}</code>, <code>{recipient}</code>…) n'ont volontairement pas d'audio : un clip figé
+        dirait un faux montant.
+      </p>
+      <p class="warnbox" id="limit" hidden></p>
+    </div>
+  </section>
+  <div id="langues"></div>
+</main>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+
+  function esc(value) {
+    return String(value).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  }
+
+  async function load() {
+    const response = await fetch('/audio/index.json');
+    if (!response.ok) {
+      $('chips').innerHTML = '<span class="chip warn">aucun clip : lancez pnpm tts</span>';
+      $('langues').innerHTML = '<section class="panel"><div class="body">' +
+        'Aucun audio enregistré. Lancez <code>pnpm --filter @nkap/gateway tts</code> ' +
+        '(Python + torch + transformers, voir <code>docs/VOIX-MMS.md</code>).</div></section>';
+      return;
+    }
+    const index = await response.json();
+    $('chips').innerHTML =
+      '<span class="chip ok">' + index.clips.length + ' clip(s)</span>' +
+      '<span class="chip">' + esc((index.models || []).join(' · ')) + '</span>' +
+      '<span class="chip">' + esc(index.generated_at || '') + '</span>' +
+      '<span class="chip warn">' + esc(index.licence || 'CC-BY-NC 4.0') + '</span>';
+
+    const body = await fetch('/langues').then((r) => r.json()).catch(() => ({ languages: [] }));
+    const sansModele = (body.languages || []).filter((entry) => entry.code !== 'fr' && entry.code !== 'en');
+    if (sansModele.length > 0) {
+      $('limit').hidden = false;
+      $('limit').textContent =
+        'Aucun modèle MMS-TTS publié pour ' + sansModele.map((entry) => entry.code).join(', ') +
+        ' : ces langues restent sans voix de synthèse. Le fulfulde doit être enregistré par deux locuteurs ' +
+        '(docs/relecture/fub.md) — on ne fait pas lire du fulfulde par une voix française.';
+    }
+
+    const parLangue = new Map();
+    for (const clip of index.clips) {
+      if (!parLangue.has(clip.lang)) parLangue.set(clip.lang, []);
+      parLangue.get(clip.lang).push(clip);
+    }
+    $('langues').innerHTML = [...parLangue.entries()].sort().map(([lang, clips]) =>
+      '<section class="panel"><h2>' + esc(lang) + ' — ' + clips.length + ' clip(s) · ' + esc(clips[0].model) + '</h2>' +
+      '<div class="body">' + clips.map((clip) =>
+        '<div class="clip"><div><b>' + esc(clip.key) + '</b><span>' + esc(clip.text) + '</span>' +
+        '<em> ' + clip.duration_ms + ' ms · ' + Math.round(clip.bytes / 1024) + ' Ko</em></div>' +
+        '<audio controls preload="none" src="/audio/' + esc(clip.lang) + '/' + esc(clip.key) + '.wav"></audio></div>'
+      ).join('') + '</div></section>'
+    ).join('');
+  }
+
+  load().catch((error) => {
+    $('chips').innerHTML = '<span class="chip warn">erreur : ' + esc(error.message) + '</span>';
+  });
+</script>
+</body>
+</html>

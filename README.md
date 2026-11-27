@@ -26,7 +26,7 @@ altérer un montant, un nom ou un numéro**.
 | **Contrat** `@nkap/contracts` | intentions canoniques, tours, traces jury (§6.D), port financier, schémas zod |
 | **Banque simulée** `@nkap/banking-sim` | comptes, contacts, grilles de frais, plafonds, historique, codes de retrait |
 | **Mode hors-ligne** | menus USSD pré-traduits servis depuis un cache local quand la banque est injoignable ; corrections mises en file puis synchronisées ([ADR 0005](docs/adr/0005-mode-hors-ligne-ussd.md)) |
-| **Tests** | **229/229** au dernier contrôle local, dont des parcours des **10 scénarios standardisés du §7**, des cinq canaux et de la base de mots |
+| **Tests** | **240/240** au dernier contrôle local (27/11/2026), dont des parcours des **10 scénarios standardisés du §7**, des **six canaux** et de la base de mots |
 
 ## Ce qui est prêt (J2 — clients)
 
@@ -46,17 +46,21 @@ altérer un montant, un nom ou un numéro**.
 | **Contrat SAFINUM** `@nkap/safinum` | protocole, 13 intentions officielles, langues, grille de frais (seule copie), statuts du kit officiel ([ADR 0006](docs/adr/0006-middleware-sur-le-moteur-partage.md)) |
 | **Banque de démonstration** `apps/gateway/src/demo` | mêmes routes et codes d'erreur que l'API SAFINUM, pour tester sans clé d'équipe |
 | **Branchement** | [`docs/INNOVATIONS.md`](docs/INNOVATIONS.md) | Quatre pistes d'innovation : anti-arnaque par message, second regard et aller-retour de vérification implémentés ; corrections communautaires à arbitrer |
-| [`docs/GUIDE-SAFINUM.md`](docs/GUIDE-SAFINUM.md) : clé, tunnel, déclaration des trois canaux, dépannage |
+| [`docs/GUIDE-SAFINUM.md`](docs/GUIDE-SAFINUM.md) : clé, tunnel, déclaration des canaux, dépannage |
+| [`docs/SIX-CANAUX.md`](docs/SIX-CANAUX.md) : les six canaux prouvés en direct le 27/11 (tunnel, déclaration, solde, cycle transactionnel) |
+| [`docs/GUIDE-STUDIO-ENREGISTREMENT.md`](docs/GUIDE-STUDIO-ENREGISTREMENT.md) : enregistrer les voix des langues sans modèle TTS |
 
-Reste : une **clé d'équipe `sbx_…` acceptée par la sandbox** (celle fournie le 26/11 est refusée en 401),
-le tunnel et la déclaration des trois canaux, la console jury, la voix — voir [`docs/ROADMAP.md`](docs/ROADMAP.md).
+État vérifié le 27/11/2026 : la clé `sbx_…` est **acceptée** (`GET /sandbox/endpoint` → 200, team `shun-and-co`,
+id 10), les **six canaux** sont déclarés et répondent 200. Reste : un **tunnel nommé** (aucun certificat
+Cloudflare sur la machine), les écrans autres que `home`/`atm_welcome`, les 47 clés `atm.*` en anglais,
+et les packs de langues (aucun pack livré : voir [`docs/ROADMAP.md`](docs/ROADMAP.md)).
 
 ## Démarrer
 
 ```bash
 corepack enable            # pnpm 10
 pnpm install
-pnpm test                  # 229 tests au dernier contrôle local (27/11/2026)
+pnpm test                  # 240 tests au dernier contrôle local (27/11/2026)
 pnpm typecheck             # TypeScript strict, zéro any (9 projets)
 
 pnpm dev:web               # http://localhost:3000 — banque en ligne + assistant
@@ -79,12 +83,12 @@ autoriser la superposition et « Lecture d'écran à la demande » → **Lancer 
 | [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) | Architecture, technologie linguistique, intégration, sécurité, scalabilité |
 | [`docs/adr/`](docs/adr/) | Décisions d'architecture et leurs compromis (0001–0006 : moteur, bulle, contrat, clients, hors-ligne USSD, middleware sur le moteur partagé) |
 | [`docs/SANDBOX-SAFINUM.md`](docs/SANDBOX-SAFINUM.md) | Contrat de la sandbox SAFINUM, règles d'évaluation, écarts corrigés |
-| [`docs/GUIDE-SAFINUM.md`](docs/GUIDE-SAFINUM.md) | Brancher le middleware : clé, tunnel, déclaration des trois canaux, dépannage |
+| [`docs/GUIDE-SAFINUM.md`](docs/GUIDE-SAFINUM.md) | Brancher le middleware : clé, tunnel, déclaration des canaux, dépannage |
 | [`docs/LANGUES.md`](docs/LANGUES.md) | État réel de chaque langue de la sandbox, sources lues, packs de langue à faire remplir par des locuteurs |
 | [`docs/JOUR-J.md`](docs/JOUR-J.md) | Déroulé de la présentation : rôles, veille, matin, scénarios, plans de secours |
 | [`docs/GUIDE-ACTIONS-JOUR-J.md`](docs/GUIDE-ACTIONS-JOUR-J.md) | Les dix actions humaines du jour J, commande par commande, avec les pièges connus |
 | [`docs/TUNNEL-NOMME.md`](docs/TUNNEL-NOMME.md) | Tunnel nommé (URL figée) : création Cloudflare, jeton, lancement, dépannage |
-| [`docs/PRESENTATION-CAPTURES.md`](docs/PRESENTATION-CAPTURES.md) | Démonstration capture par capture : cinq canaux, administration des langues, parcours de 6 minutes |
+| [`docs/PRESENTATION-CAPTURES.md`](docs/PRESENTATION-CAPTURES.md) | Démonstration capture par capture : six canaux, administration des langues, parcours de 6 minutes |
 | [`docs/relecture/fub.md`](docs/relecture/fub.md) | Fiche de relecture fulfulde à faire signer par deux locuteurs |
 | [`docs/IVR-VOIX.md`](docs/IVR-VOIX.md) | Ce qui est proposé pour l'IVR et les canaux vocaux (DTMF, enregistrements, ASR) |
 | [`preselection/`](preselection/) | Dossier de la phase de présélection (extension v1.1, vidéo, notes) |

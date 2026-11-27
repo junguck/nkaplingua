@@ -230,7 +230,12 @@ describe('surface HTTP des canaux locaux', () => {
 
     try {
       const health = await fetch(`http://127.0.0.1:${address.port}/health`);
-      expect(await health.json()).toMatchObject({ localChannels: ['ivr', 'atm'], channels: ['ussd', 'mobile', 'web'] });
+      // Les six canaux ouverts par la sandbox sont servis sur la même URL (vérifié le 27/11) ;
+      // `localChannels` ne décrit plus que les routes de démonstration `/ivr` et `/atm`.
+      expect(await health.json()).toMatchObject({
+        localChannels: ['ivr', 'atm'],
+        channels: ['ussd', 'mobile', 'web', 'sms', 'atm', 'ivr'],
+      });
 
       const reply = await fetch(`http://127.0.0.1:${address.port}/ivr`, {
         method: 'POST',

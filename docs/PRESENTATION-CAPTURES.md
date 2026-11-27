@@ -166,12 +166,34 @@ sans redéploiement. C'est ce qui rend le vocabulaire corrigeable le jour de la 
 
 ## Ce que ces captures ne prouvent pas
 
-- **La sandbox SAFINUM réelle** : ces captures viennent du serveur local et de la banque de
-  démonstration. Le passage sur la vraie passerelle reste l'étape 4 du guide du jour J.
+- **Les captures locales ne prouvent pas la sandbox.** Celles de ce document viennent du serveur
+  local et de la banque de démonstration. Les six canaux ont par ailleurs été joués **en direct**
+  sur la sandbox le 27/11/2026 : voir [SIX-CANAUX](SIX-CANAUX.md) et
+  `docs/preuves/six-canaux-2026-11-27.json`. Les deux preuves ne se remplacent pas : l'une montre
+  le dialogue complet, l'autre montre que la passerelle nous atteint et journalise nos appels.
 - **Le tunnel nommé** : il demande un domaine chez Cloudflare et une action humaine
   (`docs/TUNNEL-NOMME.md`). Le jour J, c'est `pnpm tunnel:named` qui déclare l'URL figée.
 - **La relecture fulfulde** : `docs/relecture/fub.md` est une fiche **à faire signer**. Tant que
   deux locuteurs ne l'ont pas signée, les formes fulfulde restent déclarées « proposées », pas
   « validées ».
-- **La voix** : l'IVR est en DTMF. Les propositions TTS/ASR sont dans `docs/IVR-VOIX.md` et ne sont
-  pas implémentées.
+- **La voix** : 112 clips `facebook/mms-tts` (fr et en) sont servis par `GET /audio/*` et attachés à
+  `POST /ivr` ; les cinq langues camerounaises n'ont **aucun** modèle publié et restent sans audio
+  (`voice.model: null`). Le studio humain est décrit dans `docs/GUIDE-STUDIO-ENREGISTREMENT.md`.
+
+## Les six canaux (preuve en direct, 27/11/2026)
+
+Les captures ci-dessous sont les réponses **réelles** de `POST /api/v1/channel/<canal>` sur la
+sandbox, recopiées depuis `docs/preuves/six-canaux-2026-11-27.json`.
+
+| Canal | Ce qu'on voit | Ce qu'on raconte | Ce que ça prouve |
+| --- | --- | --- | --- |
+| USSD | `Safinum. Choisissez:` + 8 entrées | « Le menu vient de notre middleware, pas du simulateur. » | la passerelle nous appelle et journalise le tour |
+| Mobile | `screen: home`, `translation.language: fr`, `strings` complets | « Chaque clé d'écran est traduite ou déclarée. » | la traduction clé par clé fonctionne |
+| Web | idem mobile | « Même contrat, même moteur. » | un seul middleware sert deux canaux d'écran |
+| SMS | même menu, `sms: {encoding: gsm7, segments: 1}` | « Le découpage facturé est annoncé. » | la contrainte 160/70 est mesurée, pas supposée |
+| ATM | `screen: atm_welcome`, `strings` ATM | « Le distributeur parle la même langue. » | le canal ATM est branché (retrait simulé, déclaré) |
+| IVR | `Choisissez: 1. Solde 2. Envoyer…` | « Le téléphone reçoit du texte, prêt à être dit. » | le canal vocal répond sans audio inventé |
+
+Ce que ces six captures **ne** prouvent pas : les écrans autres que `home`/`atm_welcome`, les
+langues autres que `fr`, et les 47 clés `atm.*` (absentes de nos dictionnaires → repli français
+signalé `missing`). C'est écrit dans [SIX-CANAUX](SIX-CANAUX.md) §6.

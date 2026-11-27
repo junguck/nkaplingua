@@ -43,6 +43,7 @@ export type MessageKey =
   | 'confirm.edit'
   | 'confirm.retry'
   | 'done.transfer'
+  | 'done.transfer_nobalance'
   | 'done.airtime'
   | 'done.bill'
   | 'done.cancel'
@@ -129,6 +130,7 @@ const FR: Catalogue = {
   'confirm.edit': '3. Modifier le montant',
   'confirm.retry': 'Repondez 1 pour confirmer ou 2 pour annuler.',
   'done.transfer': '{amount} envoye a {recipient}. Ref {ref}. Solde {balance}.',
+  'done.transfer_nobalance': '{amount} envoye a {recipient}. Ref {ref}.',
   'done.airtime': 'Credit de {amount} envoye au {phone}. Ref {ref}.',
   'done.bill': 'Facture {biller} payee: {amount}. Ref {ref}.',
   'done.cancel': 'Operation annulee. Aucun montant debite.',
@@ -202,6 +204,7 @@ const EN: Catalogue = {
   'confirm.edit': '3. Change the amount',
   'confirm.retry': 'Reply 1 to confirm or 2 to cancel.',
   'done.transfer': '{amount} sent to {recipient}. Ref {ref}. Balance {balance}.',
+  'done.transfer_nobalance': '{amount} sent to {recipient}. Ref {ref}.',
   'done.airtime': 'Airtime of {amount} sent to {phone}. Ref {ref}.',
   'done.bill': 'Bill {biller} paid: {amount}. Ref {ref}.',
   'done.cancel': 'Transaction cancelled. Nothing was debited.',
@@ -279,6 +282,7 @@ const FUB: Catalogue = {
   'confirm.edit': '3. Waylu ceede',
   'confirm.retry': 'Tii 1 ngam tabbitinde walla 2 ngam haaytude.',
   'done.transfer': '{amount} neldaama ka {recipient}. Limgal {ref}. Ceede keddiiɗe {balance}.',
+  'done.transfer_nobalance': '{amount} neldaama ka {recipient}. Limgal {ref}.',
   'done.airtime': 'Kerdii {amount} neldaama ka {phone}. Limgal {ref}.',
   'done.bill': 'Fakture {biller} yoɓaama: {amount}. Limgal {ref}.',
   'done.cancel': 'Golle ndee haaytaama. Ceede fof ittaaka.',

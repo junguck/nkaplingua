@@ -1,8 +1,9 @@
 /**
- * Serveur HTTP du middleware : une seule URL sert les trois canaux SAFINUM et l'adaptateur IVR.
+ * Serveur HTTP du middleware : une seule URL sert les six canaux ouverts par SAFINUM.
  *
- *   POST /middleware/ussd     POST /middleware/mobile     POST /middleware/web     POST /middleware/ivr
- *   POST /                    (même chose, canal déduit du corps)
+ *   POST /middleware/ussd     POST /middleware/mobile     POST /middleware/web
+ *   POST /                    (même chose, canal déduit du corps : sms, atm et ivr compris)
+ *   POST /ivr  POST /atm      (vues locales des canaux v2, hors contrat)
  *   GET  /health              (pour vérifier que le tunnel arrive jusqu'ici)
  *   GET  /                     (compatibilité avec le kit officiel)
  *
@@ -11,13 +12,16 @@
 
 import fs from 'node:fs';
 import http from 'node:http';
+import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { AddressInfo } from 'node:net';
 import { Gateway } from './gateway.js';
 import { SafinumBank } from './bank.js';
 import { handleAtm } from './atm.js';
 import { handleIvr, type IvrState } from './ivr.js';
+import { handleSms } from './sms.js';
 import { adminAction, adminState } from './lang-admin.js';
+import { audioDir, audioUrl, clipForText, loadAudioIndex, voiceModel, voiceSummary } from './voice.js';
 import { TtlStore } from './session.js';
 import { isSafinumLanguage, isUiTranslation, statusModeFrom, type InboundTurn, type StatusMode } from '@nkap/safinum';
 import { loadEnv } from './env.js';
@@ -26,8 +30,11 @@ import { applyWordDb, lastWordBase } from './word-base.js';
 
 const MAX_BODY_BYTES = 512 * 1024;
 
-/** Canaux servis par une même URL. `atm` et `ivr` sont locaux, hors contrat SAFINUM. */
-const KNOWN_CHANNELS: ReadonlySet<string> = new Set(['ussd', 'mobile', 'web', 'ivr']);
+/** Les six canaux acceptés par `POST /sandbox/endpoint` (vérifié le 27/11 : tous répondent 200). */
+const KNOWN_CHANNELS: ReadonlySet<string> = new Set(['ussd', 'mobile', 'web', 'sms', 'atm', 'ivr']);
+
+/** Canaux v2 qui gardent une session de dialogue sur la même URL que les trois du contrat. */
+const V2_CHANNELS: ReadonlySet<string> = new Set(['sms', 'atm', 'ivr']);
 
 export interface ServerOptions {
   readonly teamKey: string;
@@ -46,6 +53,7 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
   });
   const log = options.log ?? ((line: string) => console.log(line));
   const ivrSessions = new TtlStore<IvrState>(300_000);
+  const smsSessions = new TtlStore<import('./session.js').SessionState>(600_000);
 
   return http.createServer((req, res) => {
     void (async () => {
@@ -107,16 +115,50 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
         });
       }
 
+      // Voix : page d'écoute, index des clips et fichiers WAV (lecture seule, sans clé).
+      if (req.method === 'GET' && (url.pathname === '/voix' || url.pathname === '/voix/')) {
+        const page = fs.readFileSync(fileURLToPath(new URL('../public/voix.html', import.meta.url)), 'utf8');
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+        res.end(page);
+        return;
+      }
+
+      if (req.method === 'GET' && url.pathname === '/audio/index.json') {
+        const index = loadAudioIndex();
+        if (index === null) return json(res, 404, { error: 'Aucun clip : lancez pnpm --filter @nkap/gateway tts' });
+        return json(res, 200, index);
+      }
+
+      const audioClip = url.pathname.match(/^\/audio\/([a-z]{2,3})\/([a-z0-9._-]+)\.wav$/i);
+      if (req.method === 'GET' && audioClip) {
+        const lang = audioClip[1] ?? '';
+        const key = audioClip[2] ?? '';
+        const dir = path.resolve(audioDir());
+        const file = path.resolve(dir, lang, `${key}.wav`);
+        // Aucune traversée possible : le motif ne contient ni `/` ni `..`, et on revérifie le chemin.
+        if (!file.startsWith(dir + path.sep) || !fs.existsSync(file)) {
+          return json(res, 404, { error: 'Clip inconnu' });
+        }
+        res.writeHead(200, {
+          'Content-Type': 'audio/wav',
+          'Content-Length': fs.statSync(file).size,
+          'Cache-Control': 'public, max-age=3600',
+        });
+        fs.createReadStream(file).pipe(res);
+        return;
+      }
+
       if (req.method === 'GET' && (url.pathname === '/' || url.pathname === '/health')) {
         const words = lastWordBase();
         return json(res, 200, {
           ok: true,
           service: 'nkaplingua-safinum-middleware',
-          channels: ['ussd', 'mobile', 'web'],
+          channels: ['ussd', 'mobile', 'web', 'sms', 'atm', 'ivr'],
           localChannels: options.localChannels ? ['ivr', 'atm'] : [],
           teamKeyConfigured: options.teamKey.length > 0,
           bankUrl: options.bankUrl,
           wordBase: { file: words.file, ok: words.ok, languages: words.report?.languages ?? [], words: words.report?.cues ?? 0, problems: words.problems },
+          voice: voiceSummary(),
         });
       }
 
@@ -164,7 +206,20 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
           { bank, sessions: ivrSessions },
         );
         log(`trace=${trace || '-'} channel=ivr`);
-        return json(res, 200, reply);
+        // Audio : on ne sert un clip que s'il correspond EXACTEMENT à la phrase prononcée.
+        const clip = clipForText(reply.language, reply.say);
+        const model = voiceModel(reply.language);
+        return json(res, 200, {
+          ...reply,
+          audio:
+            clip === null
+              ? null
+              : { url: audioUrl(clip), duration_ms: clip.duration_ms, model: clip.model, engine: clip.engine, status: clip.status },
+          voice:
+            model === null
+              ? { model: null, note: 'Aucun modèle MMS-TTS publié pour cette langue : pas de voix synthétique.' }
+              : { model },
+        });
       }
 
       // Canal ATM local : même règle que l'IVR, jamais sur le contrat SAFINUM.
@@ -234,6 +289,11 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
       ) {
         return json(res, 404, { error: 'Canal inconnu' });
       }
+      // Le chemin fait foi : nommer un AUTRE canal dans le corps ne transforme pas `/middleware/ussd`
+      // en tour ATM/IVR — sinon un appel USSD contournerait le canal déclaré à la sandbox.
+      if (pathChannel !== undefined && typeof payload.channel === 'string' && payload.channel !== pathChannel) {
+        return json(res, 404, { error: 'CANAL_CONTRADICTOIRE' });
+      }
       const requestChannel = pathChannel ?? payload.channel ?? (url.pathname === '/channel/ivr' ? 'ivr' : undefined);
       // Kit officiel : la passerelle envoie l'identifiant du tour dans l'en-tête `X-Trace-Id`, le corps
       // n'est qu'un repli. Une trace erronée sur nos appels bancaires = NO_BANK_CALL (travail invisible).
@@ -243,6 +303,56 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
         ...(traceId === undefined ? {} : { trace_id: traceId }),
         ...(requestChannel ? { channel: payload.channel ?? requestChannel } : {}),
       };
+
+      // Canaux v2 sur la même URL : SAFINUM les appelle comme les autres (vérifié : 200 à la
+      // déclaration). On renvoie le contrat (response / interpretation / transaction) pour que le
+      // journal du jury lise la même chose, plus la vue propre au canal pour nos démonstrations.
+      if (requestChannel !== undefined && V2_CHANNELS.has(requestChannel) && url.pathname !== '/channel/ivr') {
+        const v2Trace = traceFrom(req.headers['x-trace-id'], payload.trace_id) ?? '';
+        const v2Bank = new SafinumBank({ baseUrl: options.bankUrl, teamKey: options.teamKey, traceId: v2Trace });
+        if (requestChannel === 'sms') {
+          const sms = await handleSms(turn, { bank: v2Bank, sessions: smsSessions });
+          log(`trace=${v2Trace || '-'} channel=sms segments=${sms.sms.segments} ${sms.sms.encoding}`);
+          return json(res, 200, sms);
+        }
+        if (requestChannel === 'ivr') {
+          const reply = await handleIvr(
+            {
+              call_id: payload.session_id,
+              session_id: payload.session_id,
+              phone: payload.phone,
+              language: payload.language ?? null,
+              input: payload.input as { digits?: string; text?: string } | undefined,
+            },
+            { bank: v2Bank, sessions: ivrSessions },
+          );
+          log(`trace=${v2Trace || '-'} channel=ivr`);
+          return json(res, 200, {
+            ...reply,
+            response: { text: reply.say, end_session: reply.end, options: [] },
+            interpretation: { intent: 'UNKNOWN', parameters: {}, language: reply.language },
+            transaction: {
+              id: reply.state.pending_id ?? null,
+              status: reply.state.pending_id === undefined ? 'none' : 'pending',
+            },
+          });
+        }
+        const atm = await handleAtm(
+          {
+            session_id: payload.session_id,
+            language: payload.language ?? null,
+            input: payload.input as { digits?: string; text?: string } | undefined,
+          },
+          { bank: v2Bank },
+        );
+        log(`trace=${v2Trace || '-'} channel=atm`);
+        return json(res, 200, {
+          ...atm,
+          response: { text: atm.screen, end_session: atm.end, options: [] },
+          interpretation: { intent: 'UNKNOWN', parameters: {}, language: atm.language },
+          transaction: { id: null, status: 'none' },
+        });
+      }
 
       try {
         const handled = await gateway.handleWithMeta(turn);

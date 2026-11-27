@@ -87,9 +87,9 @@ cloudflared tunnel --url http://localhost:8080   # ou : ngrok http 8080
 **C'est la racine du middleware qu'on tunele** : `http://127.0.0.1:8080`, pas un sous-chemin. Le
 middleware accepte `POST /` et `POST /middleware/{ussd|mobile|web}` avec le même contrat ; `/console`
 reste servi pour la démonstration. Gardez `HOST=127.0.0.1` et `PORT=8080` : le tunnel s'occupe du reste.
-L'URL gratuite change à chaque redémarrage du tunnel — il faut alors redéclarer les trois canaux.
+L'URL gratuite change à chaque redémarrage du tunnel — il faut alors redéclarer les **six** canaux.
 
-### 3.3 Déclarer les trois canaux
+### 3.3 Déclarer les six canaux
 
 ```bash
 SAFINUM_TEAM_KEY=sbx_... SAFINUM_TEAM_ID=shun-and-co \
@@ -98,7 +98,9 @@ SAFINUM_TEAM_KEY=sbx_... SAFINUM_TEAM_ID=shun-and-co \
 node apps/gateway/scripts/safinum.mjs status
 ```
 
-Une seule URL sert les trois canaux : le middleware aiguille sur `type: "ui_translation"`.
+Une seule URL sert les six canaux : le middleware aiguille sur `channel` (et sur `type: "ui_translation"`
+pour mobile/web). Depuis le 27/11, `POST /channel/*` de la sandbox exige en plus le PASS : voir
+[SIX-CANAUX](SIX-CANAUX.md) §3.
 
 ### 3.4 Tester
 
@@ -185,7 +187,9 @@ trop longue n'est jamais envoyée. Sous 75 % de clés traduites, tout l'écran r
   texte libre fulfulde créé au tour A puis confirmé au tour B, options dans la langue de l'écran.
 - En-têtes `X-Team-Key` et `X-Trace-Id` observés côté banque, `trace_id` différent entre
   l'initiation et la confirmation.
-- **Sandbox en direct : non testée** — la sandbox répond, mais refuse la clé d'équipe fournie (401, 26/11).
+- **Sandbox en direct : testée le 27/11** — clé acceptée (200), six canaux déclarés, scénario solde et
+  cycle `pending → confirmed` prouvés. Voir [SIX-CANAUX](SIX-CANAUX.md) ; la mention « 401, 26/11 »
+  qui figurait ici était périmée.
 
 ## 9. Packs de langue (jour J)
 

@@ -14,7 +14,8 @@
     "i18n": "node scripts/i18n.mjs",
     "lang": "node scripts/lang.mjs",
     "tunnel": "node scripts/tunnel-stable.mjs",
-    "tunnel:named": "node scripts/tunnel-named.mjs"
+    "tunnel:named": "node scripts/tunnel-named.mjs",
+    "tts": "node scripts/tts.mjs"
   },
   "dependencies": {
     "@nkap/contracts": "workspace:*",

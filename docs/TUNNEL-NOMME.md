@@ -55,7 +55,8 @@ Le script :
 1. refuse de démarrer si le middleware local ne répond pas sur `/health` ;
 2. lance `cloudflared tunnel run` (jeton ou nom) ;
 3. attend que **l'URL publique** réponde `{"ok":true}` (DNS + route) ;
-4. déclare cette URL sur `ussd`, `mobile` et `web` via `POST /sandbox/endpoint` ;
+4. déclare cette URL sur **les six canaux** (`ussd`, `mobile`, `web`, `sms`, `atm`, `ivr`) via
+   `POST /sandbox/endpoint` — la sandbox les accepte tous depuis le 27/11 ;
 5. garde le tunnel au premier plan : `Ctrl+C` l'arrête proprement.
 
 Options utiles :
@@ -97,3 +98,22 @@ d'accueil) : le panneau Diagnostics doit voir les appels bancaires, sans anomali
 - **Machine de secours** : même commit, même jeton de tunnel, donc même URL. C'est tout l'intérêt
   du tunnel nommé ; copier `apps/gateway/.env` et le jeton la veille, sur un support chiffré.
 - Le quick tunnel `pnpm tunnel` reste disponible pour les répétitions, jamais pour le passage.
+
+## 6. État au 27/11/2026 — ce qui a été fait, ce qui bloque
+
+- **Aucun certificat Cloudflare sur la machine** (`~/.cloudflared` absent) : `cloudflared tunnel list`
+  échoue avec `Cannot determine default origin certificate path`. Un tunnel nommé n'est donc pas
+  possible sans l'étape 1 (connexion navigateur + domaine DNS chez Cloudflare).
+- **Repli utilisé** : quick tunnel `https://weed-bulk-gibraltar-reports.trycloudflare.com`, qui a
+  servi à déclarer et tester les six canaux. Son URL mourra au prochain redémarrage : elle ne doit
+  pas rester dans `GET /sandbox/endpoint` le jour J.
+- **Rappel de la contrainte** : pendant l'évaluation, `POST /sandbox/endpoint` répond
+  `409 CONFIG_LOCKED`. L'URL définitive doit être déclarée **avant** le passage, donc le tunnel
+  nommé (ou ngrok à domaine réservé) n'est pas une option mais une nécessité.
+- **Vérifier après déclaration** :
+
+  ```bash
+  node apps/gateway/scripts/safinum.mjs status   # six endpoints, même URL
+  curl -s https://<url>/health                    # {"channels":["ussd","mobile","web","sms","atm","ivr"]}
+  SAFINUM_SIMULATOR_PASS=… node apps/gateway/scripts/six-canaux.mjs   # 6/6 en 200
+  ```

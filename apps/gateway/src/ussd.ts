@@ -589,7 +589,16 @@ async function atConfirmation(
 
     const tx = result.data;
     const amount = tx.amount || pending.amount;
-    const key: MessageKey = pending.type === 'transfer' ? 'done.transfer' : pending.type === 'airtime' ? 'done.airtime' : 'done.bill';
+    const baseKey: MessageKey = pending.type === 'transfer' ? 'done.transfer' : pending.type === 'airtime' ? 'done.airtime' : 'done.bill';
+    // La confirmation SAFINUM ne renvoie AUCUN solde (vérifié en direct le 27/11) : on relit le compte
+    // plutôt que d'annoncer `0`, et si la lecture échoue on se tait au lieu de mentir.
+    const balanceAfter =
+      tx.balanceAfter ??
+      (await deps.bank
+        .account(phone)
+        .then((r) => (r.ok ? r.data.balance : undefined))
+        .catch(() => undefined));
+    const key: MessageKey = baseKey === 'done.transfer' && balanceAfter === undefined ? 'done.transfer_nobalance' : baseKey;
     const text = message(language, key, {
       amount: money(amount),
       recipient: recipientLabel(pending.name, pending.to),
@@ -597,7 +606,7 @@ async function atConfirmation(
       phone: displayPhone(pending.to ?? ''),
       ref: tx.id || pending.id,
       biller: pending.biller ?? '',
-      balance: money(tx.balanceAfter ?? 0),
+      balance: money(balanceAfter ?? 0),
     });
 
     return done(

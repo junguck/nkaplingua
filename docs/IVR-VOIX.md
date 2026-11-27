@@ -5,6 +5,13 @@ mais restent **locaux** (`ENABLE_V2_CHANNELS=1`) parce que la sandbox SAFINUM n'
 `ussd`, `mobile` et `web`. La voix n'est donc pas un prérequis du jour J : c'est ce qu'on ajoute
 *après*, sans toucher au moteur de compréhension.
 
+> **Mise à jour du 27/11/2026 — la synthèse est branchée.** Les phrases fixes sont enregistrées
+> hors ligne avec `facebook/mms-tts-fra` et `facebook/mms-tts-eng` (56 clips par langue), servies par
+> `GET /audio/<langue>/<cle>.wav` et attachées à chaque réponse `/ivr`. En revanche, **aucun modèle
+> MMS-TTS fulfulde n'est publié** (`fub`, `fuv`, `fuf`, `ffm` → 401) : le fulfulde reste sans voix de
+> synthèse et devra être enregistré par deux locuteurs. Détail, licence CC-BY-NC et limites :
+> **`docs/VOIX-MMS.md`**. La section B ci-dessous explique pourquoi ce n'est pas un contournement.
+
 Trois voies, de la plus sûre à la plus ambitieuse. Mon avis : **A tout de suite, B le jour J en
 secours, C seulement après mesure.**
 

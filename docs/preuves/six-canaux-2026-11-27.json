@@ -1,0 +1,178 @@
+{
+  "genere_le": "2026-11-27T16:55:00.821Z",
+  "base": "https://safinum.cm/api/v1",
+  "equipe": 10,
+  "telephone": "237650626114",
+  "canaux": [
+    {
+      "canal": "ussd",
+      "http": 200,
+      "texte": "Safinum. Choisissez: 1. Mon solde 2. Envoyer de l'argent 3. Frais 4. Historique 5. Acheter du credit 6. Payer une facture 7. Aide 8. Langue",
+      "intention": "UNKNOWN",
+      "langue": "fr",
+      "statut": "none",
+      "sms": null,
+      "diagnostics": {
+        "http_status": 200,
+        "duration_ms": 272,
+        "error_code": null,
+        "error_detail": null,
+        "response_length": 139,
+        "max_chars": 182,
+        "over_limit": false,
+        "gsm7_violations": [],
+        "realism_flags": []
+      },
+      "erreur": null,
+      "brut": "{\"trace_id\":\"95dccd78-c7b3-486b-90b4-7cb8e38a75c3\",\"session_id\":\"six-ussd-1795798496950\",\"channel\":\"ussd\",\"response\":{\"text\":\"Safinum. Choisissez:\\n1. Mon solde\\n2. Envoyer de l'argent\\n3. Frais\\n4. Historique\\n5. Acheter du credit\\n6. Payer une facture\\n7. Aide\\n8. Langue\",\"end_session\":false,\"options\":[\"Mon solde\",\"Envoyer de l'argent\",\"Frais\",\"Historique\",\"Acheter du credit\",\"Payer une facture\",\"Aide\",\"Langue\"]},\"interpretation\":{\"intent\":\"UNKNOWN\",\"parameters\":[],\"language\":\"fr\"},\"transaction\":{\"id\":null,\"status\":\"none\"},\"diagnostics\":{\"http_status\":200,\"duration_ms\":272,\"error_code\":null,\"error_detail\":null,\"response_length\":139,\"max_chars\":182,\"over_limit\":false,\"gsm7_violations\":[],\"realism_flags\":[]},\"sms\":null,\"audio\":null,\"reply_audio\":null}",
+      "requete": {
+        "team_id": 10,
+        "phone": "237650626114",
+        "session_id": "six-ussd-1795798496950",
+        "text": "",
+        "input_type": "text"
+      }
+    },
+    {
+      "canal": "mobile",
+      "http": 200,
+      "texte": "home",
+      "intention": null,
+      "langue": null,
+      "statut": null,
+      "sms": null,
+      "diagnostics": {
+        "http_status": 200,
+        "duration_ms": 211,
+        "error_code": null,
+        "error_detail": null,
+        "realism_flags": []
+      },
+      "erreur": null,
+      "brut": "{\"trace_id\":\"97644608-dc79-4fc2-a0c8-fec1c7cea7ec\",\"session_id\":\"six-mobile-1795798497593\",\"channel\":\"mobile\",\"screen\":\"home\",\"translation\":{\"language\":\"fr\",\"strings\":{\"nav.home\":\"Accueil\",\"nav.transfer\":\"Envoyer\",\"nav.pay\":\"Payer\",\"nav.history\":\"Historique\",\"shell.greeting\":\"Bonjour {name}\",\"common.back\":\"Retour\",\"common.continue\":\"Continuer\",\"common.cancel\":\"Annuler\",\"common.loading\":\"Chargement\",\"common.listen\":\"Écouter\",\"common.stop_listening\":\"Arrêter la lecture\",\"home.balance_label\":\"Solde disponible\",\"home.account\":\"Compte {phone}\",\"home.quick_actions\":\"Que voulez-vous faire ?\",\"home.action_transfer\":\"Envoyer de l'argent\",\"home.action_bill\":\"Payer une facture\",\"home.action_airtime\":\"Acheter du crédit\",\"home.action_history\":\"Mes opérations\",\"home.recent\":\"Dernières opérations\",\"home.see_all\":\"Tout voir\",\"home.empty\":\"Aucune opération pour le moment.\",\"tx.transfer_out\":\"Envoi à {name}\",\"tx.transfer_in\":\"Reçu de {name}\",\"tx.airtime\":\"Crédit {operator}\",\"tx.bill\":\"Facture {biller}\",\"tx.withdrawal\":\"Retrait\",\"tx.status.confirmed\":\"Effectuée\",\"tx.status.pending\":\"En attente\",\"tx.status.failed\":\"Échouée\",\"tx.status.cancelled\":\"Annulée\"},\"source\":{\"nav.home\":\"Accueil\",\"nav.transfer\"",
+      "requete": {
+        "team_id": 10,
+        "phone": "237650626114",
+        "session_id": "six-mobile-1795798497593",
+        "screen": "home",
+        "text": "",
+        "input_type": "text",
+        "language": "fr"
+      }
+    },
+    {
+      "canal": "web",
+      "http": 200,
+      "texte": "home",
+      "intention": null,
+      "langue": null,
+      "statut": null,
+      "sms": null,
+      "diagnostics": {
+        "http_status": 200,
+        "duration_ms": 218,
+        "error_code": null,
+        "error_detail": null,
+        "realism_flags": []
+      },
+      "erreur": null,
+      "brut": "{\"trace_id\":\"2c493f17-c766-447b-80ae-b58d73cbf82d\",\"session_id\":\"six-web-1795798498213\",\"channel\":\"web\",\"screen\":\"home\",\"translation\":{\"language\":\"fr\",\"strings\":{\"nav.home\":\"Accueil\",\"nav.transfer\":\"Envoyer\",\"nav.pay\":\"Payer\",\"nav.history\":\"Historique\",\"shell.greeting\":\"Bonjour {name}\",\"shell.logout\":\"Se déconnecter\",\"shell.secure\":\"Connexion sécurisée\",\"common.back\":\"Retour\",\"common.continue\":\"Continuer\",\"common.cancel\":\"Annuler\",\"common.loading\":\"Chargement\",\"common.listen\":\"Écouter\",\"common.stop_listening\":\"Arrêter la lecture\",\"home.balance_label\":\"Solde disponible\",\"home.account\":\"Compte {phone}\",\"home.quick_actions\":\"Que voulez-vous faire ?\",\"home.action_transfer\":\"Envoyer de l'argent\",\"home.action_bill\":\"Payer une facture\",\"home.action_airtime\":\"Acheter du crédit\",\"home.action_history\":\"Mes opérations\",\"home.recent\":\"Dernières opérations\",\"home.see_all\":\"Tout voir\",\"home.empty\":\"Aucune opération pour le moment.\",\"tx.transfer_out\":\"Envoi à {name}\",\"tx.transfer_in\":\"Reçu de {name}\",\"tx.airtime\":\"Crédit {operator}\",\"tx.bill\":\"Facture {biller}\",\"tx.withdrawal\":\"Retrait\",\"tx.status.confirmed\":\"Effectuée\",\"tx.status.pending\":\"En attente\",\"tx.status.failed\":\"Échouée\",\"tx.status.canc",
+      "requete": {
+        "team_id": 10,
+        "phone": "237650626114",
+        "session_id": "six-web-1795798498213",
+        "screen": "home",
+        "text": "",
+        "input_type": "text",
+        "language": "fr"
+      }
+    },
+    {
+      "canal": "sms",
+      "http": 200,
+      "texte": "Safinum. Choisissez: 1. Mon solde 2. Envoyer de l'argent 3. Frais 4. Historique 5. Acheter du credit 6. Payer une facture 7. Aide 8. Langue",
+      "intention": "UNKNOWN",
+      "langue": "fr",
+      "statut": "none",
+      "sms": {
+        "encoding": "gsm7",
+        "segments": 1,
+        "awaiting_reply": false
+      },
+      "diagnostics": {
+        "http_status": 200,
+        "duration_ms": 439,
+        "error_code": null,
+        "error_detail": null,
+        "response_length": 139,
+        "max_chars": 160,
+        "over_limit": false,
+        "gsm7_violations": [],
+        "realism_flags": []
+      },
+      "erreur": null,
+      "brut": "{\"trace_id\":\"03039a95-bc76-4b58-bc07-0f5eb576aa13\",\"session_id\":\"sms-03039a95-bc76-4b58-bc07-0f5eb576aa13\",\"channel\":\"sms\",\"response\":{\"text\":\"Safinum. Choisissez:\\n1. Mon solde\\n2. Envoyer de l'argent\\n3. Frais\\n4. Historique\\n5. Acheter du credit\\n6. Payer une facture\\n7. Aide\\n8. Langue\",\"end_session\":false,\"options\":[\"Mon solde\",\"Envoyer de l'argent\",\"Frais\",\"Historique\",\"Acheter du credit\",\"Payer une facture\",\"Aide\",\"Langue\"]},\"interpretation\":{\"intent\":\"UNKNOWN\",\"parameters\":[],\"language\":\"fr\"},\"transaction\":{\"id\":null,\"status\":\"none\"},\"diagnostics\":{\"http_status\":200,\"duration_ms\":439,\"error_code\":null,\"error_detail\":null,\"response_length\":139,\"max_chars\":160,\"over_limit\":false,\"gsm7_violations\":[],\"realism_flags\":[]},\"sms\":{\"encoding\":\"gsm7\",\"segments\":1,\"awaiting_reply\":false},\"audio\":null,\"reply_audio\":null}",
+      "requete": {
+        "team_id": 10,
+        "phone": "237650626114",
+        "session_id": "six-sms-1795798498798",
+        "text": "",
+        "input_type": "text"
+      }
+    },
+    {
+      "canal": "atm",
+      "http": 200,
+      "texte": "atm_welcome",
+      "intention": null,
+      "langue": null,
+      "statut": null,
+      "sms": null,
+      "diagnostics": {
+        "http_status": 200,
+        "duration_ms": 197,
+        "error_code": "INVALID_RESPONSE",
+        "error_detail": "Champ `strings` manquant ou invalide : un objet { clé: texte } est attendu.",
+        "realism_flags": []
+      },
+      "erreur": null,
+      "brut": "{\"trace_id\":\"3afcc652-3762-40d9-b3cc-a3dba407f2c0\",\"session_id\":\"six-atm-1795798499627\",\"channel\":\"atm\",\"screen\":\"atm_welcome\",\"translation\":{\"language\":\"fr\",\"strings\":{\"atm.bank\":\"Banque Safinum\",\"atm.cancel_hint\":\"Touche rouge : annuler\",\"atm.please_wait\":\"Veuillez patienter\",\"atm.welcome\":\"Bienvenue\",\"atm.insert_card\":\"Insérez votre carte\",\"atm.available\":\"Service disponible 24h/24\"},\"source\":{\"atm.bank\":\"Banque Safinum\",\"atm.cancel_hint\":\"Touche rouge : annuler\",\"atm.please_wait\":\"Veuillez patienter\",\"atm.welcome\":\"Bienvenue\",\"atm.insert_card\":\"Insérez votre carte\",\"atm.available\":\"Service disponible 24h/24\"},\"report\":{\"total\":6,\"translated\":0,\"missing\":[\"atm.bank\",\"atm.cancel_hint\",\"atm.please_wait\",\"atm.welcome\",\"atm.insert_card\",\"atm.available\"],\"untranslated\":[],\"placeholder_errors\":[],\"over_limit\":[],\"unknown_keys\":[]}},\"diagnostics\":{\"http_status\":200,\"duration_ms\":197,\"error_code\":\"INVALID_RESPONSE\",\"error_detail\":\"Champ `strings` manquant ou invalide : un objet { clé: texte } est attendu.\",\"realism_flags\":[]}}",
+      "requete": {
+        "team_id": 10,
+        "phone": "237650626114",
+        "session_id": "six-atm-1795798499627",
+        "screen": "atm_welcome",
+        "text": ""
+      }
+    },
+    {
+      "canal": "ivr",
+      "http": 200,
+      "texte": "Choisissez: 1. Solde 2. Envoyer 3. Frais 4. Historique 0. Quitter",
+      "intention": "UNKNOWN",
+      "langue": "fr",
+      "statut": "none",
+      "sms": null,
+      "diagnostics": {
+        "http_status": 200,
+        "duration_ms": 208,
+        "error_code": null,
+        "error_detail": null,
+        "response_length": 65,
+        "max_chars": 400,
+        "over_limit": false,
+        "gsm7_violations": [],
+        "realism_flags": []
+      },
+      "erreur": null,
+      "brut": "{\"trace_id\":\"3b98ebc3-781f-4e76-9f4e-d5335c46ac4f\",\"session_id\":\"six-ivr-1795798500215\",\"channel\":\"ivr\",\"response\":{\"text\":\"Choisissez:\\n1. Solde\\n2. Envoyer\\n3. Frais\\n4. Historique\\n0. Quitter\",\"end_session\":false,\"options\":[]},\"interpretation\":{\"intent\":\"UNKNOWN\",\"parameters\":[],\"language\":\"fr\"},\"transaction\":{\"id\":null,\"status\":\"none\"},\"diagnostics\":{\"http_status\":200,\"duration_ms\":208,\"error_code\":null,\"error_detail\":null,\"response_length\":65,\"max_chars\":400,\"over_limit\":false,\"gsm7_violations\":[],\"realism_flags\":[]},\"sms\":null,\"audio\":null,\"reply_audio\":null}",
+      "requete": {
+        "team_id": 10,
+        "phone": "237650626114",
+        "session_id": "six-ivr-1795798500215",
+        "text": "",
+        "input_type": "text"
+      }
+    }
+  ]
+}
