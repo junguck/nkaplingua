@@ -1,0 +1,15 @@
+node_modules/
+dist/
+.next/
+*.tsbuildinfo
+.env
+.env.local
+coverage/
+apps/tts/.cache/
+apps/middleware/.audio-cache/
+docs/latex/*.aux
+docs/latex/*.log
+docs/latex/*.out
+docs/latex/*.toc
+docs/latex/*.fls
+docs/latex/*.fdb_latexmk
