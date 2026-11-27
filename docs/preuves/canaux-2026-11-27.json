@@ -1,0 +1,495 @@
+{
+  "base": "http://127.0.0.1:8080",
+  "date": "2026-11-27T16:14:52.694Z",
+  "ok": true,
+  "tours": [
+    {
+      "canal": "ussd",
+      "tour": "solde",
+      "url": "/middleware/ussd",
+      "entree": {
+        "trace_id": "console-mwz6ml4l",
+        "team_id": "nkaplingua",
+        "channel": "ussd",
+        "session_id": "ussd-4oopjc",
+        "phone": "237699000003",
+        "language": null,
+        "input": {
+          "type": "menu",
+          "text": "1",
+          "ussd_text": "1"
+        },
+        "constraints": {
+          "max_chars": 182,
+          "charset": "gsm7",
+          "mode": "menu",
+          "timeout_ms": 3000
+        }
+      },
+      "http": 200,
+      "ms": 57,
+      "intention": "BALANCE_INQUIRY",
+      "langue": "fr",
+      "resume": "Votre solde est de 250 000 FCFA.",
+      "ok": true,
+      "reponse": {
+        "response": {
+          "text": "Votre solde est de 250 000 FCFA.",
+          "end_session": true,
+          "options": []
+        },
+        "interpretation": {
+          "intent": "BALANCE_INQUIRY",
+          "parameters": {
+            "balance": 250000,
+            "currency": "XAF"
+          },
+          "language": "fr"
+        },
+        "transaction": {
+          "id": null,
+          "status": "none"
+        }
+      }
+    },
+    {
+      "canal": "ussd",
+      "tour": "transfert",
+      "url": "/middleware/ussd",
+      "entree": {
+        "trace_id": "console-mwz6ml67",
+        "team_id": "nkaplingua",
+        "channel": "ussd",
+        "session_id": "ussd-lang-i363zx",
+        "phone": "237699000003",
+        "language": null,
+        "input": {
+          "type": "menu",
+          "text": "Envoie 5000 à Aicha Njoya",
+          "ussd_text": "Envoie 5000 à Aicha Njoya"
+        },
+        "constraints": {
+          "max_chars": 182,
+          "charset": "gsm7",
+          "mode": "menu",
+          "timeout_ms": 3000
+        }
+      },
+      "http": 200,
+      "ms": 23,
+      "intention": "TRANSFER",
+      "resume": "TRANSFER",
+      "ok": true,
+      "reponse": {
+        "response": {
+          "text": "Envoi de 5 000 FCFA a Aicha Njoya (690 000 002). Frais 50 FCFA. Total 5 050 FCFA.\n1. Confirmer\n2. Annuler\n3. Modifier",
+          "end_session": false,
+          "options": [
+            "Confirmer",
+            "Annuler",
+            "Modifier"
+          ]
+        },
+        "interpretation": {
+          "intent": "TRANSFER",
+          "parameters": {
+            "amount": 5000,
+            "fee": 50,
+            "total": 5050,
+            "beneficiary": "Aicha Njoya",
+            "beneficiary_phone": "690000002",
+            "transaction_id": "MBP00000004"
+          },
+          "language": "fr"
+        },
+        "transaction": {
+          "id": "MBP00000004",
+          "status": "pending"
+        }
+      }
+    },
+    {
+      "canal": "ussd",
+      "tour": "langue en confirm.",
+      "url": "/middleware/ussd",
+      "entree": {
+        "trace_id": "console-mwz6ml6u",
+        "team_id": "nkaplingua",
+        "channel": "ussd",
+        "session_id": "ussd-lang-i363zx",
+        "phone": "237699000003",
+        "language": null,
+        "input": {
+          "type": "menu",
+          "text": "parle-moi en fulfulde",
+          "ussd_text": "parle-moi en fulfulde"
+        },
+        "constraints": {
+          "max_chars": 182,
+          "charset": "gsm7",
+          "mode": "menu",
+          "timeout_ms": 3000
+        }
+      },
+      "http": 200,
+      "ms": 6,
+      "intention": "LANGUAGE_SWITCH",
+      "langue": "fub",
+      "resume": "Neldugol 5 000 FCFA ka Aicha Njoya (690 000 002). Njobdi 50 FCFA. Fof 5 050 FCFA.",
+      "ok": true,
+      "reponse": {
+        "response": {
+          "text": "Neldugol 5 000 FCFA ka Aicha Njoya (690 000 002). Njobdi 50 FCFA. Fof 5 050 FCFA.\n1. Tabbitin\n2. Haaytu\n3. Waylu",
+          "end_session": false,
+          "options": [
+            "Tabbitin",
+            "Haaytu",
+            "Waylu"
+          ]
+        },
+        "interpretation": {
+          "intent": "LANGUAGE_SWITCH",
+          "parameters": {
+            "amount": 5000,
+            "fee": 50,
+            "total": 5050,
+            "beneficiary": "Aicha Njoya",
+            "beneficiary_phone": "690000002",
+            "transaction_id": "MBP00000004",
+            "target_language": "fub",
+            "served_language": "fub"
+          },
+          "language": "fub"
+        },
+        "transaction": {
+          "id": "MBP00000004",
+          "status": "pending"
+        }
+      }
+    },
+    {
+      "canal": "mobile",
+      "tour": "écran",
+      "url": "/middleware/mobile",
+      "entree": {
+        "trace_id": "console-ui-mwz6ml72",
+        "team_id": "nkaplingua",
+        "channel": "mobile",
+        "type": "ui_translation",
+        "session_id": "mobile-tqao67",
+        "phone": "237699000003",
+        "language": "fub",
+        "source_language": "fr",
+        "screen": "home",
+        "strings": {
+          "nav.home": {
+            "text": "Accueil",
+            "context": "Onglet",
+            "max_chars": 12
+          },
+          "nav.transfer": {
+            "text": "Envoyer",
+            "context": "Onglet",
+            "max_chars": 12
+          },
+          "shell.greeting": {
+            "text": "Bonjour {name}",
+            "max_chars": null
+          },
+          "home.balance_label": {
+            "text": "Solde disponible",
+            "max_chars": null
+          },
+          "home.quick_actions": {
+            "text": "Que voulez-vous faire ?",
+            "max_chars": null
+          },
+          "common.cancel": {
+            "text": "Annuler",
+            "max_chars": 20
+          }
+        },
+        "constraints": {
+          "max_chars": null,
+          "charset": "utf8",
+          "mode": "ui_translation",
+          "timeout_ms": 10000
+        }
+      },
+      "http": 200,
+      "ms": 8,
+      "intention": "UI_TRANSLATION",
+      "langue": "fub",
+      "resume": "6 chaînes",
+      "ok": true,
+      "reponse": {
+        "language": "fub",
+        "strings": {
+          "nav.home": "Fuɗɗorde",
+          "nav.transfer": "Neldu",
+          "shell.greeting": "A jaɓɓaama {name}",
+          "home.balance_label": "Ceede keddiiɗe",
+          "home.quick_actions": "Ko njiɗ-ɗaa waɗude?",
+          "common.cancel": "Haaytu"
+        }
+      }
+    },
+    {
+      "canal": "web",
+      "tour": "écran",
+      "url": "/middleware/web",
+      "entree": {
+        "trace_id": "console-ui-mwz6ml7b",
+        "team_id": "nkaplingua",
+        "channel": "web",
+        "type": "ui_translation",
+        "session_id": "web-pg1ysx",
+        "phone": "237699000003",
+        "language": "fub",
+        "source_language": "fr",
+        "screen": "home",
+        "strings": {
+          "nav.home": {
+            "text": "Accueil",
+            "context": "Onglet",
+            "max_chars": 12
+          },
+          "nav.transfer": {
+            "text": "Envoyer",
+            "context": "Onglet",
+            "max_chars": 12
+          },
+          "shell.greeting": {
+            "text": "Bonjour {name}",
+            "max_chars": null
+          },
+          "home.balance_label": {
+            "text": "Solde disponible",
+            "max_chars": null
+          },
+          "home.quick_actions": {
+            "text": "Que voulez-vous faire ?",
+            "max_chars": null
+          },
+          "common.cancel": {
+            "text": "Annuler",
+            "max_chars": 20
+          }
+        },
+        "constraints": {
+          "max_chars": null,
+          "charset": "utf8",
+          "mode": "ui_translation",
+          "timeout_ms": 10000
+        }
+      },
+      "http": 200,
+      "ms": 2,
+      "intention": "UI_TRANSLATION",
+      "langue": "fub",
+      "resume": "6 chaînes",
+      "ok": true,
+      "reponse": {
+        "language": "fub",
+        "strings": {
+          "nav.home": "Fuɗɗorde",
+          "nav.transfer": "Neldu",
+          "shell.greeting": "A jaɓɓaama {name}",
+          "home.balance_label": "Ceede keddiiɗe",
+          "home.quick_actions": "Ko njiɗ-ɗaa waɗude?",
+          "common.cancel": "Haaytu"
+        }
+      }
+    },
+    {
+      "canal": "ivr",
+      "tour": "menu",
+      "url": "/ivr",
+      "entree": {
+        "call_id": "ivr-n9ph94",
+        "phone": "237699000003",
+        "input": {
+          "digits": ""
+        }
+      },
+      "http": 200,
+      "ms": 7,
+      "langue": "fr",
+      "resume": "Choisissez:",
+      "ok": true,
+      "reponse": {
+        "channel": "ivr",
+        "language": "fr",
+        "say": "Choisissez:\n1. Solde\n2. Envoyer\n3. Frais\n4. Historique\n0. Quitter",
+        "gather": {
+          "type": "menu",
+          "digits": [
+            1,
+            1
+          ],
+          "terminator": "#",
+          "cancel": "*",
+          "timeout_ms": 8000
+        },
+        "state": {
+          "step": "menu"
+        },
+        "end": false
+      }
+    },
+    {
+      "canal": "ivr",
+      "tour": "solde",
+      "url": "/ivr",
+      "entree": {
+        "call_id": "ivr-n9ph94",
+        "phone": "237699000003",
+        "input": {
+          "digits": "1"
+        }
+      },
+      "http": 200,
+      "ms": 19,
+      "langue": "fr",
+      "resume": "Votre solde est de 250 000 FCFA.",
+      "ok": true,
+      "reponse": {
+        "channel": "ivr",
+        "language": "fr",
+        "say": "Votre solde est de 250 000 FCFA.",
+        "gather": null,
+        "state": {
+          "step": "menu"
+        },
+        "end": true
+      }
+    },
+    {
+      "canal": "atm",
+      "tour": "carte",
+      "url": "/atm",
+      "entree": {
+        "session_id": "atm-biuznw",
+        "card": "237699000003",
+        "language": "fr",
+        "input": {
+          "digits": ""
+        }
+      },
+      "http": 200,
+      "ms": 6,
+      "langue": "fr",
+      "resume": "Code a 4 chiffres:",
+      "ok": true,
+      "reponse": {
+        "channel": "atm",
+        "language": "fr",
+        "screen": "Code a 4 chiffres:",
+        "gather": {
+          "type": "pin",
+          "digits": [
+            4,
+            4
+          ],
+          "terminator": "#",
+          "cancel": "*",
+          "timeout_ms": 15000
+        },
+        "simulation": {
+          "localOnly": true,
+          "bankRoute": "none",
+          "pinVerified": false,
+          "note": "Canal local : aucun appel de retrait n'existe dans l'API bancaire SAFINUM, le distributeur ne fait que simuler la remise d'espèces."
+        },
+        "state": {
+          "step": "pin",
+          "card": "699000003"
+        },
+        "end": false
+      }
+    },
+    {
+      "canal": "atm",
+      "tour": "code",
+      "url": "/atm",
+      "entree": {
+        "session_id": "atm-biuznw",
+        "card": "237699000003",
+        "language": "fr",
+        "input": {
+          "digits": "1234"
+        }
+      },
+      "http": 200,
+      "ms": 14,
+      "langue": "fr",
+      "resume": "Bienvenue au distributeur Safinum, Fadimatou Bouba.",
+      "ok": true,
+      "reponse": {
+        "channel": "atm",
+        "language": "fr",
+        "screen": "Bienvenue au distributeur Safinum, Fadimatou Bouba.\nChoisissez:\n1. Retrait\n2. Solde\n3. Quitter",
+        "gather": {
+          "type": "menu",
+          "digits": [
+            1,
+            1
+          ],
+          "terminator": "#",
+          "cancel": "*",
+          "timeout_ms": 15000
+        },
+        "simulation": {
+          "localOnly": true,
+          "bankRoute": "none",
+          "pinVerified": false,
+          "note": "Canal local : aucun appel de retrait n'existe dans l'API bancaire SAFINUM, le distributeur ne fait que simuler la remise d'espèces."
+        },
+        "state": {
+          "step": "menu",
+          "card": "699000003"
+        },
+        "end": false
+      }
+    },
+    {
+      "canal": "atm",
+      "tour": "solde",
+      "url": "/atm",
+      "entree": {
+        "session_id": "atm-biuznw",
+        "card": "237699000003",
+        "language": "fr",
+        "input": {
+          "digits": "2"
+        }
+      },
+      "http": 200,
+      "ms": 14,
+      "langue": "fr",
+      "resume": "Votre solde est de 250 000 FCFA.",
+      "ok": true,
+      "reponse": {
+        "channel": "atm",
+        "language": "fr",
+        "screen": "Votre solde est de 250 000 FCFA.",
+        "gather": null,
+        "simulation": {
+          "localOnly": true,
+          "bankRoute": "none",
+          "pinVerified": false,
+          "note": "Canal local : aucun appel de retrait n'existe dans l'API bancaire SAFINUM, le distributeur ne fait que simuler la remise d'espèces."
+        },
+        "state": {
+          "step": "menu",
+          "card": "699000003"
+        },
+        "end": true,
+        "receipt": {
+          "kind": "balance",
+          "balance": 250000
+        }
+      }
+    }
+  ]
+}

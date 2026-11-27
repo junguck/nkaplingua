@@ -18,6 +18,8 @@
     --mono: ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, monospace;
   }
   * { box-sizing: border-box; }
+  /* Un display explicite (.cards, .grid…) écrase l'attribut `hidden` : on le force ici. */
+  [hidden] { display: none !important; }
   body {
     margin: 0; background: radial-gradient(1200px 600px at 20% -10%, #16202b, var(--bg));
     color: var(--text); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -110,6 +112,8 @@
       <button class="tab" role="tab" data-channel="ussd" aria-selected="true">USSD</button>
       <button class="tab" role="tab" data-channel="mobile" aria-selected="false">Mobile</button>
       <button class="tab" role="tab" data-channel="web" aria-selected="false">Web</button>
+      <button class="tab" role="tab" data-channel="ivr" aria-selected="false">IVR</button>
+      <button class="tab" role="tab" data-channel="atm" aria-selected="false">ATM</button>
     </div>
 
     <div class="phone">
@@ -212,18 +216,28 @@
     state.channel = channel;
     document.querySelectorAll('.tab').forEach((tab) =>
       tab.setAttribute('aria-selected', String(tab.dataset.channel === channel)));
-    $('keypad').style.display = channel === 'ussd' ? 'grid' : 'none';
+    const local = channel === 'ivr' || channel === 'atm';
+    $('keypad').style.display = channel === 'ussd' || local ? 'grid' : 'none';
     $('sc-transfer').style.display = channel === 'ussd' ? 'block' : 'none';
     $('sc-balance').style.display = channel === 'ussd' ? 'block' : 'none';
     $('sc-airtime').style.display = channel === 'ussd' ? 'block' : 'none';
-    $('phone-label').textContent = channel === 'ussd' ? '*123# · 237 699 000 003' : channel + ' · écran';
+    $('phone-label').textContent =
+      channel === 'ussd' ? '*123# · 237 699 000 003' :
+      channel === 'ivr' ? 'appel · 237 699 000 003' :
+      channel === 'atm' ? 'carte · 237 699 000 003' : channel + ' · écran';
     $('screen').textContent = channel === 'ussd'
       ? 'Safinum. Choisissez:\n1. Mon solde\n2. Envoyer de l\'argent\n3. Frais\n4. Historique\n5. Acheter du credit\n6. Payer une facture\n7. Aide\n8. Langue'
-      : 'Écran d’accueil de la banque.\nCliquez sur « Envoyer » pour demander la traduction des chaînes.';
+      : channel === 'ivr'
+        ? 'Appel entrant. Envoyez une saisie vide pour écouter le menu DTMF.'
+        : channel === 'atm'
+          ? 'Carte insérée. Envoyez une saisie vide pour démarrer (code 1234).'
+          : 'Écran d’accueil de la banque.\nCliquez sur « Envoyer » pour demander la traduction des chaînes.';
     state.session = newSession();
   }
 
   async function send(text) {
+    if (state.channel === 'ivr') return sendIvr(text);
+    if (state.channel === 'atm') return sendAtm(text);
     if (state.channel !== 'ussd') return sendUi();
     const body = {
       trace_id: 'console-' + Date.now().toString(36),
@@ -236,6 +250,25 @@
       constraints: { max_chars: 182, charset: 'gsm7', mode: 'menu', timeout_ms: 3000 },
     };
     await post('/middleware/ussd', body, text);
+  }
+
+  // Canaux locaux (hors contrat SAFINUM) : DTMF uniquement, donc la même saisie qu'à l'USSD.
+  async function sendIvr(text) {
+    await post('/ivr', {
+      call_id: state.session,
+      phone: '237699000003',
+      language: state.language || null,
+      input: { digits: text }
+    }, text);
+  }
+
+  async function sendAtm(text) {
+    await post('/atm', {
+      session_id: state.session,
+      card: '237699000003',
+      language: state.language || null,
+      input: { digits: text }
+    }, text);
   }
 
   async function sendUi() {
@@ -286,6 +319,23 @@
 
   function render(json, ms, status, label) {
     $('json').textContent = JSON.stringify(json, null, 2);
+
+    if (json.channel === 'ivr' || json.channel === 'atm') {
+      const voiced = json.channel === 'ivr';
+      const text = voiced ? json.say || '' : json.screen || '';
+      $('ui-cards').hidden = true;
+      $('screen').textContent = text;
+      $('k-intent').textContent = voiced ? 'IVR (DTMF)' : 'ATM (local)';
+      $('k-tx').textContent = json.receipt ? json.receipt.kind : 'none';
+      showLanguage(json.language);
+      const measure = gsm7(text);
+      $('k-septets').textContent = measure.septets + ' / 182' + (measure.valid ? ' · GSM-7' : ' · HORS GSM-7');
+      $('k-septets-box').className = 'kpi ' + (!measure.valid || measure.septets > 182 ? 'bad' : 'good');
+      $('end-hint').textContent = (json.end ? (voiced ? 'appel terminé' : 'carte rendue') : 'saisie attendue : ' +
+        (json.gather ? json.gather.type : json.state.step)) + ' · HTTP ' + status + ' · ' + ms + ' ms';
+      log((voiced ? 'IVR « ' : 'ATM « ') + (label || '∅') + ' » → ' + json.state.step + ' · ' + (json.end ? 'fin' : 'suite') + ' · ' + ms + ' ms');
+      return;
+    }
 
     if (json.strings) {
       $('k-intent').textContent = 'UI_TRANSLATION';

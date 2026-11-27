@@ -23,7 +23,9 @@ Simulateur de canal (navigateur)
 **C'est SAFINUM qui appelle notre middleware**, pour chaque canal. Le jury teste via SES simulateurs
 (`/sandbox/ussd`, mobile, web) : nos propres applications ne sont pas le chemin évalué.
 
-- Canaux servis : `ussd`, `mobile`, `web`. Prévus (v2, refusés pour l'instant) : `sms`, `atm`, `ivr`.
+- Canaux servis : **les six** — `ussd`, `mobile`, `web`, `sms`, `atm`, `ivr` (vérifié le 27/11/2026 :
+  `channels` et les six déclarations répondent 200 ; la mention « v2, refusés pour l'instant » qui
+  figurait ici était périmée). Voir [SIX-CANAUX](SIX-CANAUX.md).
 - Notre URL doit être **publique** (`localhost` refusé → `UNSAFE_ENDPOINT`) : `ngrok http 3000` ou
   `cloudflared tunnel --url http://localhost:3000`. L'URL ngrok change à chaque redémarrage.
 - Déclaration par canal : `POST {baseUrl}/sandbox/endpoint` `{"channel":"ussd","url":"https://…/middleware"}`,
@@ -264,3 +266,39 @@ l'application** mobile/web (« app » : ce que le testeur ouvre). La langue est 
 - **Canaux v2** (refusés pour l'instant, formats figés) : SMS 160 GSM-7 / 70 UCS-2, segments de 153 / 67 comptés ;
   ATM retraits en **multiples de 5 000 FCFA**, pas de texte libre ; IVR `input.type = "audio"`, WAV 16 kHz mono (+ 8 kHz), réponse en texte.
 - **Kits de démarrage** : Node.js, Python, PHP (`/sandbox/starter/{node,python,php}.zip`).
+
+## 11. Simulateur : PASS, jeton et paramètres réels (vérifié le 27/11/2026)
+
+Depuis le 27/11, `/channel/*` exige un **PASS d'équipe**. Sans lui :
+`403 {"error":"SIMULATOR_LOCKED"}` — un simple `X-Team-Key` ne suffit plus.
+
+```bash
+# 1. déverrouiller (team_id est un ENTIER, pas le slug → 422 sinon)
+POST /api/v1/simulator/unlock   { "team_id": 10, "pass": "<PASS de l'équipe>" }
+→ 200 { "token": "…" }
+
+# 2. chaque appel de canal porte le jeton en en-tête
+POST /api/v1/channel/ussd
+  X-Team-Key: sbx_…
+  X-Sandbox-Access: <token>
+```
+
+Le jeton est un secret de session : ni commité, ni affiché, ni mis en capture. Le nôtre vit le
+temps d'un script (`apps/gateway/scripts/six-canaux.mjs`) et n'est jamais écrit sur disque.
+
+| Canal | Corps minimal accepté | Remarque |
+| --- | --- | --- |
+| `ussd` | `{ team_id, phone, text, session_id, language, input_type }` | `text: ""` ouvre le menu |
+| `mobile`, `web` | + **`screen`** (`home`, `transfer`, `pay`, `review`, `receipt`, `history`) | 422 sans `screen` |
+| `sms` | comme `ussd` | la réponse porte `sms.segments` / `sms.encoding` |
+| `atm` | + **`screen`** : `atm_welcome`, `atm_pin`, `atm_menu`, `atm_amount`, `atm_confirm`, `atm_cash`, `atm_receipt`, `atm_statement`, `atm_balance`, `atm_other`, `atm_end` | 422 sans `screen` ; la sandbox envoie `strings` et attend une **traduction d'écran** comme mobile/web, pas un dialogue (mesuré le 27/11 : `INVALID_RESPONSE` sinon) |
+| `ivr` | comme `ussd` | réponse en texte (`say` / `response.text`) |
+
+Autres faits utiles :
+
+- `GET /sandbox/teams/{id}/accounts` (avec le jeton) donne les comptes de test et leurs soldes :
+  c'est la source du « montant exact » attendu par le scénario solde.
+- La liste des équipes et de leurs canaux est dans les props de `/sandbox/ussd` (`teams[]`) :
+  `shun-and-co` = `id 10`, canaux `["ussd","mobile","web","sms","atm","ivr"]`.
+- `POST /api/v1/channel/*` limite les tentatives (`429 Too Many Attempts`, `x-ratelimit-limit: 10`).
+  Déverrouiller une fois et réutiliser le jeton dans le même processus, sinon on perd des minutes.

@@ -24,7 +24,7 @@ const KEY = process.env.SAFINUM_TEAM_KEY ?? '';
 const TEAM = process.env.SAFINUM_TEAM_ID ?? '';
 const PHONE = process.env.SAFINUM_PHONE ?? '';
 const SESSION_ID = process.env.SAFINUM_SESSION_ID ?? `nkaplingua-cli-${PHONE}`;
-const CHANNELS = ['ussd', 'mobile', 'web'];
+const CHANNELS = ['ussd', 'mobile', 'web', 'sms', 'atm', 'ivr'];
 
 const [command, ...args] = process.argv.slice(2);
 

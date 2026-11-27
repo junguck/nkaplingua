@@ -1,0 +1,474 @@
+{
+  "genere_le": "2026-11-27T17:25:05.145Z",
+  "base": "https://safinum.cm/api/v1",
+  "equipe": 10,
+  "telephone": "237650626114",
+  "beneficiaire": "237653397927",
+  "parcours": [
+    {
+      "id": "solde",
+      "canal": "ussd",
+      "entrees": [
+        "1"
+      ],
+      "solde_avant": null,
+      "solde_apres": null,
+      "tours": [
+        {
+          "entree": "1",
+          "http": 200,
+          "texte": "Votre solde est de 641 595 FCFA.",
+          "intention": "BALANCE_INQUIRY",
+          "langue": "fr",
+          "statut": "none",
+          "reference": null,
+          "sms": null,
+          "code": null,
+          "ms": 1131
+        }
+      ]
+    },
+    {
+      "id": "frais",
+      "canal": "ussd",
+      "entrees": [
+        "3",
+        "25000"
+      ],
+      "solde_avant": null,
+      "solde_apres": null,
+      "tours": [
+        {
+          "entree": "3",
+          "http": 200,
+          "texte": "Frais pour quel montant (FCFA) ?",
+          "intention": "CLARIFICATION_NEEDED",
+          "langue": "fr",
+          "statut": "none",
+          "reference": null,
+          "sms": null,
+          "code": null,
+          "ms": 229
+        },
+        {
+          "entree": "25000",
+          "http": 200,
+          "texte": "Pour 25 000 FCFA: frais 150 FCFA. Total 25 150 FCFA.",
+          "intention": "FEE_INQUIRY",
+          "langue": "fr",
+          "statut": "none",
+          "reference": null,
+          "sms": null,
+          "code": null,
+          "ms": 562
+        }
+      ]
+    },
+    {
+      "id": "historique",
+      "canal": "ussd",
+      "entrees": [
+        "4"
+      ],
+      "solde_avant": null,
+      "solde_apres": null,
+      "tours": [
+        {
+          "entree": "4",
+          "http": 200,
+          "texte": "Vos dernieres operations: 27/11 transfer -5 000 FCFA 27/11 transfer -5 000 FCFA 27/11 bill -1 000 FCFA 27/11 airtime -1 000 FCFA",
+          "intention": "TRANSACTION_HISTORY",
+          "langue": "fr",
+          "statut": "none",
+          "reference": null,
+          "sms": null,
+          "code": null,
+          "ms": 528
+        }
+      ]
+    },
+    {
+      "id": "aide",
+      "canal": "ussd",
+      "entrees": [
+        "7",
+        "1"
+      ],
+      "solde_avant": null,
+      "solde_apres": null,
+      "tours": [
+        {
+          "entree": "7",
+          "http": 200,
+          "texte": "Quel terme ? 1. Frais 2. Plafond 3. Beneficiaire 4. Confirmation",
+          "intention": "TERM_EXPLANATION",
+          "langue": "fr",
+          "statut": "none",
+          "reference": null,
+          "sms": null,
+          "code": null,
+          "ms": 226
+        },
+        {
+          "entree": "1",
+          "http": 200,
+          "texte": "Les frais sont ce que la banque retient pour executer une operation.",
+          "intention": "TERM_EXPLANATION",
+          "langue": "fr",
+          "statut": "none",
+          "reference": null,
+          "sms": null,
+          "code": null,
+          "ms": 204
+        }
+      ]
+    },
+    {
+      "id": "langue",
+      "canal": "ussd",
+      "entrees": [
+        "8",
+        "3"
+      ],
+      "solde_avant": null,
+      "solde_apres": null,
+      "tours": [
+        {
+          "entree": "8",
+          "http": 200,
+          "texte": "Choisissez la langue: 1. Francais 2. English 3. Fulfulde",
+          "intention": "LANGUAGE_SWITCH",
+          "langue": "fr",
+          "statut": "none",
+          "reference": null,
+          "sms": null,
+          "code": null,
+          "ms": 195
+        },
+        {
+          "entree": "3",
+          "http": 200,
+          "texte": "Demngal: fub. Safinum. Subo: 1. Ceede am keddiide 2. Neldu ceede 3. Njobdi 4. Golle bennude 5. Soodu kerdii 6. Yob fakture 7. Wallu 8. Demngal",
+          "intention": "LANGUAGE_SWITCH",
+          "langue": "fub",
+          "statut": "none",
+          "reference": null,
+          "sms": null,
+          "code": null,
+          "ms": 207
+        }
+      ]
+    },
+    {
+      "id": "credit",
+      "canal": "ussd",
+      "entrees": [
+        "5",
+        "1",
+        "1000",
+        "1"
+      ],
+      "solde_avant": null,
+      "solde_apres": null,
+      "tours": [
+        {
+          "entree": "5",
+          "http": 200,
+          "texte": "Credit pour: 1. Mon numero 2. Un autre numero",
+          "intention": "CLARIFICATION_NEEDED",
+          "langue": "fr",
+          "statut": "none",
+          "reference": null,
+          "sms": null,
+          "code": null,
+          "ms": 204
+        },
+        {
+          "entree": "1",
+          "http": 200,
+          "texte": "Montant (FCFA):",
+          "intention": "CLARIFICATION_NEEDED",
+          "langue": "fr",
+          "statut": "none",
+          "reference": null,
+          "sms": null,
+          "code": null,
+          "ms": 424
+        },
+        {
+          "entree": "1000",
+          "http": 200,
+          "texte": "Credit de 1 000 FCFA pour le 650 626 114. Frais 0 FCFA. Total 1 000 FCFA. 1. Confirmer 2. Annuler 3. Modifier",
+          "intention": "AIRTIME_PURCHASE",
+          "langue": "fr",
+          "statut": "pending",
+          "reference": "TRX-52A480950F",
+          "sms": null,
+          "code": null,
+          "ms": 1315
+        },
+        {
+          "entree": "1",
+          "http": 200,
+          "texte": "Credit de 1 000 FCFA envoye au 650 626 114. Ref TRX-52A480950F.",
+          "intention": "CONFIRM",
+          "langue": "fr",
+          "statut": "confirmed",
+          "reference": "TRX-52A480950F",
+          "sms": null,
+          "code": null,
+          "ms": 1192
+        }
+      ]
+    },
+    {
+      "id": "facture",
+      "canal": "ussd",
+      "entrees": [
+        "6",
+        "1",
+        "123456789",
+        "1000",
+        "1"
+      ],
+      "solde_avant": null,
+      "solde_apres": null,
+      "tours": [
+        {
+          "entree": "6",
+          "http": 200,
+          "texte": "Choisissez le facturier: 1. ENEO 2. CAMWATER 3. CANAL 4. CAMTEL 1. ENEO 2. CAMWATER 3. CANAL 4. CAMTEL",
+          "intention": "CLARIFICATION_NEEDED",
+          "langue": "fr",
+          "statut": "none",
+          "reference": null,
+          "sms": null,
+          "code": null,
+          "ms": 591
+        },
+        {
+          "entree": "1",
+          "http": 200,
+          "texte": "Numero de facture:",
+          "intention": "CLARIFICATION_NEEDED",
+          "langue": "fr",
+          "statut": "none",
+          "reference": null,
+          "sms": null,
+          "code": null,
+          "ms": 531
+        },
+        {
+          "entree": "123456789",
+          "http": 200,
+          "texte": "Montant (FCFA):",
+          "intention": "CLARIFICATION_NEEDED",
+          "langue": "fr",
+          "statut": "none",
+          "reference": null,
+          "sms": null,
+          "code": null,
+          "ms": 182
+        },
+        {
+          "entree": "1000",
+          "http": 200,
+          "texte": "Facture ENEO 123456789: 1 000 FCFA. Frais 100 FCFA. Total 1 100 FCFA. 1. Confirmer 2. Annuler 3. Modifier",
+          "intention": "BILL_PAYMENT",
+          "langue": "fr",
+          "statut": "pending",
+          "reference": "TRX-BA721D302D",
+          "sms": null,
+          "code": null,
+          "ms": 874
+        },
+        {
+          "entree": "1",
+          "http": 200,
+          "texte": "Facture ENEO payee: 1 000 FCFA. Ref TRX-BA721D302D.",
+          "intention": "CONFIRM",
+          "langue": "fr",
+          "statut": "confirmed",
+          "reference": "TRX-BA721D302D",
+          "sms": null,
+          "code": null,
+          "ms": 904
+        }
+      ]
+    },
+    {
+      "id": "transfert-confirme",
+      "canal": "ussd",
+      "entrees": [
+        "2",
+        "237653397927",
+        "5000",
+        "1"
+      ],
+      "solde_avant": 639495,
+      "solde_apres": 634445,
+      "tours": [
+        {
+          "entree": "2",
+          "http": 200,
+          "texte": "Numero du beneficiaire (9 chiffres):",
+          "intention": "CLARIFICATION_NEEDED",
+          "langue": "fr",
+          "statut": "none",
+          "reference": null,
+          "sms": null,
+          "code": null,
+          "ms": 182
+        },
+        {
+          "entree": "237653397927",
+          "http": 200,
+          "texte": "Montant (FCFA):",
+          "intention": "CLARIFICATION_NEEDED",
+          "langue": "fr",
+          "statut": "none",
+          "reference": null,
+          "sms": null,
+          "code": null,
+          "ms": 213
+        },
+        {
+          "entree": "5000",
+          "http": 200,
+          "texte": "Envoi de 5 000 FCFA a 653397927 (653 397 927). Frais 50 FCFA. Total 5 050 FCFA. 1. Confirmer 2. Annuler 3. Modifier",
+          "intention": "TRANSFER",
+          "langue": "fr",
+          "statut": "pending",
+          "reference": "TRX-2C97A08A2B",
+          "sms": null,
+          "code": null,
+          "ms": 887
+        },
+        {
+          "entree": "1",
+          "http": 200,
+          "texte": "5 000 FCFA envoye a 653397927 (653 397 927). Ref TRX-2C97A08A2B. Solde 634 445 FCFA.",
+          "intention": "CONFIRM",
+          "langue": "fr",
+          "statut": "confirmed",
+          "reference": "TRX-2C97A08A2B",
+          "sms": null,
+          "code": null,
+          "ms": 857
+        }
+      ]
+    },
+    {
+      "id": "transfert-annule",
+      "canal": "ussd",
+      "entrees": [
+        "2",
+        "237653397927",
+        "5000",
+        "2"
+      ],
+      "solde_avant": 634445,
+      "solde_apres": 634445,
+      "tours": [
+        {
+          "entree": "2",
+          "http": 200,
+          "texte": "Numero du beneficiaire (9 chiffres):",
+          "intention": "CLARIFICATION_NEEDED",
+          "langue": "fr",
+          "statut": "none",
+          "reference": null,
+          "sms": null,
+          "code": null,
+          "ms": 185
+        },
+        {
+          "entree": "237653397927",
+          "http": 200,
+          "texte": "Montant (FCFA):",
+          "intention": "CLARIFICATION_NEEDED",
+          "langue": "fr",
+          "statut": "none",
+          "reference": null,
+          "sms": null,
+          "code": null,
+          "ms": 189
+        },
+        {
+          "entree": "5000",
+          "http": 200,
+          "texte": "Envoi de 5 000 FCFA a 653397927 (653 397 927). Frais 50 FCFA. Total 5 050 FCFA. 1. Confirmer 2. Annuler 3. Modifier",
+          "intention": "TRANSFER",
+          "langue": "fr",
+          "statut": "pending",
+          "reference": "TRX-6BF30387B7",
+          "sms": null,
+          "code": null,
+          "ms": 908
+        },
+        {
+          "entree": "2",
+          "http": 200,
+          "texte": "Operation annulee. Aucun montant debite.",
+          "intention": "CANCEL",
+          "langue": "fr",
+          "statut": "cancelled",
+          "reference": "TRX-6BF30387B7",
+          "sms": null,
+          "code": null,
+          "ms": 1221
+        }
+      ]
+    },
+    {
+      "id": "sms-solde",
+      "canal": "sms",
+      "entrees": [
+        "1"
+      ],
+      "solde_avant": null,
+      "solde_apres": null,
+      "tours": [
+        {
+          "entree": "1",
+          "http": 200,
+          "texte": "Votre solde est de 634 445 FCFA.",
+          "intention": "BALANCE_INQUIRY",
+          "langue": "fr",
+          "statut": "none",
+          "reference": null,
+          "sms": {
+            "encoding": "gsm7",
+            "segments": 1,
+            "awaiting_reply": false
+          },
+          "code": null,
+          "ms": 778
+        }
+      ]
+    },
+    {
+      "id": "ivr-solde",
+      "canal": "ivr",
+      "entrees": [
+        "1"
+      ],
+      "solde_avant": null,
+      "solde_apres": null,
+      "tours": [
+        {
+          "entree": "1",
+          "http": 200,
+          "texte": "Votre solde est de 634 445 FCFA.",
+          "intention": "UNKNOWN",
+          "langue": "fr",
+          "statut": "none",
+          "reference": null,
+          "sms": null,
+          "code": null,
+          "ms": 546
+        }
+      ]
+    }
+  ]
+}

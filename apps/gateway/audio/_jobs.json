@@ -1,0 +1,674 @@
+[
+  {
+    "lang": "en",
+    "key": "ambiguous.beneficiary",
+    "text": "Several beneficiaries. Give the number.",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "ask.airtimePhone",
+    "text": "Number to top up (9 digits):",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "ask.airtimeTarget",
+    "text": "Airtime for:\n1. My number\n2. Another number",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "ask.amount",
+    "text": "Amount (FCFA):",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "ask.beneficiary",
+    "text": "Beneficiary number (9 digits):",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "ask.billReference",
+    "text": "Bill number:",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "ask.biller",
+    "text": "Choose the service:",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "ask.feesAmount",
+    "text": "Fees for which amount (FCFA)?",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "ask.language",
+    "text": "Choose the language:",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "ask.term",
+    "text": "Which term?\n1. Fee\n2. Limit\n3. Beneficiary\n4. Confirmation",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "atm.card",
+    "text": "Card number (9 digits):",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "atm.eject",
+    "text": "Thank you. Take your card.",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "atm.menu",
+    "text": "Choose:\n1. Withdraw\n2. Balance\n3. Quit",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "atm.pin",
+    "text": "4-digit code:",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "atm.simulated",
+    "text": "Local simulation: no bank debit.",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "common.cancel",
+    "text": "Cancel",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "common.confirm",
+    "text": "Confirm",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "common.edit",
+    "text": "Change",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "confirm.choose",
+    "text": "1. Confirm\n2. Cancel",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "confirm.edit",
+    "text": "3. Change the amount",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "confirm.retry",
+    "text": "Reply 1 to confirm or 2 to cancel.",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "done.cancel",
+    "text": "Transaction cancelled. Nothing was debited.",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "error.GENERIC",
+    "text": "The transaction did not go through. Try again.",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "error.INSUFFICIENT_FUNDS",
+    "text": "Insufficient balance for this transaction.",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "error.INVALID_AMOUNT",
+    "text": "Invalid amount.",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "error.LIMIT_EXCEEDED",
+    "text": "Amount above the authorised limit.",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "error.TX_NOT_PENDING",
+    "text": "This transaction can no longer be changed.",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "error.UNAUTHORIZED",
+    "text": "Service temporarily unavailable. Try again later.",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "error.UNKNOWN_ACCOUNT",
+    "text": "No account for this number.",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "error.UNKNOWN_BENEFICIARY",
+    "text": "Beneficiary not found. Check the number.",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "error.UNKNOWN_BILLER",
+    "text": "Unknown service. Choose from the list.",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "error.UNREACHABLE",
+    "text": "Service temporarily unavailable. Try again later.",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "history.empty",
+    "text": "No transactions yet.",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "history.header",
+    "text": "Your recent transactions:",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "invalid.amount",
+    "text": "Invalid amount. Enter a number, e.g. 1000",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "invalid.choice",
+    "text": "Invalid choice.",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "invalid.phone",
+    "text": "Invalid number. 9 digits, e.g. 699000002",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "ivr.askAmount",
+    "text": "Amount (FCFA) then #:",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "ivr.askBeneficiary",
+    "text": "Beneficiary number then #:",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "ivr.confirmPrompt",
+    "text": "1. Confirm\n2. Cancel",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "ivr.hangup",
+    "text": "Thank you. Goodbye.",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "ivr.invalid",
+    "text": "Invalid choice.",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "ivr.menu",
+    "text": "Choose:\n1. Balance\n2. Send\n3. Fees\n4. History\n0. Quit",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "menu.airtime",
+    "text": "Buy airtime",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "menu.balance",
+    "text": "My balance",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "menu.bill",
+    "text": "Pay a bill",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "menu.fees",
+    "text": "Fees",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "menu.header",
+    "text": "Safinum. Choose:",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "menu.help",
+    "text": "Help",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "menu.history",
+    "text": "History",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "menu.language",
+    "text": "Language",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "menu.transfer",
+    "text": "Send money",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "term.beneficiary",
+    "text": "The beneficiary is the person who receives the money.",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "term.confirmation",
+    "text": "Nothing is debited before you confirm, on the next turn.",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "term.fee",
+    "text": "The fee is what the bank keeps to carry out a transaction.",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "en",
+    "key": "term.limit",
+    "text": "The limit is 500 000 FCFA per transaction.",
+    "model": "facebook/mms-tts-eng"
+  },
+  {
+    "lang": "fr",
+    "key": "ambiguous.beneficiary",
+    "text": "Plusieurs beneficiaires. Precisez le numero.",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "ask.airtimePhone",
+    "text": "Numero a recharger (9 chiffres):",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "ask.airtimeTarget",
+    "text": "Credit pour:\n1. Mon numero\n2. Un autre numero",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "ask.amount",
+    "text": "Montant (FCFA):",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "ask.beneficiary",
+    "text": "Numero du beneficiaire (9 chiffres):",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "ask.billReference",
+    "text": "Numero de facture:",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "ask.biller",
+    "text": "Choisissez le facturier:",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "ask.feesAmount",
+    "text": "Frais pour quel montant (FCFA) ?",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "ask.language",
+    "text": "Choisissez la langue:",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "ask.term",
+    "text": "Quel terme ?\n1. Frais\n2. Plafond\n3. Beneficiaire\n4. Confirmation",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "atm.card",
+    "text": "Numero de carte (9 chiffres):",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "atm.eject",
+    "text": "Merci. Prenez votre carte.",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "atm.menu",
+    "text": "Choisissez:\n1. Retrait\n2. Solde\n3. Quitter",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "atm.pin",
+    "text": "Code a 4 chiffres:",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "atm.simulated",
+    "text": "Simulation locale: aucun debit bancaire.",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "common.cancel",
+    "text": "Annuler",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "common.confirm",
+    "text": "Confirmer",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "common.edit",
+    "text": "Modifier",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "confirm.choose",
+    "text": "1. Confirmer\n2. Annuler",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "confirm.edit",
+    "text": "3. Modifier le montant",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "confirm.retry",
+    "text": "Repondez 1 pour confirmer ou 2 pour annuler.",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "done.cancel",
+    "text": "Operation annulee. Aucun montant debite.",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "error.GENERIC",
+    "text": "Operation impossible. Reessayez plus tard.",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "error.INSUFFICIENT_FUNDS",
+    "text": "Solde insuffisant pour cette operation.",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "error.INVALID_AMOUNT",
+    "text": "Montant invalide.",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "error.LIMIT_EXCEEDED",
+    "text": "Montant au-dessus du plafond autorise.",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "error.TX_NOT_PENDING",
+    "text": "Cette operation ne peut plus etre modifiee.",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "error.UNAUTHORIZED",
+    "text": "Service momentanement indisponible. Reessayez plus tard.",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "error.UNKNOWN_ACCOUNT",
+    "text": "Compte introuvable pour ce numero.",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "error.UNKNOWN_BENEFICIARY",
+    "text": "Beneficiaire introuvable. Verifiez le numero.",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "error.UNKNOWN_BILLER",
+    "text": "Facturier inconnu. Choisissez dans la liste.",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "error.UNREACHABLE",
+    "text": "Service momentanement indisponible. Reessayez plus tard.",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "history.empty",
+    "text": "Aucune operation pour le moment.",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "history.header",
+    "text": "Vos dernieres operations:",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "invalid.amount",
+    "text": "Montant invalide. Tapez un nombre, ex: 1000",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "invalid.choice",
+    "text": "Choix invalide.",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "invalid.phone",
+    "text": "Numero invalide. 9 chiffres, ex: 699000002",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "ivr.askAmount",
+    "text": "Montant (FCFA) puis #:",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "ivr.askBeneficiary",
+    "text": "Numero du beneficiaire puis #:",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "ivr.confirmPrompt",
+    "text": "1. Confirmer\n2. Annuler",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "ivr.hangup",
+    "text": "Merci. Au revoir.",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "ivr.invalid",
+    "text": "Choix invalide.",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "ivr.menu",
+    "text": "Choisissez:\n1. Solde\n2. Envoyer\n3. Frais\n4. Historique\n0. Quitter",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "menu.airtime",
+    "text": "Acheter du credit",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "menu.balance",
+    "text": "Mon solde",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "menu.bill",
+    "text": "Payer une facture",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "menu.fees",
+    "text": "Frais",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "menu.header",
+    "text": "Safinum. Choisissez:",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "menu.help",
+    "text": "Aide",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "menu.history",
+    "text": "Historique",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "menu.language",
+    "text": "Langue",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "menu.transfer",
+    "text": "Envoyer de l'argent",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "term.beneficiary",
+    "text": "Le beneficiaire est la personne qui recoit l'argent.",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "term.confirmation",
+    "text": "Rien n'est debite avant votre confirmation, au tour suivant.",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "term.fee",
+    "text": "Les frais sont ce que la banque retient pour executer une operation.",
+    "model": "facebook/mms-tts-fra"
+  },
+  {
+    "lang": "fr",
+    "key": "term.limit",
+    "text": "Le plafond est de 500 000 FCFA par operation.",
+    "model": "facebook/mms-tts-fra"
+  }
+]

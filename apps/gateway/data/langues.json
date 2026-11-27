@@ -1,17 +1,1070 @@
 {
   "_lisez_moi": "Base de mots de NkapLingua. Ajoutez une langue ou des mots avec : pnpm --filter @nkap/gateway lang ajouter|mot|mot-outil|exporter. Le lexique TypeScript (packages/core/src/lexicon) reste la RÉFÉRENCE documentée ; cette base s'y ajoute. « remplace: true » (produit par « lang exporter <code> ») fait venir la langue entièrement d'ici : à partir de là, on modifie et on supprime sans toucher au code. Poids de 1 (indice faible) à 5 (mot sans ambiguïté).",
-  "_exemple": {
-    "dua": {
-      "nom": "Duala",
-      "alias": ["douala", "dualla"],
-      "remplace": false,
-      "sources": ["Helmlinger 1972 (lexique français-duala)", "Session de relecture : 2 locuteurs, Douala, 27/11/2026"],
-      "mots_outils": [["na", 1]],
+  "langues": {
+    "fr": {
+      "nom": "Français",
+      "alias": [],
+      "remplace": true,
+      "sources": [
+        "lexique intégré (packages/core/src/lexicon)"
+      ],
+      "mots_outils": [
+        [
+          "je",
+          2
+        ],
+        [
+          "j",
+          1
+        ],
+        [
+          "mon",
+          2
+        ],
+        [
+          "ma",
+          1
+        ],
+        [
+          "mes",
+          2
+        ],
+        [
+          "le",
+          1
+        ],
+        [
+          "la",
+          1
+        ],
+        [
+          "les",
+          1
+        ],
+        [
+          "de",
+          1
+        ],
+        [
+          "du",
+          1
+        ],
+        [
+          "des",
+          1
+        ],
+        [
+          "a",
+          1
+        ],
+        [
+          "est",
+          1
+        ],
+        [
+          "quel",
+          2
+        ],
+        [
+          "quelle",
+          2
+        ],
+        [
+          "combien",
+          2
+        ],
+        [
+          "veux",
+          2
+        ],
+        [
+          "voudrais",
+          2
+        ],
+        [
+          "pour",
+          1
+        ],
+        [
+          "moi",
+          2
+        ],
+        [
+          "envoie",
+          2
+        ],
+        [
+          "s il",
+          2
+        ],
+        [
+          "plait",
+          2
+        ],
+        [
+          "c est",
+          2
+        ],
+        [
+          "quoi",
+          2
+        ],
+        [
+          "mille",
+          2
+        ],
+        [
+          "oui",
+          2
+        ],
+        [
+          "non",
+          2
+        ],
+        [
+          "merci",
+          2
+        ],
+        [
+          "bonjour",
+          2
+        ],
+        [
+          "pouvez",
+          2
+        ],
+        [
+          "aider",
+          1
+        ],
+        [
+          "ne sais pas",
+          2
+        ],
+        [
+          "comment",
+          1
+        ],
+        [
+          "il me reste",
+          3
+        ],
+        [
+          "reste",
+          1
+        ],
+        [
+          "compte",
+          2
+        ],
+        [
+          "operation",
+          2
+        ],
+        [
+          "enregistree",
+          2
+        ],
+        [
+          "application",
+          2
+        ],
+        [
+          "n existe pas",
+          2
+        ],
+        [
+          "me dire",
+          1
+        ]
+      ],
       "mots": {
-        "CHECK_BALANCE": [["musongi", 2]],
-        "TRANSFER": [["loma", 3]]
+        "CHECK_BALANCE": [
+          [
+            "solde",
+            3
+          ],
+          [
+            "combien il me reste",
+            3
+          ],
+          [
+            "combien j ai",
+            3
+          ],
+          [
+            "ce qui reste",
+            2
+          ],
+          [
+            "mon compte",
+            1
+          ]
+        ],
+        "TRANSFER": [
+          [
+            "envo*",
+            3
+          ],
+          [
+            "transf*",
+            3
+          ],
+          [
+            "virement",
+            3
+          ],
+          [
+            "fais passer",
+            3
+          ],
+          [
+            "donne",
+            1
+          ]
+        ],
+        "CHECK_FEES": [
+          [
+            "frais",
+            3
+          ],
+          [
+            "commission",
+            3
+          ],
+          [
+            "tarif*",
+            2
+          ],
+          [
+            "combien ca coute",
+            3
+          ],
+          [
+            "ca coute",
+            2
+          ]
+        ],
+        "TX_HISTORY": [
+          [
+            "historique",
+            3
+          ],
+          [
+            "dernieres operations",
+            3
+          ],
+          [
+            "mes operations",
+            3
+          ],
+          [
+            "mouvements",
+            2
+          ],
+          [
+            "releve",
+            2
+          ],
+          [
+            "transactions",
+            2
+          ]
+        ],
+        "BUY_AIRTIME": [
+          [
+            "credit de communication",
+            4
+          ],
+          [
+            "credit telephone",
+            4
+          ],
+          [
+            "recharge*",
+            3
+          ],
+          [
+            "unites",
+            3
+          ],
+          [
+            "airtime",
+            3
+          ],
+          [
+            "credit",
+            2
+          ]
+        ],
+        "PAY_BILL": [
+          [
+            "facture",
+            3
+          ],
+          [
+            "payer",
+            1
+          ],
+          [
+            "eneo",
+            3
+          ],
+          [
+            "camwater",
+            3
+          ],
+          [
+            "canal",
+            2
+          ],
+          [
+            "electricite",
+            2
+          ],
+          [
+            "courant",
+            1
+          ]
+        ],
+        "WITHDRAW": [
+          [
+            "retir*",
+            3
+          ],
+          [
+            "retrait",
+            3
+          ],
+          [
+            "sortir de l argent",
+            3
+          ],
+          [
+            "cash out",
+            3
+          ]
+        ],
+        "EXPLAIN_TERM": [
+          [
+            "c est quoi",
+            3
+          ],
+          [
+            "qu est ce que",
+            3
+          ],
+          [
+            "que veut dire",
+            3
+          ],
+          [
+            "ca veut dire quoi",
+            3
+          ],
+          [
+            "explique",
+            3
+          ],
+          [
+            "signifie",
+            3
+          ]
+        ],
+        "GREETING": [
+          [
+            "bonjour",
+            2
+          ],
+          [
+            "bonsoir",
+            2
+          ],
+          [
+            "salut",
+            2
+          ]
+        ],
+        "HELP": [
+          [
+            "aide",
+            3
+          ],
+          [
+            "aidez moi",
+            3
+          ],
+          [
+            "menu",
+            2
+          ],
+          [
+            "que puis je faire",
+            3
+          ]
+        ]
       }
+    },
+    "en": {
+      "nom": "English",
+      "alias": [],
+      "remplace": true,
+      "sources": [
+        "lexique intégré (packages/core/src/lexicon)"
+      ],
+      "mots_outils": [
+        [
+          "i",
+          1
+        ],
+        [
+          "my",
+          2
+        ],
+        [
+          "the",
+          2
+        ],
+        [
+          "is",
+          1
+        ],
+        [
+          "what",
+          2
+        ],
+        [
+          "how",
+          1
+        ],
+        [
+          "much",
+          2
+        ],
+        [
+          "want",
+          2
+        ],
+        [
+          "to",
+          1
+        ],
+        [
+          "please",
+          2
+        ],
+        [
+          "send",
+          1
+        ],
+        [
+          "thousand",
+          2
+        ],
+        [
+          "yes",
+          1
+        ],
+        [
+          "thanks",
+          2
+        ],
+        [
+          "of",
+          1
+        ],
+        [
+          "for now",
+          2
+        ],
+        [
+          "do you",
+          2
+        ],
+        [
+          "how long",
+          2
+        ],
+        [
+          "takes",
+          1
+        ]
+      ],
+      "mots": {
+        "CHECK_BALANCE": [
+          [
+            "balance",
+            3
+          ],
+          [
+            "how much do i have",
+            3
+          ],
+          [
+            "how much is left",
+            3
+          ]
+        ],
+        "TRANSFER": [
+          [
+            "send",
+            3
+          ],
+          [
+            "transfer",
+            3
+          ],
+          [
+            "give",
+            1
+          ]
+        ],
+        "CHECK_FEES": [
+          [
+            "fee",
+            3
+          ],
+          [
+            "fees",
+            3
+          ],
+          [
+            "charge",
+            2
+          ],
+          [
+            "charges",
+            2
+          ],
+          [
+            "how much does it cost",
+            3
+          ]
+        ],
+        "TX_HISTORY": [
+          [
+            "history",
+            3
+          ],
+          [
+            "transactions",
+            2
+          ],
+          [
+            "statement",
+            2
+          ],
+          [
+            "last operations",
+            3
+          ]
+        ],
+        "BUY_AIRTIME": [
+          [
+            "airtime",
+            3
+          ],
+          [
+            "top up",
+            3
+          ],
+          [
+            "topup",
+            3
+          ],
+          [
+            "credit",
+            2
+          ]
+        ],
+        "PAY_BILL": [
+          [
+            "bill",
+            3
+          ],
+          [
+            "pay",
+            1
+          ],
+          [
+            "electricity",
+            2
+          ]
+        ],
+        "WITHDRAW": [
+          [
+            "withdraw*",
+            3
+          ],
+          [
+            "cash out",
+            3
+          ],
+          [
+            "cashout",
+            3
+          ]
+        ],
+        "EXPLAIN_TERM": [
+          [
+            "what is",
+            3
+          ],
+          [
+            "what are",
+            3
+          ],
+          [
+            "what does",
+            3
+          ],
+          [
+            "explain",
+            3
+          ],
+          [
+            "meaning",
+            3
+          ]
+        ],
+        "GREETING": [
+          [
+            "hello",
+            2
+          ],
+          [
+            "hi",
+            2
+          ],
+          [
+            "good morning",
+            2
+          ]
+        ],
+        "HELP": [
+          [
+            "help",
+            3
+          ],
+          [
+            "menu",
+            2
+          ]
+        ]
+      }
+    },
+    "fub": {
+      "nom": "Fulfulde",
+      "alias": [],
+      "remplace": true,
+      "sources": [
+        "lexique intégré (packages/core/src/lexicon)"
+      ],
+      "mots_outils": [
+        [
+          "mi",
+          1
+        ],
+        [
+          "maa",
+          3
+        ],
+        [
+          "am",
+          1
+        ],
+        [
+          "ka",
+          2
+        ],
+        [
+          "ngam",
+          3
+        ],
+        [
+          "ko",
+          2
+        ],
+        [
+          "ɗum",
+          3
+        ],
+        [
+          "yiɗi",
+          3
+        ],
+        [
+          "ceede",
+          3
+        ],
+        [
+          "njelu",
+          3
+        ],
+        [
+          "ɗoo",
+          3
+        ],
+        [
+          "hande",
+          3
+        ],
+        [
+          "eey",
+          3
+        ],
+        [
+          "ala",
+          2
+        ],
+        [
+          "ujineere",
+          3
+        ],
+        [
+          "jam",
+          2
+        ],
+        [
+          "useni",
+          3
+        ],
+        [
+          "jaraama",
+          3
+        ],
+        [
+          "no",
+          1
+        ],
+        [
+          "e",
+          1
+        ],
+        [
+          "waawi",
+          2
+        ],
+        [
+          "wallude",
+          2
+        ],
+        [
+          "lam",
+          1
+        ]
+      ],
+      "mots": {
+        "CHECK_BALANCE": [
+          [
+            "keddii*",
+            3
+          ],
+          [
+            "heddii*",
+            3
+          ],
+          [
+            "ceede am",
+            1
+          ],
+          [
+            "ceede maa",
+            1
+          ]
+        ],
+        "TRANSFER": [
+          [
+            "neld*",
+            3
+          ],
+          [
+            "hokku",
+            1
+          ]
+        ],
+        "CHECK_FEES": [
+          [
+            "njoɓdi",
+            3
+          ]
+        ],
+        "TX_HISTORY": [
+          [
+            "golle ɓennuɗe",
+            3
+          ],
+          [
+            "golle am",
+            2
+          ]
+        ],
+        "BUY_AIRTIME": [
+          [
+            "kerdii",
+            3
+          ]
+        ],
+        "PAY_BILL": [
+          [
+            "fakture",
+            3
+          ],
+          [
+            "yoɓ*",
+            1
+          ]
+        ],
+        "WITHDRAW": [
+          [
+            "yalting*",
+            3
+          ],
+          [
+            "yaltin*",
+            3
+          ]
+        ],
+        "EXPLAIN_TERM": [
+          [
+            "ko woni",
+            3
+          ],
+          [
+            "ko ɗum woni",
+            3
+          ],
+          [
+            "firo",
+            3
+          ]
+        ],
+        "GREETING": [
+          [
+            "jam",
+            1
+          ],
+          [
+            "a nyalli jam",
+            2
+          ],
+          [
+            "a waali jam",
+            2
+          ],
+          [
+            "a hirti jam",
+            2
+          ],
+          [
+            "sannu",
+            2
+          ]
+        ],
+        "HELP": [
+          [
+            "ballal",
+            3
+          ],
+          [
+            "wallu",
+            2
+          ]
+        ]
+      }
+    },
+    "dua": {
+      "nom": "Duálá",
+      "alias": [],
+      "remplace": true,
+      "sources": [
+        "lexique intégré (packages/core/src/lexicon)"
+      ],
+      "mots_outils": [],
+      "mots": {
+        "CHECK_BALANCE": [
+          [
+            "mbolo",
+            1
+          ],
+          [
+            "moni",
+            1
+          ],
+          [
+            "musongi",
+            2
+          ]
+        ],
+        "TRANSFER": [
+          [
+            "loma*",
+            3
+          ]
+        ],
+        "HELP": [
+          [
+            "ongwane",
+            3
+          ]
+        ]
+      }
+    },
+    "ewo": {
+      "nom": "Ewondo",
+      "alias": [],
+      "remplace": true,
+      "sources": [
+        "lexique intégré (packages/core/src/lexicon)"
+      ],
+      "mots_outils": [],
+      "mots": {
+        "CHECK_BALANCE": [
+          [
+            "mɔni a lig",
+            3
+          ],
+          [
+            "lig a nkɔp",
+            2
+          ],
+          [
+            "nkɔp",
+            1
+          ]
+        ],
+        "TRANSFER": [
+          [
+            "lom",
+            3
+          ],
+          [
+            "lom moni",
+            3
+          ]
+        ],
+        "CHECK_FEES": [
+          [
+            "moni ba nɔŋ",
+            3
+          ]
+        ],
+        "PAY_BILL": [
+          [
+            "yanər",
+            1
+          ]
+        ],
+        "WITHDRAW": [
+          [
+            "nɔŋ moni",
+            2
+          ]
+        ],
+        "HELP": [
+          [
+            "voili",
+            3
+          ]
+        ]
+      }
+    },
+    "bbj": {
+      "nom": "Ghɔmálá",
+      "alias": [],
+      "remplace": true,
+      "sources": [
+        "lexique intégré (packages/core/src/lexicon)"
+      ],
+      "mots_outils": [],
+      "mots": {
+        "CHECK_BALANCE": [
+          [
+            "nkap",
+            1
+          ],
+          [
+            "ngkap",
+            1
+          ]
+        ],
+        "TRANSFER": [
+          [
+            "shyaa*",
+            3
+          ]
+        ],
+        "PAY_BILL": [
+          [
+            "joa",
+            2
+          ]
+        ]
+      }
+    },
+    "bas": {
+      "nom": "Ɓasaá",
+      "alias": [
+        "bassa",
+        "basa"
+      ],
+      "remplace": false,
+      "sources": [
+        "À compléter : locuteur, ville, date de la session"
+      ],
+      "mots_outils": [],
+      "mots": {}
+    },
+    "byv": {
+      "nom": "Mə̀dûmbà",
+      "alias": [
+        "medumba",
+        "medoumba"
+      ],
+      "remplace": false,
+      "sources": [
+        "À compléter : locuteur, ville, date de la session"
+      ],
+      "mots_outils": [],
+      "mots": {}
+    },
+    "hau": {
+      "nom": "Hausa",
+      "alias": [
+        "haoussa",
+        "haussa"
+      ],
+      "remplace": false,
+      "sources": [
+        "À compléter : locuteur, ville, date de la session"
+      ],
+      "mots_outils": [],
+      "mots": {}
+    },
+    "bul": {
+      "nom": "Bulu",
+      "alias": [
+        "boulou"
+      ],
+      "remplace": false,
+      "sources": [
+        "À compléter : locuteur, ville, date de la session"
+      ],
+      "mots_outils": [],
+      "mots": {}
+    },
+    "wes": {
+      "nom": "Kamtok",
+      "alias": [
+        "pidgin",
+        "pidgin camerounais"
+      ],
+      "remplace": false,
+      "sources": [
+        "À compléter : locuteur, ville, date de la session"
+      ],
+      "mots_outils": [],
+      "mots": {}
     }
-  },
-  "langues": {}
+  }
 }

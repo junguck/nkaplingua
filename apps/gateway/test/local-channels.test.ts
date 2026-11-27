@@ -230,7 +230,12 @@ describe('surface HTTP des canaux locaux', () => {
 
     try {
       const health = await fetch(`http://127.0.0.1:${address.port}/health`);
-      expect(await health.json()).toMatchObject({ localChannels: ['ivr', 'atm'], channels: ['ussd', 'mobile', 'web'] });
+      // Les six canaux ouverts par la sandbox sont servis sur la même URL (vérifié le 27/11) ;
+      // `localChannels` ne décrit plus que les routes de démonstration `/ivr` et `/atm`.
+      expect(await health.json()).toMatchObject({
+        localChannels: ['ivr', 'atm'],
+        channels: ['ussd', 'mobile', 'web', 'sms', 'atm', 'ivr'],
+      });
 
       const reply = await fetch(`http://127.0.0.1:${address.port}/ivr`, {
         method: 'POST',
@@ -241,6 +246,43 @@ describe('surface HTTP des canaux locaux', () => {
       const body = (await reply.json()) as IvrReply;
       expect(body.channel).toBe('ivr');
       expect(body.say).toContain('1. Solde');
+    } finally {
+      await new Promise<void>((resolve) => server.close(() => resolve()));
+    }
+  });
+
+  it('traduit les écrans ATM comme mobile/web, pas comme le dialogue local', async () => {
+    const server = createMiddlewareServer({ teamKey: DEMO_TEAM_KEY, bankUrl: 'http://127.0.0.1:1', log: () => undefined });
+    await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+    const address = server.address() as AddressInfo;
+
+    try {
+      // La sandbox envoie `strings` sur le canal ATM et attend une traduction clé par clé :
+      // renvoyer le dialogue local donne INVALID_RESPONSE (mesuré en direct le 27/11).
+      const reply = await fetch(`http://127.0.0.1:${address.port}/middleware/atm`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          channel: 'atm',
+          type: 'ui_translation',
+          screen: 'atm_menu',
+          language: 'en',
+          strings: {
+            'atm.bank': { text: 'Banque Safinum' },
+            'atm.key_withdraw': { text: 'Retrait' },
+            'atm.confirm_amount': { text: 'Montant : {amount}' },
+          },
+        }),
+      });
+      expect(reply.status).toBe(200);
+      const body = (await reply.json()) as { screen?: string; language?: string; strings?: Record<string, string> };
+      expect(body.screen).toBe('atm_menu');
+      expect(body.language).toBe('en');
+      expect(body.strings).toEqual({
+        'atm.bank': 'Safinum Bank',
+        'atm.key_withdraw': 'Withdraw',
+        'atm.confirm_amount': 'Amount: {amount}',
+      });
     } finally {
       await new Promise<void>((resolve) => server.close(() => resolve()));
     }

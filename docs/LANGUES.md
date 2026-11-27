@@ -1,7 +1,11 @@
 # Langues de la sandbox — état réel, sources, méthode
 
-> Mis à jour le 26/11/2026. Langues évaluées par la sandbox SAFINUM : `dua` Duala · `ewo` Ewondo · `bas` Basaa ·
+> Mis à jour le 27/11/2026. Langues évaluées par la sandbox SAFINUM : `dua` Duala · `ewo` Ewondo · `bas` Basaa ·
 > `bbj` Ghomala · `byv` Medumba · `fub` Fulfulde · `fr` · `en`. La langue est **tirée au sort** par le jury.
+>
+> Les cinq gabarits de packs (`dua`, `ewo`, `bas`, `bbj`, `byv`) sont rangés dans
+> [`docs/relecture/gabarits/`](relecture/gabarits/README.md) : **145 valeurs vides chacun** (89 écrans
+> + 56 phrases USSD), **0/89 écrans** remplis. Aucune valeur n'est inventée.
 
 ## 1. Ce qui compte pour la note, et ce que nous pouvons garantir
 
@@ -24,11 +28,17 @@ a de quoi la servir (USSD : catalogue complet ; écrans : ≤ 25 % de français)
 | `fr` | ✓ | ✓ | ✓ (source) | — |
 | `en` | ✓ | ✓ | ✓ 89/89 (identique au kit officiel) | kit SAFINUM |
 | `fub` Fulfulde | ✓ | ✓ (proposé) | ✓ 88/89 (proposé) | glossaire de présélection |
-| `dua` Duala | **partiel** : argent, envoyer, aider, compte, confirmer, oui, non, annuler, « à » | ✗ → `fr` déclaré | ✗ → `fr` | **Helmlinger 1972**, texte intégral (Internet Archive) ; Omniglot (présélection) |
-| `ewo` Ewondo | partiel : envoyer, frais, solde, oui, aide (proposés) | ✗ → `fr` | ✗ → `fr` | glossaire de présélection (42 entrées « proposé », sans source citée) |
-| `bbj` Ghomala | minimal : argent, envoyer, payer | ✗ → `fr` | ✗ → `fr` | *Dictionnaire Ghomálá'-Français* (PDF) : police encodée, seules les « 2e formes » en clair sont exploitables |
-| `bas` Basaa | ✗ | ✗ → `fr` | ✗ → `fr` | aucune : le dictionnaire SIL (Njock 2005) exige une connexion (HTTP 403) |
-| `byv` Medumba | ✗ | ✗ → `fr` | ✗ → `fr` | aucune : Kemelang refuse les clients automatisés (HTTP 403) |
+| `dua` Duala | **partiel** : argent, envoyer, aider, compte, confirmer, oui, non, annuler, « à » | ✗ → `fr` déclaré | **0/89** → `fr` | **Helmlinger 1972**, texte intégral (Internet Archive) ; Omniglot (présélection) |
+| `ewo` Ewondo | partiel : envoyer, frais, solde, oui, aide (proposés) | ✗ → `fr` | **0/89** → `fr` | glossaire de présélection (42 entrées « proposé », sans source citée) |
+| `bbj` Ghomala | minimal : argent, envoyer, payer | ✗ → `fr` | **0/89** → `fr` | *Dictionnaire Ghomálá'-Français* (PDF) : police encodée, seules les « 2e formes » en clair sont exploitables |
+| `bas` Basaa | ✗ | ✗ → `fr` | **0/89** → `fr` | aucune : le dictionnaire SIL (Njock 2005) exige une connexion (HTTP 403) |
+| `byv` Medumba | ✗ | ✗ → `fr` | **0/89** → `fr` | aucune : Kemelang refuse les clients automatisés (HTTP 403) |
+
+Mesuré en direct le 27/11 (`docs/preuves/ecrans-fub-2026-11-27.json`) : **88 clés sur 89** sont en
+fulfulde ; `shell.secure` reste « Connexion sécurisée » et est signalée `untranslated` sur les
+**6 écrans web** (les écrans mobile ne demandent pas cette clé). Les 11 écrans ATM sont **repliés en
+`fr`** : aucune clé `atm.*` n'existe en fub, et le repli est déclaré (`language: "fr"`), pas présenté
+comme traduit.
 
 ### Sources consultées le 26/11
 
@@ -51,9 +61,12 @@ a de quoi la servir (USSD : catalogue complet ; écrans : ≤ 25 % de français)
 1. **Comprendre** (fait en partie, à étendre) : mots attestés → `packages/core/src/lexicon/intents.lexicon.ts`,
    source en commentaire. Une forme non attestée n'y entre qu'en statut « proposé » et après un locuteur.
 2. **Répondre** : un **pack de langue** par langue, rempli par **deux locuteurs** :
-   - `pnpm --filter @nkap/gateway i18n modele` → `apps/gateway/translations/_modele.json` (89 clés d'écran,
-     56 phrases USSD, avec le français et l'anglais en regard) ;
-   - copier en `dua.json` (etc.), remplir, garder **exactement** les emplacements `{x}` ;
+   - les cinq gabarits sont déjà rangés dans [`docs/relecture/gabarits/`](relecture/gabarits/README.md)
+     (`dua`, `ewo`, `bas`, `bbj`, `byv`) : 89 clés d'écran + 56 phrases USSD, **toutes vides** ;
+   - sinon `pnpm --filter @nkap/gateway i18n modele` → `apps/gateway/translations/_modele.json` (même
+     contenu, avec le français et l'anglais en regard) ;
+   - remplir le gabarit, garder **exactement** les emplacements `{x}`, puis copier en
+     `apps/gateway/translations/<code>.json` ;
    - `pnpm --filter @nkap/gateway i18n verifier` → couverture, emplacements, 182 septets ; `pnpm test` refuse un pack cassé ;
    - redémarrer le middleware : la langue est servie dès que le pack USSD est complet, les écrans dès 75 % de clés.
 3. **Statuts** : `proposed` (un locuteur), `validated` (deux locuteurs distincts), `draft` (jamais relu). Le statut
