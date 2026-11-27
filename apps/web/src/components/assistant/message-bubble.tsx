@@ -3,10 +3,11 @@
 import { t, type ChatMessage } from '@nkap/client';
 import type { ReplyOption } from '@nkap/contracts';
 import { Mic, Volume2 } from 'lucide-react';
-import type { JSX } from 'react';
+import { useState, type JSX } from 'react';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { useNkap } from '@/lib/nkap';
-import { speak } from '@/lib/speech';
+import { speak, speechBadgeLabel, type SpeechOutput } from '@/lib/speech';
 import { cn } from '@/lib/utils';
 import { OperationCard } from './operation-card';
 import { StatusBadge } from './status-badge';
@@ -28,6 +29,8 @@ interface MessageBubbleProps {
 
 export function MessageBubble({ message, isLast, pending }: MessageBubbleProps): JSX.Element {
   const { chat } = useNkap();
+  const [speechOutput, setSpeechOutput] = useState<SpeechOutput | null>(null);
+  const speechBadge = speechBadgeLabel(speechOutput);
 
   if (message.role === 'user') {
     return (
@@ -63,11 +66,20 @@ export function MessageBubble({ message, isLast, pending }: MessageBubbleProps):
         ) : null}
         <div className="mt-3 flex items-center justify-between gap-2">
           <StatusBadge status={reply.status} fallback={reply.fallback} lang={reply.lang} />
-          <Button size="sm" variant="ghost" className="h-7 px-2 text-muted-foreground" onClick={() => speak(reply.text, reply.lang)}>
+          <Button
+            size="sm"
+            variant="ghost"
+            className="h-7 px-2 text-muted-foreground"
+            onClick={() => {
+              setSpeechOutput(null);
+              void speak(reply.text, reply.lang).then(setSpeechOutput);
+            }}
+          >
             <Volume2 />
             {t('ui.listen', reply.lang)}
           </Button>
         </div>
+        {speechBadge !== null ? <Badge variant="warning" aria-label={speechBadge}>{speechBadge}</Badge> : null}
         <TraceDetails trace={trace} lang={reply.lang} />
       </div>
     </div>

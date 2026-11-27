@@ -1,0 +1,269 @@
+# Rapport d’attestation des glossaires Ewondo et Bulu
+
+Source des formes : Leo Mendo Olame, "Soreva", 2025, CC-BY-4.0. Le split test contient 150 transcriptions ewondo. Le dataset ne fournit aucune traduction française ; aucun alignement ni aucune phrase traduite n’a été créé.
+
+## Ewondo — attestées à forme exacte (0/42)
+
+- Aucune.
+
+## Ewondo — retrouvées mais non attestées (1)
+
+- `term.name` — « Dzóé » — cm_ewo_005 — trouvée après repli des tons seulement, statut inchangé (propose)
+
+## Ewondo — non retrouvées (41)
+
+- `term.balance` — « Í mɔ̄ní á líg á ǹkɔ́p »
+- `term.money` — « Mɔ̄ní »
+- `term.amount` — « Á bím mɔ̄ní »
+- `term.fees` — « Í mɔ̄ní bá nɔ́ŋ »
+- `term.total` — « Mɔ̄ní á sə »
+- `term.beneficiary` — « Í mód á nɔ́ŋ mɔ̄ní »
+- `term.sender` — « Í mód á lóm mɔ́ni »
+- `term.phone` — « Number telefón »
+- `term.account` — « Ǹkɔ́p »
+- `term.transfer` — « Á lóm mɔ̄ní »
+- `term.send` — « Lóm »
+- `term.receive` — « Á bǐ »
+- `term.withdraw` — « Á nɔ́ŋ mɔ̄ní »
+- `term.deposit` — « Á fúd mɔ̄ní »
+- `term.pay` — « Á yánər »
+- `term.loan` — « Í kól mɔ̄ní »
+- `term.insufficient` — « Mɔ̄ní á yénə kí »
+- `term.free` — « Zízə »
+- `term.help` — « Á voílí »
+- `term.yes` — « Owé »
+- `term.no` — « Á yé »
+- `term.thanks` — « Abui ngǎŋ »
+- `term.retry` — « Á bâ bɔ̀ »
+- `term.check` — « Á bəbə̄ »
+- `ph.beneficiary_is` — « Í mód á nɔ́ŋ (á nə dzwé nâ) »
+- `ph.phone_is` — « Number telefón »
+- `ph.send_to` — « Mə lóm (mɔ̄ní) á (dzóé) »
+- `ph.received` — « Ú bí mɔ̄ní á dzóé »
+- `ph.enter_amount` — « Tílí á bím mɔ̄ní mí nə́ lóm »
+- `ph.enter_number` — « Tílí number telefón í mód é nɔ́ŋ mɔ̄ní »
+- `ui.listen` — « Á wɔ́g »
+- `ui.notes` — « Mə fəp mə mɔ̄ní, é mí sáŋ mí mɔ̄ní »
+- `guide.transfer_amount` — « Tílí á bím mɔ̄ní wē lóm »
+- `guide.transfer_number` — « Tílí number í mód é nɔ́ŋ »
+- `guide.balance` — « Á mú wǎ yən í mɔ̄ní á líg á ǹkɔ́p »
+- `ph.min_amount` — « Yá síli á bím mɔ̀ní »
+- `ph.max_amount` — « Mí ní sí kí dzǎm lód á bím mɔ̄ní dí »
+- `ph.check_before_confirm` — « Mí ní bəgə dzóé, number telefón, á bím mɔ̄ní »
+- `ph.send_to_number` — « Wé lóm mɔ̄ní á number telefón »
+- `ph.send_to_phone` — « Bé lóm mɔ̄ní á dzóé, á number telefón »
+- `ph.amount_is` — « Á bím wé lóm: Mɔ̄ní »
+
+## Clés manquantes à enregistrer au Studio de l’extension
+
+### Ewondo (87)
+
+- `cat.balance`
+- `cat.condition`
+- `cat.confirm`
+- `cat.error`
+- `cat.fees`
+- `cat.fraud`
+- `cat.info`
+- `cat.pin`
+- `cat.success`
+- `cat.transfer`
+- `cat.warning`
+- `flag.condition`
+- `flag.negation`
+- `guide.error`
+- `guide.fees`
+- `guide.security`
+- `guide.success`
+- `guide.summary`
+- `guide.transfer_check`
+- `guide.transfer_confirm`
+- `ph.account_blocked`
+- `ph.attempts_left`
+- `ph.balance_is`
+- `ph.enter_pin`
+- `ph.failed`
+- `ph.fee_applied`
+- `ph.fee_percent`
+- `ph.fee_range`
+- `ph.fees_are`
+- `ph.fraud_warning`
+- `ph.insufficient`
+- `ph.irreversible`
+- `ph.limit_exceeded`
+- `ph.network_error`
+- `ph.never_share_otp`
+- `ph.never_share_pin`
+- `ph.new_balance`
+- `ph.pending`
+- `ph.reference_is`
+- `ph.sent_success`
+- `ph.staff_never_ask`
+- `ph.success`
+- `ph.total_debit`
+- `ph.total_is`
+- `ph.welcome`
+- `ph.welcome_name`
+- `ph.wrong_pin`
+- `ph.wrong_pin_attempts`
+- `term.agent`
+- `term.airtime`
+- `term.back`
+- `term.bill`
+- `term.blocked`
+- `term.cancel`
+- `term.confirm`
+- `term.continue`
+- `term.date`
+- `term.error`
+- `term.fraud`
+- `term.history`
+- `term.home`
+- `term.interest`
+- `term.irreversible`
+- `term.limit`
+- `term.login`
+- `term.logout`
+- `term.never`
+- `term.otp`
+- `term.pending`
+- `term.pin`
+- `term.receipt`
+- `term.reference`
+- `term.savings`
+- `term.security`
+- `term.success`
+- `term.warning`
+- `term.wrong`
+- `ui.ai`
+- `ui.factsheet`
+- `ui.keywords`
+- `ui.locked_values`
+- `ui.next`
+- `ui.original`
+- `ui.scam_alert`
+- `ui.total_mismatch`
+- `ui.total_ok`
+- `ui.unvalidated`
+
+### Bulu (113)
+
+- `cat.balance`
+- `cat.condition`
+- `cat.confirm`
+- `cat.error`
+- `cat.fees`
+- `cat.fraud`
+- `cat.info`
+- `cat.pin`
+- `cat.success`
+- `cat.transfer`
+- `cat.warning`
+- `flag.condition`
+- `flag.negation`
+- `guide.balance`
+- `guide.error`
+- `guide.fees`
+- `guide.security`
+- `guide.success`
+- `guide.summary`
+- `guide.transfer_amount`
+- `guide.transfer_check`
+- `guide.transfer_confirm`
+- `guide.transfer_number`
+- `ph.account_blocked`
+- `ph.amount_is`
+- `ph.attempts_left`
+- `ph.balance_is`
+- `ph.check_before_confirm`
+- `ph.enter_amount`
+- `ph.enter_number`
+- `ph.enter_pin`
+- `ph.failed`
+- `ph.fee_applied`
+- `ph.fee_percent`
+- `ph.fee_range`
+- `ph.fees_are`
+- `ph.fraud_warning`
+- `ph.insufficient`
+- `ph.irreversible`
+- `ph.limit_exceeded`
+- `ph.max_amount`
+- `ph.min_amount`
+- `ph.network_error`
+- `ph.never_share_otp`
+- `ph.never_share_pin`
+- `ph.new_balance`
+- `ph.pending`
+- `ph.phone_is`
+- `ph.reference_is`
+- `ph.send_to_number`
+- `ph.send_to_phone`
+- `ph.sent_success`
+- `ph.staff_never_ask`
+- `ph.success`
+- `ph.total_debit`
+- `ph.total_is`
+- `ph.welcome`
+- `ph.welcome_name`
+- `ph.wrong_pin`
+- `ph.wrong_pin_attempts`
+- `term.account`
+- `term.agent`
+- `term.airtime`
+- `term.amount`
+- `term.back`
+- `term.balance`
+- `term.bill`
+- `term.blocked`
+- `term.cancel`
+- `term.check`
+- `term.confirm`
+- `term.continue`
+- `term.date`
+- `term.deposit`
+- `term.error`
+- `term.fees`
+- `term.fraud`
+- `term.free`
+- `term.help`
+- `term.history`
+- `term.home`
+- `term.interest`
+- `term.irreversible`
+- `term.limit`
+- `term.loan`
+- `term.login`
+- `term.logout`
+- `term.never`
+- `term.no`
+- `term.otp`
+- `term.phone`
+- `term.pin`
+- `term.receipt`
+- `term.reference`
+- `term.retry`
+- `term.savings`
+- `term.security`
+- `term.total`
+- `term.withdraw`
+- `term.wrong`
+- `term.yes`
+- `ui.ai`
+- `ui.factsheet`
+- `ui.keywords`
+- `ui.listen`
+- `ui.locked_values`
+- `ui.next`
+- `ui.notes`
+- `ui.original`
+- `ui.scam_alert`
+- `ui.total_mismatch`
+- `ui.total_ok`
+- `ui.unvalidated`
+
+Enregistrements à collecter auprès de locuteurs ; une entrée ne peut être marquée `validated` qu’après validation par deux locuteurs distincts.
+
+## Blocage de génération
+
+`apps/extension/glossary/bundle.js` référence `tools/build-glossary.mjs`, absent du dépôt. Le bundle et `bundle.json` n’ont pas été régénérés ni modifiés.

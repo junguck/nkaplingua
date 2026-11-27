@@ -1,6 +1,6 @@
 # Langues de la sandbox — état réel, sources, méthode
 
-> Mis à jour le 26/11/2026. Langues évaluées par la sandbox SAFINUM : `dua` Duala · `ewo` Ewondo · `bas` Basaa ·
+> Mis à jour le 27/11/2026. Langues évaluées par la sandbox SAFINUM : `dua` Duala · `ewo` Ewondo · `bas` Basaa ·
 > `bbj` Ghomala · `byv` Medumba · `fub` Fulfulde · `fr` · `en`. La langue est **tirée au sort** par le jury.
 
 ## 1. Ce qui compte pour la note, et ce que nous pouvons garantir
@@ -25,7 +25,7 @@ a de quoi la servir (USSD : catalogue complet ; écrans : ≤ 25 % de français)
 | `en` | ✓ | ✓ | ✓ 89/89 (identique au kit officiel) | kit SAFINUM |
 | `fub` Fulfulde | ✓ | ✓ (proposé) | ✓ 88/89 (proposé) | glossaire de présélection |
 | `dua` Duala | **partiel** : argent, envoyer, aider, compte, confirmer, oui, non, annuler, « à » | ✗ → `fr` déclaré | ✗ → `fr` | **Helmlinger 1972**, texte intégral (Internet Archive) ; Omniglot (présélection) |
-| `ewo` Ewondo | partiel : envoyer, frais, solde, oui, aide (proposés) | ✗ → `fr` | ✗ → `fr` | glossaire de présélection (42 entrées « proposé », sans source citée) |
+| `ewo` Ewondo | partiel : envoyer, frais, solde, oui, aide (proposés ; 1 forme retrouvée après repli des tons, aucune attestation exacte) | ✗ → `fr` | ✗ → `fr` | glossaire de présélection ; transcriptions SOREVA pour attester uniquement les formes réellement retrouvées |
 | `bbj` Ghomala | minimal : argent, envoyer, payer | ✗ → `fr` | ✗ → `fr` | *Dictionnaire Ghomálá'-Français* (PDF) : police encodée, seules les « 2e formes » en clair sont exploitables |
 | `bas` Basaa | ✗ | ✗ → `fr` | ✗ → `fr` | aucune : le dictionnaire SIL (Njock 2005) exige une connexion (HTTP 403) |
 | `byv` Medumba | ✗ | ✗ → `fr` | ✗ → `fr` | aucune : Kemelang refuse les clients automatisés (HTTP 403) |
@@ -45,8 +45,26 @@ a de quoi la servir (USSD : catalogue complet ; écrans : ≤ 25 % de français)
 - **Non accessibles** : SIL (basaa), Kemelang (ghomala, medumba), Omniglot (refuse les robots — pas de contournement).
   Références imprimées à consulter sur place : Njock (2005, basaa, ~16 000 entrées), Domche-Téko (2012, ghomala, éd. CLÉ),
   Tsala (1958) et Atangana Ondigui (2007, ewondo), Ittmann (1976, duala).
+- **Ewondo — SOREVA** : Leo Mendo Olame (2025), *Soreva: Small Out-of-domain Resource for Various African languages*,
+  configuration `ewo_cm`, split `test`, licence CC-BY-4.0. Les transcriptions servent seulement à attester une forme
+  lexicale qui y apparaît ; elles ne contiennent pas de traduction française. L’audio n’est pas copié dans le dépôt.
+  Le split exporté contient 150 transcriptions : une forme du glossaire (sur 42) est retrouvée après repli des tons,
+  mais aucune n’apparaît sous sa forme exacte et n’est donc passée à `attested`; 41 formes ne sont pas retrouvées.
+  Aucun échantillon de Bulu n’est listé par la fiche/configuration du dataset.
+- **Bulu — source possible** : Common Voice Scripted Speech 27.0, Bulu, CC0. Source à vérifier et à utiliser seulement
+  pour recueillir des formes auprès de locuteurs ; la redistribution de l’audio Common Voice est interdite. Aucune
+  entrée Bulu n’est ajoutée à partir de cette source.
 
-## 3. Méthode pour « faire toutes les langues » proprement
+## 3. Assistant vocal ewondo / bulu
+
+Le contrat indique `asrMode` et `ttsMode` serveur pour `ewo` et `bul`. Le gateway ne charge aucun modèle :
+il relaie les appels vers `services/speech/`, désactivé par défaut. Les transcriptions et la synthèse sont des sorties
+machine ; la voix synthétique porte le statut **brouillon** et ne constitue jamais une traduction validée.
+`facebook/mms-1b-all` utilise ses adaptateurs `ewo` et `bum`; les modèles MMS d’origine sont sous CC-BY-NC-4.0.
+Vérifier la licence de chaque checkpoint et de chaque adaptateur avant tout usage commercial. La politique de
+l’extension reste inchangée : un enregistrement humain validé est prioritaire sur toute synthèse.
+
+## 4. Méthode pour « faire toutes les langues » proprement
 
 1. **Comprendre** (fait en partie, à étendre) : mots attestés → `packages/core/src/lexicon/intents.lexicon.ts`,
    source en commentaire. Une forme non attestée n'y entre qu'en statut « proposé » et après un locuteur.

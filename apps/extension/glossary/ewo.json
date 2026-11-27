@@ -7,7 +7,9 @@
   "tts": "fr-FR",
   "status_note": "Traductions à relire et valider par des locuteurs natifs.",
   "default_status": "propose",
-  "sources": [],
+  "sources": [
+    "Leo Mendo Olame, \"Soreva\", 2025, CC-BY-4.0"
+  ],
   "entries": {
     "term.balance": {
       "t": "Í mɔ̄ní á líg á ǹkɔ́p",
@@ -83,7 +85,8 @@
     },
     "term.name": {
       "t": "Dzóé",
-      "s": "propose"
+      "s": "propose",
+      "src": "soreva (CC-BY-4.0) cm_ewo_005"
     },
     "term.help": {
       "t": "Á voílí",

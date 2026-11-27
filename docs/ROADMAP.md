@@ -44,6 +44,7 @@ Ce qui est livré est décrit dans le [README](../README.md) et les [ADR](adr/) 
 | Liste blanche de la bulle : identifiants réels des applis MoMo / Orange Money | Relevés sur l'appareil (`adb shell pm list packages`), jamais devinés |
 | GAB simulé : retrait avec le code obtenu sur mobile | |
 | Entrée vocale pidgin (STT `en-NG`) dans web et mobile | |
+| **Assistant vocal Ewondo / Bulu** : STT/TTS serveur, voix synthétique toujours `draft` | Prototype sur la branche `feat/voix-ewo-bul`. Reste P2 : ne pas activer pour l’évaluation avant les packs de langue relus par deux locuteurs et la validation de la clé sandbox ; vérifier les licences MMS, les modèles ne traduisent pas. |
 | Widget embarquable `<script src=…/nkap-widget.js>` | |
 | Glossaire haoussa : relecture + phrases `ph.*` | 65 entrées « proposées » issues d'audio transcrit |
 

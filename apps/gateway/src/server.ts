@@ -16,15 +16,18 @@ import type { AddressInfo } from 'node:net';
 import { Gateway } from './gateway.js';
 import { statusModeFrom, type InboundTurn, type StatusMode } from '@nkap/safinum';
 import { loadEnv } from './env.js';
+import { isSpeechLanguage, SpeechBackendError, speechBackendFromEnv, type SpeechBackend } from './speech-backend.js';
 
 loadEnv();
 
 const MAX_BODY_BYTES = 512 * 1024;
+const MAX_SPEECH_BYTES = 20 * 1024 * 1024;
 
 export interface ServerOptions {
   readonly teamKey: string;
   readonly bankUrl: string;
   readonly statusMode?: StatusMode;
+  readonly speechBackend?: SpeechBackend;
   readonly log?: (line: string) => void;
 }
 
@@ -35,11 +38,49 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
     ...(options.statusMode === undefined ? {} : { statusMode: options.statusMode }),
   });
   const log = options.log ?? ((line: string) => console.log(line));
+  const speechBackend = options.speechBackend ?? speechBackendFromEnv();
 
   return http.createServer((req, res) => {
     void (async () => {
       const started = Date.now();
       const url = new URL(req.url ?? '/', 'http://127.0.0.1');
+
+      if (req.method === 'POST' && url.pathname === '/v1/stt') {
+        const lang = url.searchParams.get('lang');
+        if (!isSpeechLanguage(lang)) return json(res, 400, { error: 'lang doit être ewo ou bul' });
+        const contentType = req.headers['content-type'] ?? '';
+        if (!contentType.startsWith('audio/') && contentType !== 'application/octet-stream') {
+          return json(res, 415, { error: 'Audio requis' });
+        }
+        try {
+          const audio = await readBuffer(req, MAX_SPEECH_BYTES);
+          if (audio.length === 0) return json(res, 400, { error: 'Audio vide' });
+          return json(res, 200, await speechBackend.transcribe(audio, lang, contentType));
+        } catch (error) {
+          return speechError(res, error, log);
+        }
+      }
+
+      if (req.method === 'POST' && url.pathname === '/v1/tts') {
+        let body: unknown;
+        try {
+          body = await readUnknownJson(req);
+        } catch {
+          return json(res, 400, { error: 'JSON invalide' });
+        }
+        if (!isTtsRequest(body)) return json(res, 400, { error: 'text et lang (ewo ou bul) requis' });
+        try {
+          const audio = await speechBackend.synthesize(body.text, body.lang);
+          res.writeHead(200, {
+            'Content-Type': 'audio/wav',
+            'Content-Length': audio.length,
+            'X-Translation-Status': 'draft',
+          });
+          return res.end(audio);
+        } catch (error) {
+          return speechError(res, error, log);
+        }
+      }
 
       // Console de test : la même page sert de simulateur USSD / mobile / web en local.
       if (req.method === 'GET' && (url.pathname === '/console' || url.pathname === '/console/')) {
@@ -120,6 +161,10 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
 }
 
 function readJson(req: http.IncomingMessage): Promise<InboundTurn> {
+  return readUnknownJson(req).then((body) => body as InboundTurn);
+}
+
+function readUnknownJson(req: http.IncomingMessage): Promise<unknown> {
   return new Promise((resolve, reject) => {
     let raw = '';
     let size = 0;
@@ -134,13 +179,50 @@ function readJson(req: http.IncomingMessage): Promise<InboundTurn> {
     });
     req.on('end', () => {
       try {
-        resolve(raw ? (JSON.parse(raw) as InboundTurn) : {});
+        resolve(raw ? JSON.parse(raw) as unknown : {});
       } catch {
         reject(new Error('JSON invalide'));
       }
     });
     req.on('error', reject);
   });
+}
+
+function readBuffer(req: http.IncomingMessage, maxBytes: number): Promise<Buffer> {
+  return new Promise((resolve, reject) => {
+    const chunks: Buffer[] = [];
+    let size = 0;
+    let tooLarge = false;
+    req.on('data', (chunk: Buffer) => {
+      if (tooLarge) return;
+      size += chunk.length;
+      if (size > maxBytes) {
+        tooLarge = true;
+        chunks.length = 0;
+        return;
+      }
+      chunks.push(chunk);
+    });
+    req.on('end', () => {
+      if (tooLarge) reject(new Error('TOO_LARGE'));
+      else resolve(Buffer.concat(chunks));
+    });
+    req.on('error', reject);
+  });
+}
+
+function isTtsRequest(value: unknown): value is { readonly text: string; readonly lang: 'ewo' | 'bul' } {
+  if (typeof value !== 'object' || value === null) return false;
+  const request = value as Record<string, unknown>;
+  return typeof request.text === 'string' && request.text.trim().length > 0 && isSpeechLanguage(request.lang);
+}
+
+function speechError(res: http.ServerResponse, error: unknown, log: (line: string) => void): void {
+  if (error instanceof SpeechBackendError) return json(res, error.status, { error: error.message });
+  if (error instanceof Error && error.message === 'TOO_LARGE') return json(res, 413, { error: 'Audio trop volumineux' });
+  const message = error instanceof Error ? error.message : String(error);
+  log(`ERREUR speech ${message}`);
+  return json(res, 502, { error: 'Service vocal indisponible' });
 }
 
 /** En-tête `X-Trace-Id` d'abord (kit officiel), `trace_id` du corps en repli. */

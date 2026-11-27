@@ -18,6 +18,9 @@ export const UI_TEXT = {
   'ui.listen': { fr: 'Écouter', en: 'Listen', fub: 'Nan', wes: 'Hear am' },
   'ui.help': { fr: 'Aide', en: 'Help', fub: 'Wallu', wes: 'Hep' },
   'ui.placeholder': { fr: 'Écrivez ou parlez à l’assistant…', en: 'Type or talk to the assistant…' },
+  'ui.voice.review': { fr: 'Texte reconnu — vérifiez-le avant l’envoi.', en: 'Recognized text — review it before sending.' },
+  'ui.voice.confirm': { fr: 'Confirmer le texte', en: 'Confirm text' },
+  'ui.voice.edit': { fr: 'Modifier', en: 'Edit' },
   'ui.mic': { fr: 'Parler', en: 'Speak' },
   'ui.mic.unavailable': {
     fr: 'Aucune reconnaissance vocale n’existe pour cette langue : écrivez, ou utilisez les boutons.',

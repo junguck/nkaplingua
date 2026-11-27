@@ -25,21 +25,23 @@ export interface LanguageInfo {
   readonly ttsLocale: string;
   /** Locale de reconnaissance vocale utilisable, ou null si aucune n'existe. */
   readonly sttLocale: string | null;
+  readonly asrMode: 'device' | 'server' | null;
+  readonly ttsMode: 'device' | 'server' | null;
 }
 
 export const LANGUAGE_INFO: Readonly<Record<LanguageCode, LanguageInfo>> = {
-  fr: { code: 'fr', name: 'Français', nativeName: 'Français', isNational: false, ttsLocale: 'fr-FR', sttLocale: 'fr-FR' },
-  en: { code: 'en', name: 'Anglais', nativeName: 'English', isNational: false, ttsLocale: 'en-GB', sttLocale: 'en-GB' },
-  fub: { code: 'fub', name: 'Fulfulde (Adamaoua)', nativeName: 'Fulfulde', isNational: true, ttsLocale: 'fr-FR', sttLocale: null },
-  wes: { code: 'wes', name: 'Pidgin camerounais', nativeName: 'Kamtok', isNational: true, ttsLocale: 'en-GB', sttLocale: 'en-NG' },
-  ewo: { code: 'ewo', name: 'Ewondo', nativeName: 'Ewondo', isNational: true, ttsLocale: 'fr-FR', sttLocale: null },
-  bul: { code: 'bul', name: 'Bulu', nativeName: 'Bulu', isNational: true, ttsLocale: 'fr-FR', sttLocale: null },
-  hau: { code: 'hau', name: 'Haoussa', nativeName: 'Hausa', isNational: true, ttsLocale: 'fr-FR', sttLocale: null },
+  fr: { code: 'fr', name: 'Français', nativeName: 'Français', isNational: false, ttsLocale: 'fr-FR', sttLocale: 'fr-FR', asrMode: 'device', ttsMode: 'device' },
+  en: { code: 'en', name: 'Anglais', nativeName: 'English', isNational: false, ttsLocale: 'en-GB', sttLocale: 'en-GB', asrMode: 'device', ttsMode: 'device' },
+  fub: { code: 'fub', name: 'Fulfulde (Adamaoua)', nativeName: 'Fulfulde', isNational: true, ttsLocale: 'fr-FR', sttLocale: null, asrMode: null, ttsMode: null },
+  wes: { code: 'wes', name: 'Pidgin camerounais', nativeName: 'Kamtok', isNational: true, ttsLocale: 'en-GB', sttLocale: 'en-NG', asrMode: 'device', ttsMode: 'device' },
+  ewo: { code: 'ewo', name: 'Ewondo', nativeName: 'Ewondo', isNational: true, ttsLocale: 'fr-FR', sttLocale: null, asrMode: 'server', ttsMode: 'server' },
+  bul: { code: 'bul', name: 'Bulu', nativeName: 'Bulu', isNational: true, ttsLocale: 'fr-FR', sttLocale: null, asrMode: 'server', ttsMode: 'server' },
+  hau: { code: 'hau', name: 'Haoussa', nativeName: 'Hausa', isNational: true, ttsLocale: 'fr-FR', sttLocale: null, asrMode: null, ttsMode: null },
   // Noms natifs : ceux de la documentation de la sandbox SAFINUM.
-  dua: { code: 'dua', name: 'Duala', nativeName: 'Duálá', isNational: true, ttsLocale: 'fr-FR', sttLocale: null },
-  bas: { code: 'bas', name: 'Basaa', nativeName: 'Ɓasaá', isNational: true, ttsLocale: 'fr-FR', sttLocale: null },
-  bbj: { code: 'bbj', name: 'Ghomala', nativeName: 'Ghɔmálá', isNational: true, ttsLocale: 'fr-FR', sttLocale: null },
-  byv: { code: 'byv', name: 'Medumba', nativeName: 'Mə̀dûmbà', isNational: true, ttsLocale: 'fr-FR', sttLocale: null },
+  dua: { code: 'dua', name: 'Duala', nativeName: 'Duálá', isNational: true, ttsLocale: 'fr-FR', sttLocale: null, asrMode: null, ttsMode: null },
+  bas: { code: 'bas', name: 'Basaa', nativeName: 'Ɓasaá', isNational: true, ttsLocale: 'fr-FR', sttLocale: null, asrMode: null, ttsMode: null },
+  bbj: { code: 'bbj', name: 'Ghomala', nativeName: 'Ghɔmálá', isNational: true, ttsLocale: 'fr-FR', sttLocale: null, asrMode: null, ttsMode: null },
+  byv: { code: 'byv', name: 'Medumba', nativeName: 'Mə̀dûmbà', isNational: true, ttsLocale: 'fr-FR', sttLocale: null, asrMode: null, ttsMode: null },
 };
 
 export function isLanguageCode(value: string): value is LanguageCode {
