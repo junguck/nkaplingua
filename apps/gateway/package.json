@@ -1,0 +1,29 @@
+{
+  "name": "@nkap/gateway",
+  "version": "2.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Middleware SAFINUM : reçoit les tours de la passerelle (USSD, mobile, web), parle à l'API bancaire avec X-Team-Key et X-Trace-Id, et répond au format du contrat.",
+  "main": "./dist/server.js",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json",
+    "build": "node scripts/build.mjs",
+    "start": "node dist/server.js",
+    "demo": "node dist/demo/server.js",
+    "dev": "pnpm build && node dist/server.js",
+    "i18n": "node scripts/i18n.mjs",
+    "lang": "node scripts/lang.mjs",
+    "tunnel": "node scripts/tunnel-stable.mjs",
+    "tunnel:named": "node scripts/tunnel-named.mjs",
+    "tts": "node scripts/tts.mjs"
+  },
+  "dependencies": {
+    "@nkap/contracts": "workspace:*",
+    "@nkap/core": "workspace:*",
+    "@nkap/safinum": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "22.20.5",
+    "esbuild": "0.28.2"
+  }
+}

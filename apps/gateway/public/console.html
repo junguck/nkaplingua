@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NkapLingua · middleware SAFINUM — console de test</title>
+<style>
+  :root {
+    --bg: #0b0f14;
+    --panel: #121821;
+    --panel-2: #172029;
+    --line: #243040;
+    --text: #e8eef6;
+    --muted: #8fa1b6;
+    --accent: #f0b429;
+    --accent-2: #2f9e77;
+    --danger: #d9584a;
+    --mono: ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  /* Un display explicite (.cards, .grid…) écrase l'attribut `hidden` : on le force ici. */
+  [hidden] { display: none !important; }
+  body {
+    margin: 0; background: radial-gradient(1200px 600px at 20% -10%, #16202b, var(--bg));
+    color: var(--text); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
+  header {
+    display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between;
+    padding: 16px 22px; border-bottom: 1px solid var(--line); background: #0e1a24cc; position: sticky; top: 0; backdrop-filter: blur(6px);
+  }
+  h1 { font-size: 16px; margin: 0; letter-spacing: .2px; }
+  h1 span { color: var(--accent); }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip {
+    font: 12px/1 var(--mono); padding: 6px 9px; border-radius: 999px;
+    border: 1px solid var(--line); background: var(--panel); color: var(--muted);
+  }
+  .chip.ok { color: #8fe3c1; border-color: #2f9e7755; background: #2f9e771a; }
+  main { display: grid; grid-template-columns: minmax(320px, 430px) 1fr; gap: 18px; padding: 18px 22px 30px; align-items: start; }
+  @media (max-width: 900px) { main { grid-template-columns: 1fr; } }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+  .panel h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .12em; color: var(--muted); margin: 0; padding: 12px 14px; border-bottom: 1px solid var(--line); background: var(--panel-2); }
+  .panel .body { padding: 14px; }
+  .tabs { display: flex; gap: 6px; padding: 12px 12px 0; }
+  .tab {
+    flex: 1; padding: 8px 6px; border-radius: 9px 9px 0 0; border: 1px solid var(--line); border-bottom: none;
+    background: #0f151d; color: var(--muted); cursor: pointer; font-size: 13px;
+  }
+  .tab[aria-selected="true"] { background: var(--panel); color: var(--text); border-color: #33475e; }
+  .phone {
+    margin: 12px; border: 1px solid #33475e; border-radius: 16px; background: #0a1017; overflow: hidden;
+  }
+  .phone-head { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; font: 11px/1 var(--mono); color: var(--muted); border-bottom: 1px solid #1d2836; }
+  .screen {
+    min-height: 190px; padding: 14px; font: 14px/1.45 var(--mono); white-space: pre-wrap; color: #d8e6f2;
+    background: repeating-linear-gradient(#0a1017, #0a1017 28px, #0c131b 28px, #0c131b 29px);
+  }
+  .screen .label { color: var(--accent); }
+  .keypad { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 10px 12px 14px; }
+  .keypad button, .btn {
+    border: 1px solid #2b3a4d; background: #131c26; color: var(--text); border-radius: 9px;
+    padding: 10px 8px; font: 14px/1 var(--mono); cursor: pointer;
+  }
+  .keypad button:hover, .btn:hover { background: #1a2634; }
+  .btn.primary { background: var(--accent); color: #201a08; border-color: #d9a01f; font-weight: 600; }
+  .btn.primary:hover { background: #ffc94a; }
+  .btn.ghost { background: transparent; color: var(--muted); }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  input[type=text], select {
+    background: #0c131b; border: 1px solid #2b3a4d; color: var(--text); border-radius: 9px;
+    padding: 9px 10px; font: 14px/1 var(--mono); min-width: 0;
+  }
+  input[type=text] { flex: 1; }
+  .hint { color: var(--muted); font-size: 12px; }
+  .results { display: grid; gap: 10px; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin-bottom: 12px; }
+  .kpi { border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px; background: var(--panel-2); }
+  .kpi b { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 500; }
+  .kpi span { font: 13px/1.3 var(--mono); }
+  .kpi.good span { color: #8fe3c1; }
+  .kpi.warn span { color: var(--accent); }
+  .kpi.bad span { color: #ff9a8d; }
+  pre {
+    margin: 0; background: #0a1017; border: 1px solid #1d2836; border-radius: 10px; padding: 12px;
+    font: 12px/1.5 var(--mono); color: #bcd3e8; overflow: auto; max-height: 300px;
+  }
+  .log { display: grid; gap: 6px; max-height: 240px; overflow: auto; }
+  .log div { font: 12px/1.4 var(--mono); color: var(--muted); border-left: 2px solid #2b3a4d; padding-left: 8px; }
+  .log div.err { color: #ff9a8d; border-color: var(--danger); }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+  .card { border: 1px solid var(--line); border-radius: 10px; padding: 9px 10px; background: var(--panel-2); }
+  .card b { display: block; font: 10px/1.4 var(--mono); color: var(--muted); }
+  .card span { font-size: 14px; }
+  .scenarios { display: grid; gap: 8px; }
+  .sep { height: 1px; background: var(--line); margin: 12px 0; }
+  footer { padding: 0 22px 24px; color: var(--muted); font-size: 12px; }
+  code { font-family: var(--mono); color: #cfe3f5; }
+</style>
+</head>
+<body>
+<header>
+  <h1>NkapLingua <span>·</span> middleware SAFINUM — console de test</h1>
+  <div class="chips">
+    <span class="chip" id="health">vérification…</span>
+    <span class="chip">tours envoyés : <b id="count">0</b></span>
+  </div>
+</header>
+
+<main>
+  <section class="panel">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-channel="ussd" aria-selected="true">USSD</button>
+      <button class="tab" role="tab" data-channel="mobile" aria-selected="false">Mobile</button>
+      <button class="tab" role="tab" data-channel="web" aria-selected="false">Web</button>
+      <button class="tab" role="tab" data-channel="ivr" aria-selected="false">IVR</button>
+      <button class="tab" role="tab" data-channel="atm" aria-selected="false">ATM</button>
+    </div>
+
+    <div class="phone">
+      <div class="phone-head"><span id="phone-label">*123# · 237 699 000 003</span><span id="lang-label">fr</span></div>
+      <div class="screen" id="screen">Safinum. Choisissez:
+1. Mon solde
+2. Envoyer de l'argent
+3. Frais
+4. Historique
+5. Acheter du credit
+6. Payer une facture
+7. Aide
+8. Langue</div>
+      <div class="keypad" id="keypad">
+        <button data-key="1">1</button><button data-key="2">2</button><button data-key="3">3</button>
+        <button data-key="4">4</button><button data-key="5">5</button><button data-key="6">6</button>
+        <button data-key="7">7</button><button data-key="8">8</button><button data-key="9">9</button>
+        <button data-key="*">*</button><button data-key="0">0</button><button data-key="#">#</button>
+      </div>
+      <div class="body" style="padding-top:0">
+        <div class="row">
+          <input type="text" id="input" placeholder="saisie (ex. 690000002, 5000)" autocomplete="off">
+          <button class="btn primary" id="send">Envoyer</button>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <select id="language">
+            <option value="">langue : auto (null)</option>
+            <option value="fr">fr</option>
+            <option value="en">en</option>
+            <option value="fub">fub</option>
+            <option value="dua">dua (non couverte → repli fr)</option>
+          </select>
+          <button class="btn ghost" id="reset">Nouvelle session</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="body">
+      <div class="scenarios">
+        <button class="btn" id="sc-transfer">Scénario transfert : 2 → 690000002 → 5 000 → 1</button>
+        <button class="btn" id="sc-balance">Scénario solde (1)</button>
+        <button class="btn" id="sc-airtime">Scénario crédit : 5 → 1 → 1 000 → 1</button>
+      </div>
+      <p class="hint" id="scenario-status" style="margin:10px 0 0"></p>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Réponse du middleware</h2>
+    <div class="body results">
+      <div class="kpis">
+        <div class="kpi"><b>intention</b><span id="k-intent">—</span></div>
+        <div class="kpi"><b>transaction</b><span id="k-tx">—</span></div>
+        <div class="kpi"><b>langue</b><span id="k-lang">—</span></div>
+        <div class="kpi" id="k-lang-status-box"><b>statut langue</b><span id="k-lang-status">—</span></div>
+        <div class="kpi" id="k-lang-fallback-box"><b>repli</b><span id="k-lang-fallback">—</span></div>
+        <div class="kpi" id="k-septets-box"><b>septets GSM-7</b><span id="k-septets">—</span></div>
+      </div>
+      <pre id="json">{ "response": { … }, "interpretation": { … }, "transaction": { … } }</pre>
+      <div id="ui-cards" class="cards" hidden></div>
+      <div class="sep"></div>
+      <div class="row" style="justify-content:space-between">
+        <span class="hint" id="end-hint">—</span>
+        <button class="btn ghost" id="clear-log">Vider le journal</button>
+      </div>
+      <div class="log" id="log"></div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  Console locale : <code>fetch('/middleware/:channel')</code> → middleware → API bancaire (banque de démonstration).
+  Aucune donnée réelle ; la clé d'équipe reste côté serveur.
+</footer>
+
+<script>
+  const state = { channel: 'ussd', session: newSession(), turns: 0, language: '', catalog: [] };
+  const $ = (id) => document.getElementById(id);
+
+  function newSession() {
+    return 'console-' + Math.random().toString(36).slice(2, 8);
+  }
+
+  const BASIC = new Set([...('@£$¥èéùìòÇ\nØø\rÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉ !"#¤%&\'()*+,-./0123456789:;<=>?' +
+    '¡ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÑÜ§¿abcdefghijklmnopqrstuvwxyzäöñüà')]);
+  const EXT = new Set([...('^{}\\[~]|€\f')]);
+
+  function gsm7(text) {
+    let septets = 0;
+    let valid = true;
+    for (const ch of text) {
+      if (BASIC.has(ch)) septets += 1;
+      else if (EXT.has(ch)) septets += 2;
+      else valid = false;
+    }
+    return { septets, valid };
+  }
+
+  function setChannel(channel) {
+    state.channel = channel;
+    document.querySelectorAll('.tab').forEach((tab) =>
+      tab.setAttribute('aria-selected', String(tab.dataset.channel === channel)));
+    const local = channel === 'ivr' || channel === 'atm';
+    $('keypad').style.display = channel === 'ussd' || local ? 'grid' : 'none';
+    $('sc-transfer').style.display = channel === 'ussd' ? 'block' : 'none';
+    $('sc-balance').style.display = channel === 'ussd' ? 'block' : 'none';
+    $('sc-airtime').style.display = channel === 'ussd' ? 'block' : 'none';
+    $('phone-label').textContent =
+      channel === 'ussd' ? '*123# · 237 699 000 003' :
+      channel === 'ivr' ? 'appel · 237 699 000 003' :
+      channel === 'atm' ? 'carte · 237 699 000 003' : channel + ' · écran';
+    $('screen').textContent = channel === 'ussd'
+      ? 'Safinum. Choisissez:\n1. Mon solde\n2. Envoyer de l\'argent\n3. Frais\n4. Historique\n5. Acheter du credit\n6. Payer une facture\n7. Aide\n8. Langue'
+      : channel === 'ivr'
+        ? 'Appel entrant. Envoyez une saisie vide pour écouter le menu DTMF.'
+        : channel === 'atm'
+          ? 'Carte insérée. Envoyez une saisie vide pour démarrer (code 1234).'
+          : 'Écran d’accueil de la banque.\nCliquez sur « Envoyer » pour demander la traduction des chaînes.';
+    state.session = newSession();
+  }
+
+  async function send(text) {
+    if (state.channel === 'ivr') return sendIvr(text);
+    if (state.channel === 'atm') return sendAtm(text);
+    if (state.channel !== 'ussd') return sendUi();
+    const body = {
+      trace_id: 'console-' + Date.now().toString(36),
+      team_id: 'nkaplingua',
+      channel: 'ussd',
+      session_id: state.session,
+      phone: '237699000003',
+      language: state.language || null,
+      input: { type: 'menu', text, ussd_text: text },
+      constraints: { max_chars: 182, charset: 'gsm7', mode: 'menu', timeout_ms: 3000 },
+    };
+    await post('/middleware/ussd', body, text);
+  }
+
+  // Canaux locaux (hors contrat SAFINUM) : DTMF uniquement, donc la même saisie qu'à l'USSD.
+  async function sendIvr(text) {
+    await post('/ivr', {
+      call_id: state.session,
+      phone: '237699000003',
+      language: state.language || null,
+      input: { digits: text }
+    }, text);
+  }
+
+  async function sendAtm(text) {
+    await post('/atm', {
+      session_id: state.session,
+      card: '237699000003',
+      language: state.language || null,
+      input: { digits: text }
+    }, text);
+  }
+
+  async function sendUi() {
+    const body = {
+      trace_id: 'console-ui-' + Date.now().toString(36),
+      team_id: 'nkaplingua',
+      channel: state.channel,
+      type: 'ui_translation',
+      session_id: state.session,
+      phone: '237699000003',
+      language: state.language || 'fub',
+      constraints: { max_chars: null, charset: 'utf8', mode: 'ui_translation', timeout_ms: 10000 },
+      source_language: 'fr',
+      screen: 'home',
+      strings: {
+        'nav.home': { text: 'Accueil', context: 'Onglet', max_chars: 12 },
+        'nav.transfer': { text: 'Envoyer', context: 'Onglet', max_chars: 12 },
+        'nav.history': { text: 'Historique', context: 'Onglet', max_chars: 12 },
+        'shell.greeting': { text: 'Bonjour {name}', max_chars: null },
+        'home.balance_label': { text: 'Solde disponible', max_chars: null },
+        'home.quick_actions': { text: 'Que voulez-vous faire ?', max_chars: null },
+        'home.action_transfer': { text: 'Envoyer de l’argent', max_chars: 28 },
+        'home.action_bill': { text: 'Payer une facture', max_chars: 28 },
+        'common.cancel': { text: 'Annuler', max_chars: 20 },
+        'common.loading': { text: 'Chargement', max_chars: null }
+      }
+    };
+    await post('/middleware/' + state.channel, body, body.language);
+  }
+
+  async function post(url, body, label) {
+    try {
+      const started = performance.now();
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const ms = Math.round(performance.now() - started);
+      const json = await response.json();
+      state.turns += 1;
+      $('count').textContent = String(state.turns);
+      render(json, ms, response.status, label);
+    } catch (error) {
+      log('erreur réseau : ' + error.message, true);
+    }
+  }
+
+  function render(json, ms, status, label) {
+    $('json').textContent = JSON.stringify(json, null, 2);
+
+    if (json.channel === 'ivr' || json.channel === 'atm') {
+      const voiced = json.channel === 'ivr';
+      const text = voiced ? json.say || '' : json.screen || '';
+      $('ui-cards').hidden = true;
+      $('screen').textContent = text;
+      $('k-intent').textContent = voiced ? 'IVR (DTMF)' : 'ATM (local)';
+      $('k-tx').textContent = json.receipt ? json.receipt.kind : 'none';
+      showLanguage(json.language);
+      const measure = gsm7(text);
+      $('k-septets').textContent = measure.septets + ' / 182' + (measure.valid ? ' · GSM-7' : ' · HORS GSM-7');
+      $('k-septets-box').className = 'kpi ' + (!measure.valid || measure.septets > 182 ? 'bad' : 'good');
+      $('end-hint').textContent = (json.end ? (voiced ? 'appel terminé' : 'carte rendue') : 'saisie attendue : ' +
+        (json.gather ? json.gather.type : json.state.step)) + ' · HTTP ' + status + ' · ' + ms + ' ms';
+      log((voiced ? 'IVR « ' : 'ATM « ') + (label || '∅') + ' » → ' + json.state.step + ' · ' + (json.end ? 'fin' : 'suite') + ' · ' + ms + ' ms');
+      return;
+    }
+
+    if (json.strings) {
+      $('k-intent').textContent = 'UI_TRANSLATION';
+      $('k-tx').textContent = 'none';
+      showLanguage(json.language);
+      $('k-septets').textContent = '—';
+      $('k-septets-box').className = 'kpi';
+      $('end-hint').textContent = Object.keys(json.strings).length + ' chaînes · HTTP ' + status + ' · ' + ms + ' ms';
+      const cards = $('ui-cards');
+      cards.hidden = false;
+      cards.innerHTML = Object.entries(json.strings)
+        .map(([key, value]) => '<div class="card"><b>' + key + '</b><span>' + escapeHtml(value) + '</span></div>')
+        .join('');
+      $('screen').textContent = Object.values(json.strings).slice(0, 8).join('\n');
+      log(label + ' → ' + json.language + ' · ' + Object.keys(json.strings).length + ' chaînes · ' + ms + ' ms');
+      return;
+    }
+
+    $('ui-cards').hidden = true;
+    const intent = json.interpretation?.intent ?? '—';
+    const tx = json.transaction ?? { id: null, status: 'none' };
+    const text = json.response?.text ?? '';
+    const measure = gsm7(text);
+
+    $('screen').textContent = text;
+    $('k-intent').textContent = intent;
+    $('k-tx').textContent = tx.status + (tx.id ? ' · ' + tx.id : '');
+    if (json.interpretation?.language) showLanguage(json.interpretation.language);
+    $('k-septets').textContent = measure.septets + ' / 182' + (measure.valid ? ' · GSM-7' : ' · HORS GSM-7');
+    $('k-septets-box').className = 'kpi ' + (!measure.valid || measure.septets > 182 ? 'bad' : measure.septets > 160 ? 'warn' : 'good');
+    $('end-hint').textContent = (json.response?.end_session ? 'session terminée' : 'session ouverte') + ' · HTTP ' + status + ' · ' + ms + ' ms';
+
+    log('« ' + (label || '∅') + ' » → ' + intent + ' · ' + tx.status + (tx.id ? ' ' + tx.id : '') + ' · ' + measure.septets + ' septets · ' + ms + ' ms');
+  }
+
+  function langInfo(code) {
+    return state.catalog.find((entry) => entry.code === code) || null;
+  }
+
+  // Langue réellement servie, son statut de traduction et le repli éventuel : lisible d'un coup d'œil
+  // par le jury. Une langue sans catalogue USSD complet est déclarée en repli français, jamais masquée.
+  function showLanguage(replyLang) {
+    const info = langInfo(replyLang);
+    const served = info === null ? true : info.ussd === 'servi';
+    $('k-lang').textContent = replyLang + (info === null ? '' : ' · ' + info.nom + ' · ' + info.pack);
+    $('k-lang-status').textContent = info === null ? '—' : served ? 'servie' : 'repli français';
+    $('k-lang-status-box').className = 'kpi ' + (served ? 'good' : 'warn');
+    const asked = state.language || null;
+    $('k-lang-fallback').textContent = asked !== null && asked !== replyLang ? 'fr (demandé : ' + asked + ')' : 'aucun';
+    $('k-lang-fallback-box').className = 'kpi ' + (asked !== null && asked !== replyLang ? 'warn' : 'good');
+  }
+
+  async function loadCatalog() {
+    try {
+      const response = await fetch('/langues');
+      const json = await response.json();
+      state.catalog = json.languages || [];
+      const options = state.catalog
+        .map((entry) => '<option value="' + entry.code + '">' + entry.code + ' — ' + entry.nom +
+          (entry.ussd === 'servi' ? '' : ' (pack ' + entry.pack + ' → repli fr)') + '</option>')
+        .join('');
+      $('language').innerHTML = '<option value="">langue : auto (null)</option>' + options;
+      const base = json.wordBase || {};
+      log('langues : ' + state.catalog.map((entry) => entry.code + '=' + entry.ussd).join(', '));
+      log('base de mots : ' + (base.ok ? (base.words || 0) + ' indice(s) depuis ' + base.file : 'IGNORÉE — ' + (base.problems || []).join('; ')), base.ok === false);
+    } catch (error) {
+      log('catalogue des langues indisponible : ' + error.message, true);
+    }
+  }
+
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  }
+
+  function log(line, isError) {
+    const entry = document.createElement('div');
+    if (isError) entry.className = 'err';
+    entry.textContent = line;
+    $('log').prepend(entry);
+  }
+
+  document.querySelectorAll('.tab').forEach((tab) =>
+    tab.addEventListener('click', () => setChannel(tab.dataset.channel)));
+
+  $('keypad').addEventListener('click', (event) => {
+    const key = event.target.dataset?.key;
+    if (!key) return;
+    $('input').value += key;
+    $('input').focus();
+  });
+
+  $('send').addEventListener('click', () => {
+    const value = $('input').value.trim();
+    $('input').value = '';
+    void send(value);
+  });
+
+  $('input').addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') $('send').click();
+  });
+
+  $('language').addEventListener('change', (event) => {
+    state.language = event.target.value;
+    $('lang-label').textContent = state.language || 'fr';
+    log('langue demandée : ' + (state.language || 'null (détection)'));
+  });
+
+  $('reset').addEventListener('click', () => {
+    state.session = newSession();
+    $('screen').textContent = state.channel === 'ussd'
+      ? 'Nouvelle session. Envoyez une saisie vide pour afficher le menu.'
+      : 'Nouvelle session.';
+    log('nouvelle session ' + state.session);
+  });
+
+  $('clear-log').addEventListener('click', () => { $('log').innerHTML = ''; });
+
+  async function scenario(steps) {
+    const status = $('scenario-status');
+    for (const [index, step] of steps.entries()) {
+      status.textContent = 'tour ' + (index + 1) + '/' + steps.length + ' : « ' + step + ' »';
+      await send(step);
+      await new Promise((resolve) => setTimeout(resolve, 350));
+    }
+    status.textContent = 'scénario terminé';
+  }
+
+  $('sc-transfer').addEventListener('click', () => {
+    state.session = newSession();
+    void scenario(['2', '690000002', '5000', '1']);
+  });
+
+  $('sc-balance').addEventListener('click', () => {
+    state.session = newSession();
+    void scenario(['1']);
+  });
+
+  $('sc-airtime').addEventListener('click', () => {
+    state.session = newSession();
+    void scenario(['5', '1', '1000', '1']);
+  });
+
+  $('health').addEventListener('click', checkHealth);
+
+  async function checkHealth() {
+    try {
+      const response = await fetch('/health');
+      const json = await response.json();
+      $('health').textContent = 'middleware ' + (json.ok ? 'en ligne' : 'injoignable') + ' · clé ' + (json.teamKeyConfigured ? 'configurée' : 'absente');
+      $('health').className = 'chip ' + (json.ok ? 'ok' : '');
+      log('santé : ' + JSON.stringify(json));
+    } catch {
+      $('health').textContent = 'middleware injoignable';
+      $('health').className = 'chip';
+    }
+  }
+
+  void checkHealth();
+  void loadCatalog();
+</script>
+</body>
+</html>

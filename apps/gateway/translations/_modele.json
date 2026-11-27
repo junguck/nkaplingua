@@ -1,0 +1,474 @@
+{
+  "_lisez_moi": "Copiez ce fichier en <code>.json (dua, ewo, bas, bbj, byv), remplissez les valeurs vides. Gardez EXACTEMENT les emplacements {x}. Une valeur vide = pas encore traduite. Puis : pnpm --filter @nkap/gateway i18n verifier",
+  "language": "xxx",
+  "status": "proposed",
+  "sources": [
+    "Nom des locuteurs, ville, date de la session"
+  ],
+  "ui": {
+    "biller.CAMTEL": "",
+    "biller.CAMWATER": "",
+    "biller.CANAL": "",
+    "biller.ENEO": "",
+    "common.back": "",
+    "common.cancel": "",
+    "common.continue": "",
+    "common.listen": "",
+    "common.loading": "",
+    "common.stop_listening": "",
+    "error.AMBIGUOUS_BENEFICIARY": "",
+    "error.GENERIC": "",
+    "error.INSUFFICIENT_FUNDS": "",
+    "error.INVALID_AMOUNT": "",
+    "error.LIMIT_EXCEEDED": "",
+    "error.UNKNOWN_BENEFICIARY": "",
+    "error.UNKNOWN_BILLER": "",
+    "help.beneficiary": "",
+    "help.fee": "",
+    "help.limit": "",
+    "history.col_amount": "",
+    "history.col_date": "",
+    "history.col_label": "",
+    "history.col_status": "",
+    "history.empty": "",
+    "history.filter_all": "",
+    "history.filter_in": "",
+    "history.filter_out": "",
+    "history.title": "",
+    "home.account": "",
+    "home.action_airtime": "",
+    "home.action_bill": "",
+    "home.action_history": "",
+    "home.action_transfer": "",
+    "home.balance_label": "",
+    "home.empty": "",
+    "home.quick_actions": "",
+    "home.recent": "",
+    "home.see_all": "",
+    "nav.history": "",
+    "nav.home": "",
+    "nav.pay": "",
+    "nav.transfer": "",
+    "pay.amount_label": "",
+    "pay.biller_label": "",
+    "pay.operator_detected": "",
+    "pay.operator_label": "",
+    "pay.phone_hint": "",
+    "pay.phone_label": "",
+    "pay.tab_airtime": "",
+    "pay.tab_bill": "",
+    "pay.title": "",
+    "receipt.airtime": "",
+    "receipt.bill": "",
+    "receipt.cancelled": "",
+    "receipt.done": "",
+    "receipt.new_balance": "",
+    "receipt.reference": "",
+    "receipt.success": "",
+    "receipt.transfer": "",
+    "review.amount": "",
+    "review.balance_after": "",
+    "review.confirm": "",
+    "review.edit": "",
+    "review.fee": "",
+    "review.service": "",
+    "review.title": "",
+    "review.to": "",
+    "review.total": "",
+    "review.warning": "",
+    "shell.greeting": "",
+    "shell.logout": "",
+    "shell.secure": "",
+    "transfer.amount_hint": "",
+    "transfer.amount_label": "",
+    "transfer.fee_preview": "",
+    "transfer.saved": "",
+    "transfer.title": "",
+    "transfer.to_hint": "",
+    "transfer.to_label": "",
+    "tx.airtime": "",
+    "tx.bill": "",
+    "tx.status.cancelled": "",
+    "tx.status.confirmed": "",
+    "tx.status.failed": "",
+    "tx.status.pending": "",
+    "tx.transfer_in": "",
+    "tx.transfer_out": "",
+    "tx.withdrawal": ""
+  },
+  "ussd": {
+    "ambiguous.beneficiary": "",
+    "ask.airtimePhone": "",
+    "ask.airtimeTarget": "",
+    "ask.amount": "",
+    "ask.beneficiary": "",
+    "ask.billReference": "",
+    "ask.biller": "",
+    "ask.feesAmount": "",
+    "ask.language": "",
+    "ask.term": "",
+    "balance": "",
+    "common.cancel": "",
+    "common.confirm": "",
+    "common.edit": "",
+    "confirm.airtime": "",
+    "confirm.bill": "",
+    "confirm.choose": "",
+    "confirm.edit": "",
+    "confirm.retry": "",
+    "confirm.transfer": "",
+    "done.airtime": "",
+    "done.bill": "",
+    "done.cancel": "",
+    "done.transfer": "",
+    "error.GENERIC": "",
+    "error.INSUFFICIENT_FUNDS": "",
+    "error.INVALID_AMOUNT": "",
+    "error.LIMIT_EXCEEDED": "",
+    "error.TX_NOT_PENDING": "",
+    "error.UNAUTHORIZED": "",
+    "error.UNKNOWN_ACCOUNT": "",
+    "error.UNKNOWN_BENEFICIARY": "",
+    "error.UNKNOWN_BILLER": "",
+    "error.UNREACHABLE": "",
+    "fees": "",
+    "history.empty": "",
+    "history.header": "",
+    "history.line": "",
+    "invalid.amount": "",
+    "invalid.choice": "",
+    "invalid.limit": "",
+    "invalid.phone": "",
+    "lang.set": "",
+    "menu.airtime": "",
+    "menu.balance": "",
+    "menu.bill": "",
+    "menu.fees": "",
+    "menu.header": "",
+    "menu.help": "",
+    "menu.history": "",
+    "menu.language": "",
+    "menu.transfer": "",
+    "term.beneficiary": "",
+    "term.confirmation": "",
+    "term.fee": "",
+    "term.limit": ""
+  },
+  "_reference_ui_anglais": {
+    "nav.home": "Home",
+    "nav.transfer": "Send",
+    "nav.pay": "Pay",
+    "nav.history": "History",
+    "shell.greeting": "Hello {name}",
+    "shell.logout": "Log out",
+    "shell.secure": "Secure connection",
+    "common.back": "Back",
+    "common.continue": "Continue",
+    "common.cancel": "Cancel",
+    "common.loading": "Loading",
+    "common.listen": "Listen",
+    "common.stop_listening": "Stop reading",
+    "home.balance_label": "Available balance",
+    "home.account": "Account {phone}",
+    "home.quick_actions": "What would you like to do?",
+    "home.action_transfer": "Send money",
+    "home.action_bill": "Pay a bill",
+    "home.action_airtime": "Buy airtime",
+    "home.action_history": "My transactions",
+    "home.recent": "Recent transactions",
+    "home.see_all": "See all",
+    "home.empty": "No transactions yet.",
+    "tx.transfer_out": "Sent to {name}",
+    "tx.transfer_in": "Received from {name}",
+    "tx.airtime": "{operator} airtime",
+    "tx.bill": "{biller} bill",
+    "tx.withdrawal": "Withdrawal",
+    "tx.status.confirmed": "Completed",
+    "tx.status.pending": "Pending",
+    "tx.status.failed": "Failed",
+    "tx.status.cancelled": "Cancelled",
+    "transfer.title": "Send money",
+    "transfer.to_label": "Beneficiary",
+    "transfer.to_hint": "Phone number or name",
+    "transfer.amount_label": "Amount",
+    "transfer.amount_hint": "Up to {max} per transaction",
+    "transfer.fee_preview": "Fee: {fee}",
+    "transfer.saved": "My beneficiaries",
+    "pay.title": "Pay",
+    "pay.tab_airtime": "Airtime",
+    "pay.tab_bill": "Bills",
+    "pay.biller_label": "Choose the service",
+    "pay.operator_label": "Operator",
+    "pay.operator_detected": "Operator detected: {operator}",
+    "pay.phone_label": "Number to top up",
+    "pay.phone_hint": "Yours or someone else's",
+    "pay.amount_label": "Amount",
+    "review.title": "Check before you confirm",
+    "review.to": "Recipient",
+    "review.service": "Service",
+    "review.amount": "Amount",
+    "review.fee": "Fee",
+    "review.total": "Total debited",
+    "review.balance_after": "Balance afterwards",
+    "review.warning": "The money leaves as soon as you confirm.",
+    "review.confirm": "Confirm",
+    "review.edit": "Edit",
+    "receipt.success": "Transaction successful",
+    "receipt.done": "Done",
+    "receipt.reference": "Reference",
+    "receipt.new_balance": "New balance",
+    "receipt.transfer": "{amount} sent to {name}.",
+    "receipt.airtime": "{operator} airtime of {amount} sent to {phone}.",
+    "receipt.bill": "{biller} bill of {amount} paid.",
+    "receipt.cancelled": "Transaction cancelled. Nothing was debited.",
+    "history.title": "History",
+    "history.empty": "No transactions yet.",
+    "history.col_date": "Date",
+    "history.col_label": "Transaction",
+    "history.col_amount": "Amount",
+    "history.col_status": "Status",
+    "history.filter_all": "All",
+    "history.filter_in": "Incoming",
+    "history.filter_out": "Outgoing",
+    "help.fee": "The fee is the amount the bank keeps to carry out the transaction.",
+    "help.limit": "The limit is the most you can send in one go.",
+    "help.beneficiary": "The beneficiary is the person who receives the money.",
+    "biller.ENEO": "Electricity",
+    "biller.CAMWATER": "Water",
+    "biller.CANAL": "Television",
+    "biller.CAMTEL": "Internet and phone",
+    "error.INSUFFICIENT_FUNDS": "Insufficient balance: you are {missing} short.",
+    "error.LIMIT_EXCEEDED": "Amount too high: the limit is {max} per transaction.",
+    "error.UNKNOWN_BENEFICIARY": "Beneficiary not found. Check the number or name.",
+    "error.UNKNOWN_BILLER": "Unknown service. Choose from the list.",
+    "error.AMBIGUOUS_BENEFICIARY": "Several beneficiaries have this name. Pick the right one.",
+    "error.INVALID_AMOUNT": "Invalid amount. Enter a whole number.",
+    "error.GENERIC": "The transaction did not go through. Try again."
+  },
+  "_reference_ussd": {
+    "menu.header": {
+      "fr": "Safinum. Choisissez:",
+      "en": "Safinum. Choose:"
+    },
+    "menu.balance": {
+      "fr": "Mon solde",
+      "en": "My balance"
+    },
+    "menu.transfer": {
+      "fr": "Envoyer de l'argent",
+      "en": "Send money"
+    },
+    "menu.fees": {
+      "fr": "Frais",
+      "en": "Fees"
+    },
+    "menu.history": {
+      "fr": "Historique",
+      "en": "History"
+    },
+    "menu.airtime": {
+      "fr": "Acheter du credit",
+      "en": "Buy airtime"
+    },
+    "menu.bill": {
+      "fr": "Payer une facture",
+      "en": "Pay a bill"
+    },
+    "menu.help": {
+      "fr": "Aide",
+      "en": "Help"
+    },
+    "menu.language": {
+      "fr": "Langue",
+      "en": "Language"
+    },
+    "common.confirm": {
+      "fr": "Confirmer",
+      "en": "Confirm"
+    },
+    "common.cancel": {
+      "fr": "Annuler",
+      "en": "Cancel"
+    },
+    "common.edit": {
+      "fr": "Modifier",
+      "en": "Change"
+    },
+    "ask.beneficiary": {
+      "fr": "Numero du beneficiaire (9 chiffres):",
+      "en": "Beneficiary number (9 digits):"
+    },
+    "ask.amount": {
+      "fr": "Montant (FCFA):",
+      "en": "Amount (FCFA):"
+    },
+    "ask.feesAmount": {
+      "fr": "Frais pour quel montant (FCFA) ?",
+      "en": "Fees for which amount (FCFA)?"
+    },
+    "ask.airtimeTarget": {
+      "fr": "Credit pour:\n1. Mon numero\n2. Un autre numero",
+      "en": "Airtime for:\n1. My number\n2. Another number"
+    },
+    "ask.airtimePhone": {
+      "fr": "Numero a recharger (9 chiffres):",
+      "en": "Number to top up (9 digits):"
+    },
+    "ask.biller": {
+      "fr": "Choisissez le facturier:",
+      "en": "Choose the service:"
+    },
+    "ask.billReference": {
+      "fr": "Numero de facture:",
+      "en": "Bill number:"
+    },
+    "ask.term": {
+      "fr": "Quel terme ?\n1. Frais\n2. Plafond\n3. Beneficiaire\n4. Confirmation",
+      "en": "Which term?\n1. Fee\n2. Limit\n3. Beneficiary\n4. Confirmation"
+    },
+    "ask.language": {
+      "fr": "Choisissez la langue:",
+      "en": "Choose the language:"
+    },
+    "confirm.transfer": {
+      "fr": "Envoi de {amount} a {recipient}. Frais {fee}. Total {total}.",
+      "en": "Sending {amount} to {recipient}. Fee {fee}. Total {total}."
+    },
+    "confirm.airtime": {
+      "fr": "Credit de {amount} pour le {phone}. Frais {fee}. Total {total}.",
+      "en": "Airtime of {amount} for {phone}. Fee {fee}. Total {total}."
+    },
+    "confirm.bill": {
+      "fr": "Facture {biller} {reference}: {amount}. Frais {fee}. Total {total}.",
+      "en": "Bill {biller} {reference}: {amount}. Fee {fee}. Total {total}."
+    },
+    "confirm.choose": {
+      "fr": "1. Confirmer\n2. Annuler",
+      "en": "1. Confirm\n2. Cancel"
+    },
+    "confirm.edit": {
+      "fr": "3. Modifier le montant",
+      "en": "3. Change the amount"
+    },
+    "confirm.retry": {
+      "fr": "Repondez 1 pour confirmer ou 2 pour annuler.",
+      "en": "Reply 1 to confirm or 2 to cancel."
+    },
+    "done.transfer": {
+      "fr": "{amount} envoye a {recipient}. Ref {ref}. Solde {balance}.",
+      "en": "{amount} sent to {recipient}. Ref {ref}. Balance {balance}."
+    },
+    "done.airtime": {
+      "fr": "Credit de {amount} envoye au {phone}. Ref {ref}.",
+      "en": "Airtime of {amount} sent to {phone}. Ref {ref}."
+    },
+    "done.bill": {
+      "fr": "Facture {biller} payee: {amount}. Ref {ref}.",
+      "en": "Bill {biller} paid: {amount}. Ref {ref}."
+    },
+    "done.cancel": {
+      "fr": "Operation annulee. Aucun montant debite.",
+      "en": "Transaction cancelled. Nothing was debited."
+    },
+    "balance": {
+      "fr": "Votre solde est de {balance}.",
+      "en": "Your balance is {balance}."
+    },
+    "fees": {
+      "fr": "Pour {amount}: frais {fee}. Total {total}.",
+      "en": "For {amount}: fee {fee}. Total {total}."
+    },
+    "history.header": {
+      "fr": "Vos dernieres operations:",
+      "en": "Your recent transactions:"
+    },
+    "history.line": {
+      "fr": "{date} {label} {amount}",
+      "en": "{date} {label} {amount}"
+    },
+    "history.empty": {
+      "fr": "Aucune operation pour le moment.",
+      "en": "No transactions yet."
+    },
+    "invalid.choice": {
+      "fr": "Choix invalide.",
+      "en": "Invalid choice."
+    },
+    "invalid.amount": {
+      "fr": "Montant invalide. Tapez un nombre, ex: 1000",
+      "en": "Invalid amount. Enter a number, e.g. 1000"
+    },
+    "invalid.phone": {
+      "fr": "Numero invalide. 9 chiffres, ex: 699000002",
+      "en": "Invalid number. 9 digits, e.g. 699000002"
+    },
+    "invalid.limit": {
+      "fr": "Montant trop eleve. Plafond: {max} FCFA.",
+      "en": "Amount too high. Limit: {max} FCFA."
+    },
+    "ambiguous.beneficiary": {
+      "fr": "Plusieurs beneficiaires. Precisez le numero.",
+      "en": "Several beneficiaries. Give the number."
+    },
+    "term.fee": {
+      "fr": "Les frais sont ce que la banque retient pour executer une operation.",
+      "en": "The fee is what the bank keeps to carry out a transaction."
+    },
+    "term.limit": {
+      "fr": "Le plafond est de 500 000 FCFA par operation.",
+      "en": "The limit is 500 000 FCFA per transaction."
+    },
+    "term.beneficiary": {
+      "fr": "Le beneficiaire est la personne qui recoit l'argent.",
+      "en": "The beneficiary is the person who receives the money."
+    },
+    "term.confirmation": {
+      "fr": "Rien n'est debite avant votre confirmation, au tour suivant.",
+      "en": "Nothing is debited before you confirm, on the next turn."
+    },
+    "lang.set": {
+      "fr": "Langue: {language}.",
+      "en": "Language: {language}."
+    },
+    "error.INSUFFICIENT_FUNDS": {
+      "fr": "Solde insuffisant pour cette operation.",
+      "en": "Insufficient balance for this transaction."
+    },
+    "error.LIMIT_EXCEEDED": {
+      "fr": "Montant au-dessus du plafond autorise.",
+      "en": "Amount above the authorised limit."
+    },
+    "error.UNKNOWN_BENEFICIARY": {
+      "fr": "Beneficiaire introuvable. Verifiez le numero.",
+      "en": "Beneficiary not found. Check the number."
+    },
+    "error.UNKNOWN_BILLER": {
+      "fr": "Facturier inconnu. Choisissez dans la liste.",
+      "en": "Unknown service. Choose from the list."
+    },
+    "error.UNKNOWN_ACCOUNT": {
+      "fr": "Compte introuvable pour ce numero.",
+      "en": "No account for this number."
+    },
+    "error.INVALID_AMOUNT": {
+      "fr": "Montant invalide.",
+      "en": "Invalid amount."
+    },
+    "error.TX_NOT_PENDING": {
+      "fr": "Cette operation ne peut plus etre modifiee.",
+      "en": "This transaction can no longer be changed."
+    },
+    "error.UNAUTHORIZED": {
+      "fr": "Service momentanement indisponible. Reessayez plus tard.",
+      "en": "Service temporarily unavailable. Try again later."
+    },
+    "error.UNREACHABLE": {
+      "fr": "Service momentanement indisponible. Reessayez plus tard.",
+      "en": "Service temporarily unavailable. Try again later."
+    },
+    "error.GENERIC": {
+      "fr": "Operation impossible. Reessayez plus tard.",
+      "en": "The transaction did not go through. Try again."
+    }
+  }
+}
