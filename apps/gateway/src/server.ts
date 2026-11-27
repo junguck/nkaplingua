@@ -14,17 +14,25 @@ import http from 'node:http';
 import { fileURLToPath } from 'node:url';
 import type { AddressInfo } from 'node:net';
 import { Gateway } from './gateway.js';
-import { statusModeFrom, type InboundTurn, type StatusMode } from '@nkap/safinum';
+import { SafinumBank } from './bank.js';
+import { handleIvr, type IvrState } from './ivr.js';
+import { TtlStore } from './session.js';
+import { isSafinumLanguage, isUiTranslation, statusModeFrom, type InboundTurn, type StatusMode } from '@nkap/safinum';
 import { loadEnv } from './env.js';
-
-loadEnv();
+import { languageCatalog } from './language-catalog.js';
+import { applyWordDb, lastWordBase } from './word-base.js';
 
 const MAX_BODY_BYTES = 512 * 1024;
+
+/** Canaux servis par une même URL. `atm` et `ivr` sont locaux, hors contrat SAFINUM. */
+const KNOWN_CHANNELS: ReadonlySet<string> = new Set(['ussd', 'mobile', 'web', 'ivr']);
 
 export interface ServerOptions {
   readonly teamKey: string;
   readonly bankUrl: string;
   readonly statusMode?: StatusMode;
+  /** Canaux locaux (`/ivr`) : désactivés par défaut, jamais exposés au contrat SAFINUM. */
+  readonly localChannels?: boolean;
   readonly log?: (line: string) => void;
 }
 
@@ -35,6 +43,7 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
     ...(options.statusMode === undefined ? {} : { statusMode: options.statusMode }),
   });
   const log = options.log ?? ((line: string) => console.log(line));
+  const ivrSessions = new TtlStore<IvrState>(300_000);
 
   return http.createServer((req, res) => {
     void (async () => {
@@ -49,13 +58,33 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
         return;
       }
 
+      // Catalogue des langues : ce que nous comprenons, ce que nous servons, où en sont les packs.
+      // Sert la console de jury (statut + repli) et la vigie, sans exposer la clé d'équipe.
+      if (req.method === 'GET' && (url.pathname === '/langues' || url.pathname === '/langues/')) {
+        const words = lastWordBase();
+        return json(res, 200, {
+          languages: languageCatalog(),
+          wordBase: {
+            file: words.file,
+            loaded: words.report !== null,
+            ok: words.ok,
+            languages: words.report?.languages ?? [],
+            words: words.report?.cues ?? 0,
+            problems: words.problems,
+          },
+        });
+      }
+
       if (req.method === 'GET' && (url.pathname === '/' || url.pathname === '/health')) {
+        const words = lastWordBase();
         return json(res, 200, {
           ok: true,
           service: 'nkaplingua-safinum-middleware',
-          channels: ['ussd', 'mobile', 'web', 'ivr'],
+          channels: ['ussd', 'mobile', 'web'],
+          localChannels: options.localChannels ? ['ivr', 'atm'] : [],
           teamKeyConfigured: options.teamKey.length > 0,
           bankUrl: options.bankUrl,
+          wordBase: { file: words.file, ok: words.ok, languages: words.report?.languages ?? [], words: words.report?.cues ?? 0, problems: words.problems },
         });
       }
 
@@ -73,6 +102,39 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
         return json(res, outcome === 'unknown' ? 404 : 200, { decision: outcome });
       }
 
+      // Canal IVR local : uniquement si explicitement activé, jamais sur le contrat SAFINUM.
+      if (req.method === 'POST' && url.pathname === '/ivr') {
+        if (!options.localChannels) return json(res, 404, { error: 'Route inconnue' });
+        let ivrBody: {
+          call_id?: string;
+          session_id?: string;
+          phone?: string;
+          language?: string | null;
+          trace_id?: string;
+          input?: { digits?: string; text?: string };
+        };
+        try {
+          ivrBody = (await readJson(req)) as typeof ivrBody;
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          return json(res, message === 'TOO_LARGE' ? 413 : 400, { error: message === 'TOO_LARGE' ? 'Corps trop volumineux' : 'JSON invalide' });
+        }
+        const trace = traceFrom(req.headers['x-trace-id'], ivrBody.trace_id) ?? '';
+        const bank = new SafinumBank({ baseUrl: options.bankUrl, teamKey: options.teamKey, traceId: trace });
+        const reply = await handleIvr(
+          {
+            call_id: ivrBody.call_id,
+            session_id: ivrBody.session_id,
+            phone: ivrBody.phone,
+            language: ivrBody.language ?? null,
+            input: ivrBody.input,
+          },
+          { bank, sessions: ivrSessions },
+        );
+        log(`trace=${trace || '-'} channel=ivr`);
+        return json(res, 200, reply);
+      }
+
       if (req.method !== 'POST') return json(res, 405, { error: 'POST attendu' });
       if (url.pathname !== '/' && !url.pathname.startsWith('/middleware/') && url.pathname !== '/channel/ivr') {
         return json(res, 404, { error: 'Route inconnue' });
@@ -86,7 +148,30 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
         return json(res, message === 'TOO_LARGE' ? 413 : 400, { error: message === 'TOO_LARGE' ? 'Corps trop volumineux' : 'JSON invalide' });
       }
 
+      // Écran mobile/web : `language` et `strings` (un objet) sont obligatoires, sinon INVALID_RESPONSE.
+      // Mais `language` peut valoir `null` : la sandbox annonce alors « non précisée » et la détection
+      // (ou le repli français) nous revient — refuser `null` casserait tous les écrans de ce mode.
+      // Seule l'absence de la clé, ou une langue inconnue, est une réponse invalide.
+      const hasLanguageKey = Object.prototype.hasOwnProperty.call(payload, 'language');
+      if (
+        isUiTranslation(payload) &&
+        (!hasLanguageKey ||
+          (payload.language !== null && !isSafinumLanguage(payload.language)) ||
+          typeof payload.strings !== 'object' ||
+          payload.strings === null ||
+          Array.isArray(payload.strings))
+      ) {
+        return json(res, 400, { error: 'INVALID_RESPONSE' });
+      }
+
       const pathChannel = url.pathname.startsWith('/middleware/') ? url.pathname.split('/')[2] : undefined;
+      // Un canal inconnu (`atm`, faute de frappe) n'est jamais servi par le contrat.
+      if (
+        (pathChannel !== undefined && !KNOWN_CHANNELS.has(pathChannel)) ||
+        (typeof payload.channel === 'string' && !KNOWN_CHANNELS.has(payload.channel))
+      ) {
+        return json(res, 404, { error: 'Canal inconnu' });
+      }
       const requestChannel = pathChannel ?? payload.channel ?? (url.pathname === '/channel/ivr' ? 'ivr' : undefined);
       // Kit officiel : la passerelle envoie l'identifiant du tour dans l'en-tête `X-Trace-Id`, le corps
       // n'est qu'un repli. Une trace erronée sur nos appels bancaires = NO_BANK_CALL (travail invisible).
@@ -175,10 +260,22 @@ export function defaultOptions(): ServerOptions {
     teamKey: process.env.SAFINUM_TEAM_KEY ?? '',
     bankUrl,
     statusMode: statusModeFrom(process.env.SAFINUM_STATUS),
+    localChannels: process.env.ENABLE_V2_CHANNELS === '1',
   };
 }
 
 if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
+  // Le .env n'est lu qu'au démarrage du serveur, jamais à l'import de la bibliothèque :
+  // sinon les tests héritent de la vraie clé et la banque de démonstration les refuse.
+  loadEnv();
+  const words = applyWordDb();
+  if (!words.ok) {
+    console.warn(`ATTENTION : base de mots ignorée (${words.problems.length} probleme(s)) :`);
+    for (const problem of words.problems) console.warn(`  - ${problem}`);
+    console.warn('  Corrigez data/langues.json (pnpm --filter @nkap/gateway lang verifier), puis redemarrez.');
+  } else if (words.report !== null && words.report.languages.length > 0) {
+    console.log(`Base de mots : ${words.report.languages.join(', ')} (${words.report.cues} indice(s)) depuis ${words.file}`);
+  }
   void startMiddleware().then(({ url }) => {
     const options = defaultOptions();
     console.log(`Middleware NkapLingua a l'ecoute sur ${url}`);

@@ -56,7 +56,7 @@ le tunnel et la déclaration des trois canaux, la console jury, la voix — voir
 ```bash
 corepack enable            # pnpm 10
 pnpm install
-pnpm test                  # 154 tests au dernier contrôle local
+pnpm test                  # 218 tests au dernier contrôle local (27/11/2026)
 pnpm typecheck             # TypeScript strict, zéro any (9 projets)
 
 pnpm dev:web               # http://localhost:3000 — banque en ligne + assistant

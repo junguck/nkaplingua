@@ -1,0 +1,169 @@
+{
+    "trace_id": "essai-local-0003",
+    "team_id": "votre-equipe",
+    "channel": "mobile",
+    "type": "ui_translation",
+    "session_id": "essai-session-2",
+    "phone": "237690000000",
+    "language": "en",
+    "source_language": "fr",
+    "screen": "home",
+    "strings": {
+        "nav.home": {
+            "text": "Accueil",
+            "context": "Onglet / menu de navigation",
+            "max_chars": 12
+        },
+        "nav.transfer": {
+            "text": "Envoyer",
+            "context": "Onglet / menu de navigation",
+            "max_chars": 12
+        },
+        "nav.pay": {
+            "text": "Payer",
+            "context": "Onglet / menu de navigation",
+            "max_chars": 12
+        },
+        "nav.history": {
+            "text": "Historique",
+            "context": "Onglet / menu de navigation",
+            "max_chars": 12
+        },
+        "shell.greeting": {
+            "text": "Bonjour {name}",
+            "context": "En-tête, salutation du titulaire",
+            "max_chars": null
+        },
+        "common.back": {
+            "text": "Retour",
+            "context": "Bouton",
+            "max_chars": 20
+        },
+        "common.continue": {
+            "text": "Continuer",
+            "context": "Bouton principal",
+            "max_chars": 24
+        },
+        "common.cancel": {
+            "text": "Annuler",
+            "context": "Bouton",
+            "max_chars": 20
+        },
+        "common.loading": {
+            "text": "Chargement",
+            "context": "Indicateur d'attente",
+            "max_chars": null
+        },
+        "common.listen": {
+            "text": "Écouter",
+            "context": "Bouton qui lit l'écran à voix haute",
+            "max_chars": 20
+        },
+        "common.stop_listening": {
+            "text": "Arrêter la lecture",
+            "context": "Bouton qui coupe la lecture à voix haute",
+            "max_chars": 24
+        },
+        "home.balance_label": {
+            "text": "Solde disponible",
+            "context": "Libellé au-dessus du solde",
+            "max_chars": null
+        },
+        "home.account": {
+            "text": "Compte {phone}",
+            "context": "Numéro du compte sous le solde",
+            "max_chars": null
+        },
+        "home.quick_actions": {
+            "text": "Que voulez-vous faire ?",
+            "context": "Titre de section",
+            "max_chars": null
+        },
+        "home.action_transfer": {
+            "text": "Envoyer de l'argent",
+            "context": "Tuile d'action",
+            "max_chars": 28
+        },
+        "home.action_bill": {
+            "text": "Payer une facture",
+            "context": "Tuile d'action",
+            "max_chars": 28
+        },
+        "home.action_airtime": {
+            "text": "Acheter du crédit",
+            "context": "Tuile d'action",
+            "max_chars": 28
+        },
+        "home.action_history": {
+            "text": "Mes opérations",
+            "context": "Tuile d'action",
+            "max_chars": 28
+        },
+        "home.recent": {
+            "text": "Dernières opérations",
+            "context": "Titre de section",
+            "max_chars": null
+        },
+        "home.see_all": {
+            "text": "Tout voir",
+            "context": "Lien",
+            "max_chars": 20
+        },
+        "home.empty": {
+            "text": "Aucune opération pour le moment.",
+            "context": "Liste vide",
+            "max_chars": null
+        },
+        "tx.transfer_out": {
+            "text": "Envoi à {name}",
+            "context": "Ligne d'opération",
+            "max_chars": null
+        },
+        "tx.transfer_in": {
+            "text": "Reçu de {name}",
+            "context": "Ligne d'opération",
+            "max_chars": null
+        },
+        "tx.airtime": {
+            "text": "Crédit {operator}",
+            "context": "Ligne d'opération",
+            "max_chars": null
+        },
+        "tx.bill": {
+            "text": "Facture {biller}",
+            "context": "Ligne d'opération",
+            "max_chars": null
+        },
+        "tx.withdrawal": {
+            "text": "Retrait",
+            "context": "Ligne d'opération",
+            "max_chars": null
+        },
+        "tx.status.confirmed": {
+            "text": "Effectuée",
+            "context": "Pastille de statut",
+            "max_chars": 16
+        },
+        "tx.status.pending": {
+            "text": "En attente",
+            "context": "Pastille de statut",
+            "max_chars": 16
+        },
+        "tx.status.failed": {
+            "text": "Échouée",
+            "context": "Pastille de statut",
+            "max_chars": 16
+        },
+        "tx.status.cancelled": {
+            "text": "Annulée",
+            "context": "Pastille de statut",
+            "max_chars": 16
+        }
+    },
+    "constraints": {
+        "max_chars": null,
+        "charset": "utf8",
+        "mode": "ui_translation",
+        "timeout_ms": 10000
+    }
+}

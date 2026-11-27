@@ -26,6 +26,7 @@ import {
   MENU_KEYS,
   languageName,
   servedLanguages,
+  resolveLanguage,
   displayPhone,
   message,
   money,
@@ -624,6 +625,24 @@ async function atConfirmation(
   if (amount !== null) {
     const correction = await applyCorrection(state, text, phone, deps, language);
     if (correction) return correction;
+  }
+
+  // « Parle-moi en fulfulde » pendant une confirmation (scénario §7-8) : on change de langue et on
+  // RÉAFFICHE le récapitulatif dans la nouvelle langue, sans perdre l'opération en attente.
+  const understood = understandFreeText(text, language);
+  if (understood !== null && understood.route.kind === 'language' && understood.targetLanguage !== undefined) {
+    const next = resolveLanguage(understood.targetLanguage);
+    state.language = next;
+    state.languageSource = 'user';
+    const recap = confirmation(state, next);
+    return keep({
+      ...recap,
+      interpretation: {
+        ...recap.interpretation,
+        intent: 'LANGUAGE_SWITCH',
+        parameters: { ...recap.interpretation.parameters, target_language: understood.targetLanguage, served_language: next },
+      },
+    });
   }
 
   return keep(

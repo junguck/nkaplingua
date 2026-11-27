@@ -13,6 +13,22 @@ export { scanNumbers } from './text/numbers';
 export { MESSAGES, type MessageKey } from './lexicon/messages.lexicon';
 export { TERMS_LEXICON } from './lexicon/terms.lexicon';
 export { INTENT_CUES, CONFIRM_CUES, CANCEL_CUES } from './lexicon/intents.lexicon';
+export {
+  installWordBase,
+  clearWordBase,
+  checkWordBase,
+  wordBaseReport,
+  emptyWordBase,
+  functionWordsOf,
+  intentCuesOf,
+  intentCuesTable,
+  languageNamesOf,
+  MAX_WEIGHT,
+  MIN_WEIGHT,
+  type WordBase,
+  type WordBaseReport,
+  type LanguageWords,
+} from './lexicon/runtime';
 export { startsWithCue } from './text/normalize';
 export { readScreen, SCREEN_FIELDS, type ScreenField, type ScreenReading, type TotalCheck } from './screen/screen-reader';
 export { renderScreenCard, type ScreenCard, type ScreenCardRow, type ScreenAlert, type ScreenAlertLevel } from './screen/screen-card';

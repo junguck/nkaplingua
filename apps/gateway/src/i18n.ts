@@ -70,7 +70,21 @@ export type MessageKey =
   | 'error.TX_NOT_PENDING'
   | 'error.UNAUTHORIZED'
   | 'error.UNREACHABLE'
-  | 'error.GENERIC';
+  | 'error.GENERIC'
+  | 'ivr.menu'
+  | 'ivr.invalid'
+  | 'ivr.askAmount'
+  | 'ivr.askBeneficiary'
+  | 'ivr.confirmPrompt'
+  | 'ivr.hangup'
+  | 'atm.card'
+  | 'atm.pin'
+  | 'atm.menu'
+  | 'atm.welcome'
+  | 'atm.eject'
+  | 'atm.multiple'
+  | 'atm.dispensed'
+  | 'atm.simulated';
 
 type Catalogue = Readonly<Record<MessageKey, string>>;
 
@@ -143,6 +157,20 @@ const FR: Catalogue = {
   'error.UNAUTHORIZED': 'Service momentanement indisponible. Reessayez plus tard.',
   'error.UNREACHABLE': 'Service momentanement indisponible. Reessayez plus tard.',
   'error.GENERIC': 'Operation impossible. Reessayez plus tard.',
+  'ivr.menu': 'Choisissez:\n1. Solde\n2. Envoyer\n3. Frais\n4. Historique\n0. Quitter',
+  'ivr.invalid': 'Choix invalide.',
+  'ivr.askAmount': 'Montant (FCFA) puis #:',
+  'ivr.askBeneficiary': 'Numero du beneficiaire puis #:',
+  'ivr.confirmPrompt': '1. Confirmer\n2. Annuler',
+  'ivr.hangup': 'Merci. Au revoir.',
+  'atm.welcome': 'Bienvenue au distributeur Safinum, {name}.',
+  'atm.card': 'Numero de carte (9 chiffres):',
+  'atm.pin': 'Code a 4 chiffres:',
+  'atm.menu': 'Choisissez:\n1. Retrait\n2. Solde\n3. Quitter',
+  'atm.multiple': 'Montant multiple de {step} FCFA.',
+  'atm.eject': 'Merci. Prenez votre carte.',
+  'atm.dispensed': 'Retrait de {amount}. Frais {fee}.',
+  'atm.simulated': 'Simulation locale: aucun debit bancaire.',
 };
 
 const EN: Catalogue = {
@@ -202,6 +230,20 @@ const EN: Catalogue = {
   'error.UNAUTHORIZED': 'Service temporarily unavailable. Try again later.',
   'error.UNREACHABLE': 'Service temporarily unavailable. Try again later.',
   'error.GENERIC': 'The transaction did not go through. Try again.',
+  'ivr.menu': 'Choose:\n1. Balance\n2. Send\n3. Fees\n4. History\n0. Quit',
+  'ivr.invalid': 'Invalid choice.',
+  'ivr.askAmount': 'Amount (FCFA) then #:',
+  'ivr.askBeneficiary': 'Beneficiary number then #:',
+  'ivr.confirmPrompt': '1. Confirm\n2. Cancel',
+  'ivr.hangup': 'Thank you. Goodbye.',
+  'atm.welcome': 'Welcome to the Safinum ATM, {name}.',
+  'atm.card': 'Card number (9 digits):',
+  'atm.pin': '4-digit code:',
+  'atm.menu': 'Choose:\n1. Withdraw\n2. Balance\n3. Quit',
+  'atm.multiple': 'Amount must be a multiple of {step} FCFA.',
+  'atm.eject': 'Thank you. Take your card.',
+  'atm.dispensed': 'Withdrawal of {amount}. Fee {fee}.',
+  'atm.simulated': 'Local simulation: no bank debit.',
 };
 
 /**
@@ -265,6 +307,20 @@ const FUB: Catalogue = {
   'error.UNAUTHORIZED': 'Golle ɗee keɓaani jooni. Ɗaɓɓit caggal.',
   'error.UNREACHABLE': 'Golle ɗee keɓaani jooni. Ɗaɓɓit caggal.',
   'error.GENERIC': 'Golle ndee waɗaaka. Ɗaɓɓit caggal.',
+  'ivr.menu': 'Suɓo:\n1. Ceede am keddiiɗe\n2. Neldu ceede\n3. Njoɓdi\n4. Golle ɓennuɗe\n0. Yaltu',
+  'ivr.invalid': 'Suɓal moƴƴal alaa.',
+  'ivr.askAmount': 'Ceede (FCFA) refti #:',
+  'ivr.askBeneficiary': 'Limgal keɓoowo refti #:',
+  'ivr.confirmPrompt': '1. Tabbitin\n2. Haaytu',
+  'ivr.hangup': 'A jaɓɓaama. Yaltu.',
+  'atm.welcome': 'Bienvenue au distributeur Safinum, {name}.',
+  'atm.card': 'Numero de carte (9 chiffres):',
+  'atm.pin': 'Code a 4 chiffres:',
+  'atm.menu': 'Choisissez:\n1. Retrait\n2. Solde\n3. Quitter',
+  'atm.multiple': 'Montant multiple de {step} FCFA.',
+  'atm.eject': 'Merci. Prenez votre carte.',
+  'atm.dispensed': 'Retrait de {amount}. Frais {fee}.',
+  'atm.simulated': 'Simulation locale: aucun debit bancaire.',
 };
 
 const BUILT_IN: Readonly<Partial<Record<GatewayLanguage, Catalogue>>> = { fr: FR, en: EN, fub: FUB };

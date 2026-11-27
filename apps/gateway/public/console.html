@@ -164,6 +164,8 @@
         <div class="kpi"><b>intention</b><span id="k-intent">—</span></div>
         <div class="kpi"><b>transaction</b><span id="k-tx">—</span></div>
         <div class="kpi"><b>langue</b><span id="k-lang">—</span></div>
+        <div class="kpi" id="k-lang-status-box"><b>statut langue</b><span id="k-lang-status">—</span></div>
+        <div class="kpi" id="k-lang-fallback-box"><b>repli</b><span id="k-lang-fallback">—</span></div>
         <div class="kpi" id="k-septets-box"><b>septets GSM-7</b><span id="k-septets">—</span></div>
       </div>
       <pre id="json">{ "response": { … }, "interpretation": { … }, "transaction": { … } }</pre>
@@ -184,7 +186,7 @@
 </footer>
 
 <script>
-  const state = { channel: 'ussd', session: newSession(), turns: 0, language: '' };
+  const state = { channel: 'ussd', session: newSession(), turns: 0, language: '', catalog: [] };
   const $ = (id) => document.getElementById(id);
 
   function newSession() {
@@ -288,7 +290,7 @@
     if (json.strings) {
       $('k-intent').textContent = 'UI_TRANSLATION';
       $('k-tx').textContent = 'none';
-      $('k-lang').textContent = json.language;
+      showLanguage(json.language);
       $('k-septets').textContent = '—';
       $('k-septets-box').className = 'kpi';
       $('end-hint').textContent = Object.keys(json.strings).length + ' chaînes · HTTP ' + status + ' · ' + ms + ' ms';
@@ -311,12 +313,47 @@
     $('screen').textContent = text;
     $('k-intent').textContent = intent;
     $('k-tx').textContent = tx.status + (tx.id ? ' · ' + tx.id : '');
-    $('k-lang').textContent = json.interpretation?.language ?? '—';
+    if (json.interpretation?.language) showLanguage(json.interpretation.language);
     $('k-septets').textContent = measure.septets + ' / 182' + (measure.valid ? ' · GSM-7' : ' · HORS GSM-7');
     $('k-septets-box').className = 'kpi ' + (!measure.valid || measure.septets > 182 ? 'bad' : measure.septets > 160 ? 'warn' : 'good');
     $('end-hint').textContent = (json.response?.end_session ? 'session terminée' : 'session ouverte') + ' · HTTP ' + status + ' · ' + ms + ' ms';
 
     log('« ' + (label || '∅') + ' » → ' + intent + ' · ' + tx.status + (tx.id ? ' ' + tx.id : '') + ' · ' + measure.septets + ' septets · ' + ms + ' ms');
+  }
+
+  function langInfo(code) {
+    return state.catalog.find((entry) => entry.code === code) || null;
+  }
+
+  // Langue réellement servie, son statut de traduction et le repli éventuel : lisible d'un coup d'œil
+  // par le jury. Une langue sans catalogue USSD complet est déclarée en repli français, jamais masquée.
+  function showLanguage(replyLang) {
+    const info = langInfo(replyLang);
+    const served = info === null ? true : info.ussd === 'servi';
+    $('k-lang').textContent = replyLang + (info === null ? '' : ' · ' + info.nom + ' · ' + info.pack);
+    $('k-lang-status').textContent = info === null ? '—' : served ? 'servie' : 'repli français';
+    $('k-lang-status-box').className = 'kpi ' + (served ? 'good' : 'warn');
+    const asked = state.language || null;
+    $('k-lang-fallback').textContent = asked !== null && asked !== replyLang ? 'fr (demandé : ' + asked + ')' : 'aucun';
+    $('k-lang-fallback-box').className = 'kpi ' + (asked !== null && asked !== replyLang ? 'warn' : 'good');
+  }
+
+  async function loadCatalog() {
+    try {
+      const response = await fetch('/langues');
+      const json = await response.json();
+      state.catalog = json.languages || [];
+      const options = state.catalog
+        .map((entry) => '<option value="' + entry.code + '">' + entry.code + ' — ' + entry.nom +
+          (entry.ussd === 'servi' ? '' : ' (pack ' + entry.pack + ' → repli fr)') + '</option>')
+        .join('');
+      $('language').innerHTML = '<option value="">langue : auto (null)</option>' + options;
+      const base = json.wordBase || {};
+      log('langues : ' + state.catalog.map((entry) => entry.code + '=' + entry.ussd).join(', '));
+      log('base de mots : ' + (base.ok ? (base.words || 0) + ' indice(s) depuis ' + base.file : 'IGNORÉE — ' + (base.problems || []).join('; ')), base.ok === false);
+    } catch (error) {
+      log('catalogue des langues indisponible : ' + error.message, true);
+    }
   }
 
   function escapeHtml(value) {
@@ -407,6 +444,7 @@
   }
 
   void checkHealth();
+  void loadCatalog();
 </script>
 </body>
 </html>

@@ -1,5 +1,6 @@
 import { INTENTS, type IntentName, type IntentScore } from '@nkap/contracts';
-import { CANCEL_CUES, CONFIRM_CUES, INTENT_CUES } from '../lexicon/intents.lexicon';
+import { CANCEL_CUES, CONFIRM_CUES } from '../lexicon/intents.lexicon';
+import { intentCuesTable } from '../lexicon/runtime';
 import { POSSESSIVES, SWITCH_CUES } from '../lexicon/languages.lexicon';
 import { containsCue, fold, startsWithCue, tokenize } from '../text/normalize';
 import type { Entities } from './entities';
@@ -27,7 +28,8 @@ export function classifyIntent(folded: string, entities: Entities): Classificati
     cues.push(`${intent}:${cue}`);
   };
 
-  for (const [intent, table] of Object.entries(INTENT_CUES) as Array<[IntentName, (typeof INTENT_CUES)[IntentName]]>) {
+  // Table issue de la base de mots : lexique intégré, plus ce que des locuteurs ont ajouté.
+  for (const [intent, table] of Object.entries(intentCuesTable()) as Array<[IntentName, Partial<Record<string, readonly (readonly [string, number])[]>>]>) {
     for (const list of Object.values(table ?? {})) {
       for (const [cue, weight] of list ?? []) if (containsCue(folded, cue)) add(intent, weight, cue);
     }

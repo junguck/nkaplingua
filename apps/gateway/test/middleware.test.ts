@@ -263,6 +263,25 @@ describe('banque de démonstration et middleware (chaîne HTTP réelle)', () => 
     expect(reply.strings['shell.greeting']).toBe('Bonjour {name}');
   });
 
+  it('change de langue pendant une confirmation sans perdre l’opération (USSD)', async () => {
+    const first = (await gateway.handle(turn({ language: 'fr', input: { type: 'text', text: 'Envoie 5000 à Aicha' } }))) as UssdReply;
+    expect(first.interpretation.intent).toBe('TRANSFER');
+    expect(first.transaction.status).toBe('pending');
+
+    // « Parle-moi en fulfulde » n'est ni 1, ni 2, ni un montant : le récapitulatif doit revenir en
+    // fulfulde, avec la MÊME opération en attente (scénario §7-8).
+    const switched = (await gateway.handle(turn({ language: 'fr', input: { type: 'text', text: 'Parle-moi en fulfulde' } }))) as UssdReply;
+    expect(switched.interpretation.intent).toBe('LANGUAGE_SWITCH');
+    expect(switched.interpretation.language).toBe('fub');
+    expect(switched.transaction).toMatchObject({ id: first.transaction.id, status: 'pending' });
+    expect(switched.response.text).toContain('Neldugol');
+    assertContract(switched);
+
+    const done = (await gateway.handle(turn({ language: null, input: { type: 'text', text: 'Eey' } }))) as UssdReply;
+    expect(done.transaction.status).toBe('confirmed');
+    expect(done.interpretation.language).toBe('fub');
+  });
+
   it('expose le contrat par HTTP sur /middleware/ussd', async () => {
     const server = createMiddlewareServer({
       teamKey: DEMO_TEAM_KEY,
@@ -430,6 +449,64 @@ describe('language: null — la détection revient au middleware', () => {
       turn({ session_id: session, language: null, input: { type: 'text', text: '1' } }),
     )) as UssdReply;
     expect(balance.interpretation.language).toBe('fub');
+  });
+
+  it('un écran avec `language: null` reste servi (la sandbox annonce « non précisée »)', async () => {
+    // Un écran ne touche pas la banque : aucun appel réseau ne part d'ici.
+    const server = createMiddlewareServer({ teamKey: DEMO_TEAM_KEY, bankUrl: 'http://127.0.0.1:1', log: () => undefined });
+    await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+    const address = server.address() as AddressInfo;
+    const screen = {
+      trace_id: 'ui-null-1',
+      team_id: 'demo',
+      channel: 'web',
+      type: 'ui_translation',
+      session_id: 'ui-null-1',
+      phone: PHONE,
+      language: null,
+      source_language: 'fr',
+      screen: 'home',
+      strings: { 'nav.home': { text: 'Accueil', context: 'Onglet', max_chars: 12 } },
+    };
+
+    try {
+      const ok = await fetch(`http://127.0.0.1:${address.port}/middleware/web`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(screen),
+      });
+      expect(ok.status).toBe(200);
+      const body = (await ok.json()) as { language: string; strings: Record<string, string> };
+      expect(typeof body.language).toBe('string');
+      expect(body.strings['nav.home']).toBe('Accueil');
+
+      // Une langue annoncée mais inconnue de la sandbox reste une réponse invalide.
+      const bad = await fetch(`http://127.0.0.1:${address.port}/middleware/web`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...screen, language: 'xx' }),
+      });
+      expect(bad.status).toBe(400);
+
+      // `strings` reste obligatoire.
+      const noStrings = await fetch(`http://127.0.0.1:${address.port}/middleware/web`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...screen, strings: undefined }),
+      });
+      expect(noStrings.status).toBe(400);
+
+      // `language: null` est admis, la clé absente ne l'est pas.
+      const { language: _omitted, ...withoutLanguage } = screen;
+      const noLanguage = await fetch(`http://127.0.0.1:${address.port}/middleware/web`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(withoutLanguage),
+      });
+      expect(noLanguage.status).toBe(400);
+    } finally {
+      await new Promise<void>((resolve) => server.close(() => resolve()));
+    }
   });
 });
 

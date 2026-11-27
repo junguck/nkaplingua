@@ -1,6 +1,5 @@
 import { LANGUAGES, type LanguageCode } from '@nkap/contracts';
-import { INTENT_CUES } from '../lexicon/intents.lexicon';
-import { FUNCTION_WORDS } from '../lexicon/languages.lexicon';
+import { functionWordsOf, intentCuesOf } from '../lexicon/runtime';
 import { containsCue } from '../text/normalize';
 
 export interface LanguageGuess {
@@ -20,18 +19,17 @@ export function detectLanguage(folded: string, hint: LanguageCode): LanguageGues
   const scored = LANGUAGES.map((lang) => {
     let score = 0;
     const cues: string[] = [];
-    for (const [word, weight] of FUNCTION_WORDS[lang]) {
+    for (const [word, weight] of functionWordsOf(lang)) {
       if (containsCue(folded, word)) {
         score += weight;
         cues.push(word);
       }
     }
-    for (const table of Object.values(INTENT_CUES)) {
-      for (const [cue] of table?.[lang] ?? []) {
-        if (containsCue(folded, cue)) {
-          score += CUE_WEIGHT;
-          cues.push(cue);
-        }
+    // Les indices viennent de la base de mots : lexique intégré + ajouts relus par des locuteurs.
+    for (const [cue] of intentCuesOf(lang)) {
+      if (containsCue(folded, cue)) {
+        score += CUE_WEIGHT;
+        cues.push(cue);
       }
     }
     return { lang, score, cues };
