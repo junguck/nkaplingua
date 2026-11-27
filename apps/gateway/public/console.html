@@ -18,6 +18,8 @@
     --mono: ui-monospace, "Cascadia Mono", "SF Mono", Menlo, Consolas, monospace;
   }
   * { box-sizing: border-box; }
+  /* Un display explicite (.cards, .grid…) écrase l'attribut `hidden` : on le force ici. */
+  [hidden] { display: none !important; }
   body {
     margin: 0; background: radial-gradient(1200px 600px at 20% -10%, #16202b, var(--bg));
     color: var(--text); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif;

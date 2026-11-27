@@ -119,7 +119,8 @@ visible — et il est testé (plafond, coupures, code non vérifié par la banqu
 
 ![Administration des langues](presentation/08-langues-admin.png)
 
-**On voit** : la page `/langues-admin`. À gauche, **les 11 langues de la base** avec leur état :
+**On voit** : la page `/langues-admin`. À gauche, **la liste des langues de la base** (elle défile ; le
+bandeau en haut confirme les 11 langues chargées), avec leur état :
 `fr`, `en`, `fub` (`servi`), `dua`, `ewo`, `bas`, `bbj`, `byv` (`repli fr`), `bul`, `hau`, `wes`
 (`hors sandbox`). Puis le formulaire **Ajouter une langue du contrat** (nom, alias, provenance) et
 la **fiche de la langue** (nom, alias, provenance, `Enregistrer la fiche`, `Exporter le lexique

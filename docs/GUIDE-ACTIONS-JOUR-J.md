@@ -332,6 +332,10 @@ Deux endroits, deux rôles :
 | `apps/gateway/data/langues.json` | **base vivante** : langues, alias, mots, poids | linguistes et dev, sans rebuild |
 | `apps/gateway/translations/<code>.json` | réponses complètes (écrans + USSD) relues | deux locuteurs |
 
+Sans terminal, la même base s'édite dans le navigateur : `http://127.0.0.1:8080/langues-admin`
+(ajouter une langue, corriger un alias, changer un poids, exporter, essayer une phrase). La page
+n'accepte que la boucle locale : à travers le tunnel, elle répond `403`.
+
 ```bash
 # voir l'état (mots reconnus, pack, écrans, repli)
 pnpm --filter @nkap/gateway lang liste

@@ -1,6 +1,6 @@
 {
   "base": "http://127.0.0.1:8080",
-  "date": "2026-11-27T15:57:37.569Z",
+  "date": "2026-11-27T16:14:52.694Z",
   "ok": true,
   "tours": [
     {
@@ -8,10 +8,10 @@
       "tour": "solde",
       "url": "/middleware/ussd",
       "entree": {
-        "trace_id": "console-mwz60eei",
+        "trace_id": "console-mwz6ml4l",
         "team_id": "nkaplingua",
         "channel": "ussd",
-        "session_id": "ussd-o59m4x",
+        "session_id": "ussd-4oopjc",
         "phone": "237699000003",
         "language": null,
         "input": {
@@ -27,7 +27,7 @@
         }
       },
       "http": 200,
-      "ms": 50,
+      "ms": 57,
       "intention": "BALANCE_INQUIRY",
       "langue": "fr",
       "resume": "Votre solde est de 250 000 FCFA.",
@@ -57,10 +57,10 @@
       "tour": "transfert",
       "url": "/middleware/ussd",
       "entree": {
-        "trace_id": "console-mwz60efw",
+        "trace_id": "console-mwz6ml67",
         "team_id": "nkaplingua",
         "channel": "ussd",
-        "session_id": "ussd-lang-t2vfq3",
+        "session_id": "ussd-lang-i363zx",
         "phone": "237699000003",
         "language": null,
         "input": {
@@ -76,7 +76,7 @@
         }
       },
       "http": 200,
-      "ms": 37,
+      "ms": 23,
       "intention": "TRANSFER",
       "resume": "TRANSFER",
       "ok": true,
@@ -98,12 +98,12 @@
             "total": 5050,
             "beneficiary": "Aicha Njoya",
             "beneficiary_phone": "690000002",
-            "transaction_id": "MBP00000002"
+            "transaction_id": "MBP00000004"
           },
           "language": "fr"
         },
         "transaction": {
-          "id": "MBP00000002",
+          "id": "MBP00000004",
           "status": "pending"
         }
       }
@@ -113,10 +113,10 @@
       "tour": "langue en confirm.",
       "url": "/middleware/ussd",
       "entree": {
-        "trace_id": "console-mwz60egy",
+        "trace_id": "console-mwz6ml6u",
         "team_id": "nkaplingua",
         "channel": "ussd",
-        "session_id": "ussd-lang-t2vfq3",
+        "session_id": "ussd-lang-i363zx",
         "phone": "237699000003",
         "language": null,
         "input": {
@@ -132,7 +132,7 @@
         }
       },
       "http": 200,
-      "ms": 12,
+      "ms": 6,
       "intention": "LANGUAGE_SWITCH",
       "langue": "fub",
       "resume": "Neldugol 5 000 FCFA ka Aicha Njoya (690 000 002). Njobdi 50 FCFA. Fof 5 050 FCFA.",
@@ -155,14 +155,14 @@
             "total": 5050,
             "beneficiary": "Aicha Njoya",
             "beneficiary_phone": "690000002",
-            "transaction_id": "MBP00000002",
+            "transaction_id": "MBP00000004",
             "target_language": "fub",
             "served_language": "fub"
           },
           "language": "fub"
         },
         "transaction": {
-          "id": "MBP00000002",
+          "id": "MBP00000004",
           "status": "pending"
         }
       }
@@ -172,11 +172,11 @@
       "tour": "écran",
       "url": "/middleware/mobile",
       "entree": {
-        "trace_id": "console-ui-mwz60ehb",
+        "trace_id": "console-ui-mwz6ml72",
         "team_id": "nkaplingua",
         "channel": "mobile",
         "type": "ui_translation",
-        "session_id": "mobile-68z43y",
+        "session_id": "mobile-tqao67",
         "phone": "237699000003",
         "language": "fub",
         "source_language": "fr",
@@ -217,7 +217,7 @@
         }
       },
       "http": 200,
-      "ms": 6,
+      "ms": 8,
       "intention": "UI_TRANSLATION",
       "langue": "fub",
       "resume": "6 chaînes",
@@ -239,11 +239,11 @@
       "tour": "écran",
       "url": "/middleware/web",
       "entree": {
-        "trace_id": "console-ui-mwz60ehh",
+        "trace_id": "console-ui-mwz6ml7b",
         "team_id": "nkaplingua",
         "channel": "web",
         "type": "ui_translation",
-        "session_id": "web-3f0ceh",
+        "session_id": "web-pg1ysx",
         "phone": "237699000003",
         "language": "fub",
         "source_language": "fr",
@@ -284,7 +284,7 @@
         }
       },
       "http": 200,
-      "ms": 14,
+      "ms": 2,
       "intention": "UI_TRANSLATION",
       "langue": "fub",
       "resume": "6 chaînes",
@@ -306,14 +306,14 @@
       "tour": "menu",
       "url": "/ivr",
       "entree": {
-        "call_id": "ivr-phhg7p",
+        "call_id": "ivr-n9ph94",
         "phone": "237699000003",
         "input": {
           "digits": ""
         }
       },
       "http": 200,
-      "ms": 9,
+      "ms": 7,
       "langue": "fr",
       "resume": "Choisissez:",
       "ok": true,
@@ -342,14 +342,14 @@
       "tour": "solde",
       "url": "/ivr",
       "entree": {
-        "call_id": "ivr-phhg7p",
+        "call_id": "ivr-n9ph94",
         "phone": "237699000003",
         "input": {
           "digits": "1"
         }
       },
       "http": 200,
-      "ms": 12,
+      "ms": 19,
       "langue": "fr",
       "resume": "Votre solde est de 250 000 FCFA.",
       "ok": true,
@@ -369,7 +369,7 @@
       "tour": "carte",
       "url": "/atm",
       "entree": {
-        "session_id": "atm-juxmgq",
+        "session_id": "atm-biuznw",
         "card": "237699000003",
         "language": "fr",
         "input": {
@@ -377,7 +377,7 @@
         }
       },
       "http": 200,
-      "ms": 9,
+      "ms": 6,
       "langue": "fr",
       "resume": "Code a 4 chiffres:",
       "ok": true,
@@ -413,7 +413,7 @@
       "tour": "code",
       "url": "/atm",
       "entree": {
-        "session_id": "atm-juxmgq",
+        "session_id": "atm-biuznw",
         "card": "237699000003",
         "language": "fr",
         "input": {
@@ -421,7 +421,7 @@
         }
       },
       "http": 200,
-      "ms": 20,
+      "ms": 14,
       "langue": "fr",
       "resume": "Bienvenue au distributeur Safinum, Fadimatou Bouba.",
       "ok": true,
@@ -457,7 +457,7 @@
       "tour": "solde",
       "url": "/atm",
       "entree": {
-        "session_id": "atm-juxmgq",
+        "session_id": "atm-biuznw",
         "card": "237699000003",
         "language": "fr",
         "input": {
@@ -465,7 +465,7 @@
         }
       },
       "http": 200,
-      "ms": 9,
+      "ms": 14,
       "langue": "fr",
       "resume": "Votre solde est de 250 000 FCFA.",
       "ok": true,
