@@ -208,8 +208,10 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
         );
         log(`trace=${trace || '-'} channel=ivr`);
         // Audio : on ne sert un clip que s'il correspond EXACTEMENT à la phrase prononcée.
+        // Un clip humain (`model: "locuteurs"`) déclare sa propre voix ; sinon on se rabat sur le
+        // modèle de synthèse de la langue. Une langue sans modèle reste `model: null`.
         const clip = clipForText(reply.language, reply.say);
-        const model = voiceModel(reply.language);
+        const model = clip?.model ?? voiceModel(reply.language);
         return json(res, 200, {
           ...reply,
           audio:

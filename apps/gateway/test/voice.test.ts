@@ -170,3 +170,64 @@ afterAll(() => {
   delete process.env.NKAP_AUDIO_DIR;
   fs.rmSync(dir, { recursive: true, force: true });
 });
+
+describe('clip humain déclaré dans index.json', () => {
+  const humanDir = fs.mkdtempSync(path.join(os.tmpdir(), 'nkap-voice-human-'));
+  const MENU_FUB = message('fub', 'ivr.menu');
+  let server: ReturnType<typeof createMiddlewareServer>;
+  let base: string;
+
+  beforeAll(async () => {
+    fs.mkdirSync(path.join(humanDir, 'fub'), { recursive: true });
+    fs.writeFileSync(path.join(humanDir, 'fub', 'ivr.menu.wav'), wav());
+    fs.writeFileSync(
+      path.join(humanDir, 'index.json'),
+      JSON.stringify({
+        engine: 'human',
+        generated_at: '2026-11-27T12:00:00Z',
+        clips: [
+          {
+            lang: 'fub',
+            key: 'ivr.menu',
+            text: MENU_FUB,
+            file: 'fub/ivr.menu.wav',
+            duration_ms: 1200,
+            bytes: 1644,
+            model: 'locuteurs',
+            engine: 'human',
+            status: 'human',
+          },
+        ],
+        licence: 'Enregistrement de locuteurs — accord écrit',
+      }),
+    );
+    process.env.NKAP_AUDIO_DIR = humanDir;
+    server = createMiddlewareServer({
+      teamKey: DEMO_TEAM_KEY,
+      bankUrl: 'http://127.0.0.1:1',
+      localChannels: true,
+      log: () => undefined,
+    });
+    await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve));
+    base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
+  });
+
+  afterAll(async () => {
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+    delete process.env.NKAP_AUDIO_DIR;
+    fs.rmSync(humanDir, { recursive: true, force: true });
+  });
+
+  it('sert le clip du locuteur et le déclare « locuteurs », sans voix de synthèse', async () => {
+    const reply = await fetch(`${base}/ivr`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ call_id: 'voix-humaine', phone: PHONE, language: 'fub', input: { digits: '' } }),
+    }).then((response) => response.json() as Promise<IvrAudit>);
+
+    expect(reply.say).toBe(MENU_FUB);
+    expect(reply.audio).toMatchObject({ url: '/audio/fub/ivr.menu.wav', model: 'locuteurs' });
+    expect(reply.voice).toEqual({ model: 'locuteurs' });
+    expect(voiceSummary().languages).toContainEqual({ lang: 'fub', model: 'locuteurs', clips: 1 });
+  });
+});

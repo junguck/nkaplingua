@@ -38,7 +38,8 @@ export interface AudioClip {
   readonly bytes: number;
   readonly model: string;
   readonly engine: string;
-  readonly status: 'generated';
+  /** `generated` = MMS-TTS ; `human` = locuteur enregistré (model `locuteurs`). */
+  readonly status: 'generated' | 'human';
 }
 
 export interface AudioIndex {
@@ -106,13 +107,18 @@ export interface VoiceSummary {
 export function voiceSummary(dir: string = audioDir()): VoiceSummary {
   const index = loadAudioIndex(dir);
   const counts = new Map<string, number>();
-  for (const clip of index?.clips ?? []) counts.set(clip.lang, (counts.get(clip.lang) ?? 0) + 1);
+  const models = new Map<string, string>();
+  for (const clip of index?.clips ?? []) {
+    counts.set(clip.lang, (counts.get(clip.lang) ?? 0) + 1);
+    // Un clip humain porte son propre modèle (`locuteurs`) : on ne le déclare pas « inconnu ».
+    if (!models.has(clip.lang)) models.set(clip.lang, clip.model);
+  }
   return {
     engine: index?.engine ?? 'facebook/mms-tts',
     available: index !== null && index.clips.length > 0,
     generated_at: index?.generated_at ?? null,
     languages: [...counts.entries()]
-      .map(([lang, clips]) => ({ lang, model: VOICE_MODELS[lang] ?? 'inconnu', clips }))
+      .map(([lang, clips]) => ({ lang, model: VOICE_MODELS[lang] ?? models.get(lang) ?? 'inconnu', clips }))
       .sort((a, b) => a.lang.localeCompare(b.lang)),
     withoutModel: [...NO_VOICE_MODEL],
     licence: index?.licence ?? 'facebook/mms-tts — CC-BY-NC 4.0',

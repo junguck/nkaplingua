@@ -86,18 +86,24 @@ Exemple de réponse IVR :
 
 ## 5. Tests
 
-`apps/gateway/test/voice.test.ts` (7 tests) vérifie sans réseau ni modèle :
+`apps/gateway/test/voice.test.ts` (8 tests) vérifie sans réseau ni modèle :
 
 - la correspondance texte ↔ clip (espaces et retours à la ligne normalisés) ;
 - le refus d'une langue sans modèle (`fub` → `audio: null`, `voice.model: null`) ;
 - le service d'un WAV et de l'index, le 404 sur un clip absent, la tentative de traversée de chemin ;
 - la page `/voix` ;
-- l'attachement du clip à la réponse IVR.
+- l'attachement du clip à la réponse IVR ;
+- un clip **humain** déclaré (`status: "human"`, `model: "locuteurs"`) sort dans `POST /ivr` et
+  `voice.model` vaut `locuteurs`, jamais `null` ni un modèle de synthèse.
 
 ## 6. Passer aux enregistrements humains (fulfulde)
 
 Le format est déjà celui qu'attend le serveur : il suffit de déposer `audio/fub/<cle>.wav` et
 d'ajouter l'entrée correspondante dans `index.json` (même schéma, `engine: "human"`,
-`model: "locuteurs"`, `status: "generated"`). La fiche `docs/relecture/fub.md` fournit les phrases
-exactes, dans l'ordre, avec les deux colonnes de verdict. Tant que la séance n'a pas eu lieu,
-le fulfulde reste sans audio — et le dit.
+`model: "locuteurs"`, `status: "human"`). Le serveur retrouve le clip par le **texte exact** de la
+phrase (comme pour la synthèse) et répond `voice.model: "locuteurs"` : c'est l'enregistrement qui
+parle, pas une voix française déguisée. `GET /health` compte alors la langue avec son vrai modèle.
+La fiche `docs/relecture/fub.md` fournit les phrases exactes, dans l'ordre, avec les deux colonnes
+de verdict. Tant que la séance n'a pas eu lieu, le fulfulde reste sans audio — et le dit :
+`audio: null`, `voice.model: null`, texte fulfulde servi en clair (vérifié en direct le 27/11 via
+la sandbox : « Suɓo: 1. Ceede am keddiiɗe… », aucun audio).
