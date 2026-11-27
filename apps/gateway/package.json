@@ -12,7 +12,9 @@
     "demo": "node dist/demo/server.js",
     "dev": "pnpm build && node dist/server.js",
     "i18n": "node scripts/i18n.mjs",
-    "lang": "node scripts/lang.mjs"
+    "lang": "node scripts/lang.mjs",
+    "tunnel": "node scripts/tunnel-stable.mjs",
+    "tunnel:named": "node scripts/tunnel-named.mjs"
   },
   "dependencies": {
     "@nkap/contracts": "workspace:*",

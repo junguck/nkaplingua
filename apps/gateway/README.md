@@ -27,13 +27,14 @@ ENABLE_V2_CHANNELS=1 SAFINUM_BANK_URL=http://127.0.0.1:8788/api/v1 \
 SAFINUM_TEAM_KEY=sbx_demo_local node dist/server.js
 ```
 
-- Console de test : <http://127.0.0.1:8080/console> (langue de réponse, statut du pack et repli affichés)
-- Santé : `GET /health` · catalogue des langues : `GET /langues`
+- Console de test : <http://127.0.0.1:8080/console> — onglets USSD, mobile, web, IVR et ATM (langue de réponse, statut du pack et repli affichés)
+- Base de mots dans le navigateur : <http://127.0.0.1:8080/langues-admin> (ajout de langue, de mot, poids, export, essai) — **locale uniquement**, `403` hors boucle locale
+- Santé : `GET /health` · catalogue des langues : `GET /langues` · état de la base : `GET /api/langues`
 
 ## Tests
 
 ```bash
-npx vitest run apps/gateway   # 117 tests : détection, IVR, ATM, HTTP réel
+npx vitest run apps/gateway   # 128 tests : détection, IVR, ATM, base de mots, HTTP réel
 pnpm --filter @nkap/gateway typecheck
 ```
 
@@ -53,10 +54,34 @@ Le lexique TypeScript reste la référence ; la base s'y ajoute. `lang exporter 
 entièrement du fichier (seul moyen de supprimer un mot intégré). Une base invalide est refusée en entier et
 signalée dans `/health` et `/langues`.
 
-## Preuve des dix scénarios
+La même chose existe dans le navigateur, pour un linguiste qui ne veut pas de terminal :
+`/langues-admin` (ajouter une langue, corriger un alias, changer un poids, exporter, essayer une phrase).
+Chaque écriture est validée en bloc puis appliquée immédiatement au moteur.
+
+### Fiche de relecture pour deux locuteurs
 
 ```bash
+pnpm --filter @nkap/gateway i18n fiche fub   # → docs/relecture/fub.md (phrases + mots + signatures)
+```
+
+La fiche liste ce que le middleware affiche réellement, avec deux colonnes de verdict et une case de
+correction : c'est le support de la séance de relecture, pas une traduction inventée.
+
+## Preuves
+
+```bash
+# dix scénarios du règlement, par le vrai serveur HTTP
 node apps/gateway/scripts/scenarios.mjs --out docs/preuves/jour-j.json
+
+# un parcours sur chaque canal : ussd, mobile, web, ivr, atm
+node apps/gateway/scripts/canaux.mjs --out docs/preuves/canaux.json
+```
+
+## Tunnel
+
+```bash
+pnpm tunnel                    # quick tunnel (répétitions) : URL qui change
+pnpm tunnel:named              # tunnel nommé (jour J) : URL figée, voir docs/TUNNEL-NOMME.md
 ```
 
 Rejoue les dix scénarios du règlement sur la banque simulée et écrit, par tour : entrée, canal, intention,

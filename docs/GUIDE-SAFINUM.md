@@ -1,6 +1,6 @@
 # Brancher SAFINUM — mode d'emploi du middleware
 
-> `apps/gateway` · 117 tests dédiés · une seule URL pour `ussd`, `mobile` et `web`.<br>
+> `apps/gateway` · 128 tests dédiés · une seule URL pour `ussd`, `mobile` et `web`.<br>
 > Contrat et règles d'évaluation : [`SANDBOX-SAFINUM.md`](SANDBOX-SAFINUM.md).
 > Documentation publique consultable : [safinum.cm/sandbox/docs](https://safinum.cm/sandbox/docs). Les essais d'équipe nécessitent la clé et le `team_id` attribués.
 
@@ -179,7 +179,7 @@ trop longue n'est jamais envoyée. Sous 75 % de clés traduites, tout l'écran r
 
 ## 8. Ce qui a été vérifié
 
-- `pnpm test` : 218 tests au dernier contrôle local du 27/11/2026 (40 du middleware gateway dans la suite active) ; les essais sandbox de bout en bout nécessitent qu'une URL publique soit déclarée.
+- `pnpm test` : 229 tests au dernier contrôle local du 27/11/2026 (40 dans `middleware.test.ts`, 11 dans `lang-admin.test.ts`) ; les essais sandbox de bout en bout nécessitent qu'une URL publique soit déclarée.
 - `pnpm typecheck` : 9 projets verts.
 - Bundle `dist/server.js` + banque de démo en HTTP : kit officiel (menu, solde, écran web), transfert en
   texte libre fulfulde créé au tour A puis confirmé au tour B, options dans la langue de l'écran.

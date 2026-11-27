@@ -10,6 +10,7 @@ export { detectLanguage, resolveTurnLanguage, type LanguageGuess } from './langu
 export { InMemorySessions, TtlStore, type SessionStore, type SessionState } from './session.js';
 export { handleIvr, type IvrReply, type IvrState, type IvrTurn } from './ivr.js';
 export { handleAtm, notesFor, type AtmReply, type AtmState, type AtmTurn } from './atm.js';
+export { adminAction, adminState, type AdminResult, type AdminState } from './lang-admin.js';
 export { DemoBank } from './demo/demo-bank.js';
 export { createDemoServer, startDemoServer, DEMO_TEAM_KEY, type DemoCall, type DemoServerOptions } from './demo/server.js';
 export { SecondLook, type SecondLookPolicy, type TrustedContact, type Decision, type ApprovalRequest, type Notifier } from './second-look.js';

@@ -6,7 +6,7 @@
 
 NkapLingua est une infrastructure linguistique déterministe pour les services financiers numériques. Le dépôt combine un moteur TypeScript partagé, un middleware d’intégration SAFINUM, une banque simulée, une application web, une application mobile Android et une extension de navigateur. Le middleware prend en charge les canaux SAFINUM disponibles dans la documentation actuelle : USSD, mobile et web.
 
-Le contrôle local le plus récent (27/11/2026) compte 218 tests passés et le typage passe pour le moteur, le middleware, le web et le mobile. La clé SAFINUM est valide, mais l’équipe ne possède pas d’URL middleware déclarée : les simulateurs répondent `NO_ENDPOINT`. La démonstration SAFINUM de bout en bout n’est donc pas encore validée.
+Le contrôle local le plus récent (27/11/2026) compte 229 tests passés et le typage passe pour le moteur, le middleware, le web et le mobile. La clé SAFINUM est valide, mais l’équipe ne possède pas d’URL middleware déclarée : les simulateurs répondent `NO_ENDPOINT`. La démonstration SAFINUM de bout en bout n’est donc pas encore validée.
 
 ## Architecture
 
@@ -33,7 +33,7 @@ Le contrôle local le plus récent (27/11/2026) compte 218 tests passés et le t
 
 ## Validation réalisée
 
-- Suite Vitest : **218 tests réussis** au dernier contrôle (27/11/2026).
+- Suite Vitest : **229 tests réussis** au dernier contrôle (27/11/2026).
 - TypeScript : contrats, core, SAFINUM, gateway, web et mobile passent le typecheck.
 - La clé fournie est valide pour l’équipe `shun-and Co`, identifiant `shun-and-co`.
 - Les pages simulateur USSD, mobile et web existent. Les requêtes de test ont été acceptées par le simulateur mais signalées `NO_ENDPOINT`, car aucune URL n’est enregistrée.

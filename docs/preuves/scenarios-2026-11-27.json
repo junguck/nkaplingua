@@ -1,5 +1,5 @@
 {
-  "genere_le": "2026-11-27T14:26:01.852Z",
+  "genere_le": "2026-11-27T15:53:27.948Z",
   "banque": "démonstration locale (sbx_demo_local)",
   "telephone": "237699000003",
   "scenarios": [
@@ -20,8 +20,8 @@
           },
           "statut": "none",
           "langue_reponse": "fub",
-          "trace": "1-solde-t1-6wko2i",
-          "ms": 70,
+          "trace": "1-solde-t1-bbe5hv",
+          "ms": 64,
           "reponse": "Ceede maa keddiide: 250 000 FCFA."
         }
       ]
@@ -47,8 +47,8 @@
           },
           "statut": "pending",
           "langue_reponse": "fr",
-          "trace": "2-transfert-t1-r8fexu",
-          "ms": 21,
+          "trace": "2-transfert-t1-fgujf8",
+          "ms": 30,
           "reponse": "Envoi de 5 000 FCFA a Aicha Njoya (690 000 002). Frais 50 FCFA. Total 5 050 FCFA.\n1. Confirmer\n2. Annuler\n3. Modifier"
         },
         {
@@ -64,8 +64,8 @@
           },
           "statut": "confirmed",
           "langue_reponse": "fr",
-          "trace": "2-transfert-t2-gp5qmw",
-          "ms": 18,
+          "trace": "2-transfert-t2-9oy9rn",
+          "ms": 20,
           "reponse": "5 000 FCFA envoye a Aicha Njoya (690 000 002). Ref MBP00000001. Solde 244 950 FCFA."
         }
       ]
@@ -88,8 +88,8 @@
           },
           "statut": "none",
           "langue_reponse": "fr",
-          "trace": "3-frais-t1-4vc8ez",
-          "ms": 22,
+          "trace": "3-frais-t1-205gao",
+          "ms": 24,
           "reponse": "Pour 25 000 FCFA: frais 150 FCFA. Total 25 150 FCFA."
         }
       ]
@@ -115,8 +115,8 @@
           },
           "statut": "pending",
           "langue_reponse": "fr",
-          "trace": "4-correction-t1-idpy0u",
-          "ms": 33,
+          "trace": "4-correction-t1-o039ua",
+          "ms": 26,
           "reponse": "Envoi de 5 000 FCFA a Aicha Njoya (690 000 002). Frais 50 FCFA. Total 5 050 FCFA.\n1. Confirmer\n2. Annuler\n3. Modifier"
         },
         {
@@ -136,8 +136,8 @@
           },
           "statut": "pending",
           "langue_reponse": "fr",
-          "trace": "4-correction-t2-er9g49",
-          "ms": 31,
+          "trace": "4-correction-t2-918768",
+          "ms": 37,
           "reponse": "Envoi de 3 000 FCFA a Aicha Njoya (690 000 002). Frais 50 FCFA. Total 3 050 FCFA.\n1. Confirmer\n2. Annuler\n3. Modifier"
         }
       ]
@@ -160,8 +160,8 @@
           },
           "statut": "none",
           "langue_reponse": "fr",
-          "trace": "5-beneficiaire-inconnu-t1-jfggw4",
-          "ms": 16,
+          "trace": "5-beneficiaire-inconnu-t1-4inwj1",
+          "ms": 15,
           "reponse": "Beneficiaire introuvable. Verifiez le numero."
         },
         {
@@ -181,8 +181,8 @@
           },
           "statut": "pending",
           "langue_reponse": "fr",
-          "trace": "5-beneficiaire-inconnu-t2-rrczfa",
-          "ms": 20,
+          "trace": "5-beneficiaire-inconnu-t2-h5hgey",
+          "ms": 28,
           "reponse": "Envoi de 2 000 FCFA a 690 000 002. Frais 50 FCFA. Total 2 050 FCFA.\n1. Confirmer\n2. Annuler\n3. Modifier"
         }
       ]
@@ -203,8 +203,8 @@
           },
           "statut": "none (INSUFFICIENT_FUNDS)",
           "langue_reponse": "fr",
-          "trace": "6-solde-insuffisant-t1-5ooe2a",
-          "ms": 36,
+          "trace": "6-solde-insuffisant-t1-jed7dv",
+          "ms": 32,
           "reponse": "Solde insuffisant pour cette operation."
         }
       ]
@@ -230,8 +230,8 @@
           },
           "statut": "pending",
           "langue_reponse": "fr",
-          "trace": "7-changement-langue-t1-4bn7p8",
-          "ms": 52,
+          "trace": "7-changement-langue-t1-w52dqd",
+          "ms": 19,
           "reponse": "Envoi de 5 000 FCFA a Aicha Njoya (690 000 002). Frais 50 FCFA. Total 5 050 FCFA.\n1. Confirmer\n2. Annuler\n3. Modifier"
         },
         {
@@ -253,8 +253,8 @@
           },
           "statut": "pending",
           "langue_reponse": "fub",
-          "trace": "7-changement-langue-t2-sz3wc2",
-          "ms": 21,
+          "trace": "7-changement-langue-t2-3knecb",
+          "ms": 14,
           "reponse": "Neldugol 5 000 FCFA ka Aicha Njoya (690 000 002). Njobdi 50 FCFA. Fof 5 050 FCFA.\n1. Tabbitin\n2. Haaytu\n3. Waylu"
         }
       ]
@@ -280,8 +280,8 @@
           },
           "statut": "pending",
           "langue_reponse": "fr",
-          "trace": "8-multicanal-t1-iom78y",
-          "ms": 52,
+          "trace": "8-multicanal-t1-mtsipm",
+          "ms": 39,
           "reponse": "Envoi de 5 000 FCFA a Aicha Njoya (690 000 002). Frais 50 FCFA. Total 5 050 FCFA.\n1. Confirmer\n2. Annuler\n3. Modifier"
         },
         {
@@ -301,8 +301,8 @@
           },
           "statut": "pending",
           "langue_reponse": "fr",
-          "trace": "8-multicanal-t2-i0nkwz",
-          "ms": 42,
+          "trace": "8-multicanal-t2-7db44d",
+          "ms": 41,
           "reponse": "Envoi de 5 000 FCFA a Aicha Njoya (690 000 002). Frais 50 FCFA. Total 5 050 FCFA.\n1. Confirmer\n2. Annuler\n3. Modifier"
         },
         {
@@ -322,8 +322,8 @@
           },
           "statut": "pending",
           "langue_reponse": "fr",
-          "trace": "8-multicanal-t3-mcvmmt",
-          "ms": 47,
+          "trace": "8-multicanal-t3-4gh3h7",
+          "ms": 42,
           "reponse": "Envoi de 5 000 FCFA a Aicha Njoya (690 000 002). Frais 50 FCFA. Total 5 050 FCFA.\n1. Confirmer\n2. Annuler\n3. Modifier"
         }
       ]
@@ -342,8 +342,8 @@
           "parametres": {},
           "statut": "none",
           "langue_reponse": "fr",
-          "trace": "9-historique-t1-coz0mg",
-          "ms": 86,
+          "trace": "9-historique-t1-ik2796",
+          "ms": 36,
           "reponse": "Vos dernieres operations:\n27/11 A 690000002 -5 000 FCFA\n27/11 A 690000002 -5 000 FCFA\n27/11 A 690000002 -5 000 FCFA\n27/11 A 690000002 -5 000 FCFA"
         }
       ]
@@ -364,8 +364,8 @@
           },
           "statut": "none",
           "langue_reponse": "fr",
-          "trace": "10-terminologie-t1-6bmhwn",
-          "ms": 15,
+          "trace": "10-terminologie-t1-7w39si",
+          "ms": 23,
           "reponse": "Les frais sont ce que la banque retient pour executer une operation."
         }
       ]

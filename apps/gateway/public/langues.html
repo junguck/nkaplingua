@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NkapLingua · base de mots et langues</title>
+<style>
+  :root {
+    --bg: #f6f7f9; --panel: #fff; --line: #dde3ea; --text: #17202b; --muted: #5d6b7a;
+    --accent: #1f6feb; --accent-soft: #e8f0fe; --good: #157f52; --good-soft: #e5f6ee;
+    --warn: #9a6700; --warn-soft: #fff6d9; --bad: #b42318; --bad-soft: #fdeceb;
+    --mono: ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  header { display: flex; flex-wrap: wrap; gap: 10px; align-items: baseline; justify-content: space-between; padding: 16px 24px; background: var(--panel); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 2; }
+  h1 { font-size: 17px; margin: 0; }
+  h1 span { color: var(--accent); }
+  h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); margin: 0 0 10px; }
+  main { display: grid; grid-template-columns: 320px 1fr; gap: 18px; padding: 18px 24px 40px; align-items: start; }
+  @media (max-width: 980px) { main { grid-template-columns: 1fr; } }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+  .panel + .panel { margin-top: 14px; }
+  .chips { display: flex; gap: 8px; flex-wrap: wrap; }
+  .chip { font: 12px/1 var(--mono); padding: 6px 9px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); color: var(--muted); }
+  .chip.good { background: var(--good-soft); color: var(--good); border-color: #b7e3cd; }
+  .chip.warn { background: var(--warn-soft); color: var(--warn); border-color: #f0dda0; }
+  .chip.bad { background: var(--bad-soft); color: var(--bad); border-color: #f3c6c2; }
+  label { display: block; font-size: 12px; color: var(--muted); margin: 10px 0 4px; }
+  input, select, button, textarea { font-family: inherit; font-size: 14px; }
+  input[type=text], select { width: 100%; padding: 9px 10px; border: 1px solid var(--line); border-radius: 8px; background: #fbfcfd; color: var(--text); }
+  input[type=text]:focus, select:focus { outline: 2px solid var(--accent-soft); border-color: var(--accent); }
+  button { border: 1px solid var(--line); background: #fff; color: var(--text); border-radius: 8px; padding: 9px 12px; cursor: pointer; }
+  button:hover { background: #f2f5f9; }
+  button.primary { background: var(--accent); color: #fff; border-color: var(--accent); font-weight: 600; }
+  button.primary:hover { background: #1a5fd0; }
+  button.ghost { border-color: transparent; color: var(--muted); }
+  button.danger { color: var(--bad); border-color: #f3c6c2; background: var(--bad-soft); padding: 4px 8px; font-size: 12px; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: flex-end; }
+  .row > * { flex: 1; min-width: 120px; }
+  .row > button { flex: 0 0 auto; }
+  ul.langs { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; max-height: 420px; overflow: auto; }
+  ul.langs li { border: 1px solid var(--line); border-radius: 9px; padding: 9px 10px; cursor: pointer; display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+  ul.langs li[aria-selected=true] { border-color: var(--accent); background: var(--accent-soft); }
+  ul.langs b { font-family: var(--mono); font-size: 13px; }
+  ul.langs small { color: var(--muted); display: block; font-size: 11px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th, td { text-align: left; padding: 7px 8px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 600; }
+  td.mot { font-family: var(--mono); }
+  td.poids { width: 90px; }
+  td.poids select { padding: 4px 6px; }
+  .group { margin-bottom: 14px; }
+  .group h3 { font-size: 12px; margin: 0 0 6px; font-family: var(--mono); color: var(--muted); }
+  .hint { color: var(--muted); font-size: 12px; }
+  .notice { border-radius: 9px; padding: 9px 11px; font-size: 13px; margin-top: 10px; }
+  .notice.ok { background: var(--good-soft); color: var(--good); }
+  .notice.err { background: var(--bad-soft); color: var(--bad); }
+  .notice ul { margin: 6px 0 0; padding-left: 18px; }
+  pre { background: #0f1720; color: #dbe7f3; border-radius: 10px; padding: 12px; font: 12px/1.5 var(--mono); overflow: auto; margin: 10px 0 0; }
+  footer { padding: 0 24px 30px; color: var(--muted); font-size: 12px; }
+  code { font-family: var(--mono); }
+  .sep { height: 1px; background: var(--line); margin: 14px 0; }
+</style>
+</head>
+<body>
+<header>
+  <h1>NkapLingua <span>·</span> base de mots — langues, alias, vocabulaire</h1>
+  <div class="chips">
+    <span class="chip" id="state">chargement…</span>
+    <span class="chip" id="applied">—</span>
+    <span class="chip">local uniquement</span>
+  </div>
+</header>
+
+<main>
+  <div>
+    <section class="panel">
+      <h2>Langues dans la base</h2>
+      <ul class="langs" id="langs"></ul>
+      <div class="sep"></div>
+      <h2>Ajouter une langue du contrat</h2>
+      <label for="new-code">Langue disponible</label>
+      <select id="new-code"></select>
+      <label for="new-nom">Nom affiché</label>
+      <input type="text" id="new-nom" placeholder="ex. Ɓasaá">
+      <label for="new-alias">Alias (séparés par des virgules)</label>
+      <input type="text" id="new-alias" placeholder="ex. bassa, basa">
+      <label for="new-sources">Provenance des mots (locuteur, ville, date)</label>
+      <input type="text" id="new-sources" placeholder="ex. Session du 27/11, 2 locuteurs, Douala">
+      <div class="row" style="margin-top:12px">
+        <button class="primary" id="add-lang">Ajouter la langue</button>
+      </div>
+      <p class="hint">Une langue peut être ajoutée sans aucun mot : rien n'est inventé, elle sera simplement reconnue par son nom.</p>
+    </section>
+
+    <section class="panel">
+      <h2>Fiche de la langue</h2>
+      <div id="lang-form" hidden>
+        <label for="nom">Nom affiché</label>
+        <input type="text" id="nom">
+        <label for="alias">Alias (virgules)</label>
+        <input type="text" id="alias">
+        <label for="sources">Provenance</label>
+        <input type="text" id="sources">
+        <div class="row" style="margin-top:12px">
+          <button class="primary" id="save-lang">Enregistrer la fiche</button>
+        </div>
+        <div class="row" style="margin-top:8px">
+          <button id="export-lang">Exporter le lexique intégré</button>
+        </div>
+        <p class="hint" id="export-hint">« Exporter » fait venir la langue entièrement de cette base : à partir de là, on modifie et on supprime chaque mot, y compris ceux du code.</p>
+        <div id="lang-notice"></div>
+      </div>
+      <p class="hint" id="no-lang">Choisissez une langue à gauche.</p>
+    </section>
+  </div>
+
+  <div>
+    <section class="panel">
+      <h2 id="mots-title">Mots reconnus</h2>
+      <div id="mots-empty" class="hint">Aucune langue sélectionnée.</div>
+      <div id="mots"></div>
+
+      <div class="sep"></div>
+      <h2>Ajouter ou corriger un mot</h2>
+      <div class="row">
+        <div>
+          <label for="mot-intention">Type / intention</label>
+          <select id="mot-intention"></select>
+        </div>
+        <div>
+          <label for="mot-texte">Mot tel que l'utilisateur le tape</label>
+          <input type="text" id="mot-texte" placeholder="ex. musongi">
+        </div>
+        <div style="flex:0 0 110px">
+          <label for="mot-poids">Poids</label>
+          <select id="mot-poids"></select>
+        </div>
+        <button class="primary" id="add-mot">Enregistrer le mot</button>
+      </div>
+      <p class="hint">Un mot déjà présent est mis à jour (son poids change) au lieu d'être dupliqué. Poids 1 = indice faible, 5 = mot sans ambiguïté.</p>
+      <div id="mot-notice"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Essayer une phrase</h2>
+      <div class="row">
+        <div>
+          <label for="phrase">Phrase (comme à l'USSD)</label>
+          <input type="text" id="phrase" placeholder="ex. parle-moi en bassa / mi yiɗi ceede am">
+        </div>
+        <button class="primary" id="test">Analyser</button>
+      </div>
+      <pre id="test-out">langue, intention et paramètres apparaîtront ici.</pre>
+    </section>
+  </div>
+</main>
+
+<footer>
+  Page locale : elle écrit <code>apps/gateway/data/langues.json</code> et applique la base immédiatement.
+  Toute requête venant d'une autre adresse que la boucle locale est refusée (403), même à travers un tunnel.
+</footer>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const state = { data: null, code: null };
+
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  }
+
+  function notice(where, ok, message, problems) {
+    const box = $(where);
+    if (!message && (!problems || problems.length === 0)) { box.innerHTML = ''; return; }
+    const list = (problems || []).length ? '<ul>' + problems.map((p) => '<li>' + escapeHtml(p) + '</li>').join('') + '</ul>' : '';
+    box.innerHTML = '<div class="notice ' + (ok ? 'ok' : 'err') + '">' + escapeHtml(message || 'Refusé') + list + '</div>';
+  }
+
+  async function load() {
+    const response = await fetch('/api/langues');
+    state.data = await response.json();
+    render();
+  }
+
+  async function act(action, payload) {
+    const response = await fetch('/api/langues/' + action, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    const json = await response.json();
+    if (!json.ok) notice(action === 'langue' ? 'lang-notice' : 'mot-notice', false, 'Rien n’a été écrit', json.problems || [json.error]);
+    else await load();
+    if (json.ok) {
+      notice(action === 'langue' ? 'lang-notice' : 'mot-notice', true, json.message || 'Enregistré');
+      if (action !== 'tester') await load();
+    }
+    return json;
+  }
+
+  function render() {
+    const data = state.data;
+    const base = data.applied || {};
+    $('state').textContent = data.ok ? 'base valide' : 'base invalide';
+    $('state').className = 'chip ' + (data.ok ? 'good' : 'bad');
+    $('applied').textContent = (base.words || 0) + ' indice(s) chargé(s)' + (base.languages && base.languages.length ? ' · ' + base.languages.join(', ') : '');
+    $('applied').className = 'chip ' + (base.ok ? 'good' : 'warn');
+
+    $('langs').innerHTML = data.languages.map((language) =>
+      '<li data-code="' + language.code + '" aria-selected="' + (language.code === state.code) + '">' +
+        '<span><b>' + language.code + '</b> <small>' + escapeHtml(language.nom) + ' · ' + language.total + ' mot(s)' +
+        (language.remplace ? ' · base seule' : '') + '</small></span>' +
+        '<span class="chip ' + (language.service === 'servi' ? 'good' : language.service === 'hors sandbox' ? 'warn' : '') + '">' +
+        escapeHtml(language.service) + '</span>' +
+      '</li>').join('') || '<li class="hint">Base vide : ajoutez une langue à droite.</li>';
+    $('langs').querySelectorAll('li[data-code]').forEach((item) =>
+      item.addEventListener('click', () => select(item.dataset.code)));
+
+    $('new-code').innerHTML = data.disponibles.length
+      ? data.disponibles.map((entry) => '<option value="' + entry.code + '">' + entry.code + ' — ' + escapeHtml(entry.nom) + (entry.sandbox ? '' : ' (hors sandbox)') + '</option>').join('')
+      : '<option value="">toutes les langues du contrat sont déjà dans la base</option>';
+    if (!state.code && data.languages.length > 0) select(data.languages[0].code);
+    if (state.code) fillForm();
+    fillIntentions();
+  }
+
+  function select(code) {
+    state.code = code;
+    const language = (state.data.languages || []).find((entry) => entry.code === code);
+    document.querySelectorAll('#langs li').forEach((item) =>
+      item.setAttribute('aria-selected', String(item.dataset.code === code)));
+    if (!language) return;
+    $('lang-form').hidden = false;
+    $('no-lang').hidden = true;
+    fillForm();
+    renderWords(language);
+  }
+
+  function fillForm() {
+    const language = (state.data.languages || []).find((entry) => entry.code === state.code);
+    if (!language) return;
+    $('nom').value = language.nom;
+    $('alias').value = language.alias.join(', ');
+    $('sources').value = language.sources.join(' | ');
+    $('export-hint').textContent = language.remplace
+      ? 'Cette langue vient déjà de la base : exporter la remet à jour depuis ce que le moteur comprend aujourd’hui.'
+      : '« Exporter » fait venir la langue entièrement de cette base : à partir de là, on modifie et on supprime chaque mot, y compris ceux du code.';
+  }
+
+  function renderWords(language) {
+    $('mots-title').textContent = 'Mots reconnus — ' + language.code + ' (' + language.total + ')';
+    $('mots-empty').hidden = true;
+    const groups = [];
+    if (language.mots_outils.length) {
+      groups.push(group('mots-outils (indices de langue)', language.mots_outils, null));
+    }
+    Object.keys(language.mots).sort().forEach((intent) => {
+      if (language.mots[intent].length) groups.push(group(intent, language.mots[intent], intent));
+    });
+    $('mots').innerHTML = groups.join('') || '<p class="hint">Aucun mot dans la base pour cette langue. Ajoutez-en ci-dessous, ou exportez le lexique intégré.</p>';
+    $('mots').querySelectorAll('select[data-word]').forEach((select) => {
+      select.addEventListener('change', () => {
+        act('mot', { code: language.code, intention: select.dataset.intent || null, texte: select.dataset.word, poids: Number(select.value) });
+      });
+    });
+    $('mots').querySelectorAll('button[data-del]').forEach((button) => {
+      button.addEventListener('click', () => act('supprimer', { code: language.code, texte: button.dataset.del }));
+    });
+  }
+
+  function group(title, list, intent) {
+    const rows = list.map((word) =>
+      '<tr><td class="mot">' + escapeHtml(word.texte) + '</td>' +
+      '<td class="poids"><select data-word="' + escapeHtml(word.texte) + '" data-intent="' + escapeHtml(intent || '') + '">' +
+      weights().map((value) => '<option value="' + value + '"' + (value === word.poids ? ' selected' : '') + '>' + value + '</option>').join('') +
+      '</select></td>' +
+      '<td style="width:70px"><button class="danger" data-del="' + escapeHtml(word.texte) + '">retirer</button></td></tr>').join('');
+    return '<div class="group"><h3>' + escapeHtml(title) + '</h3><table><thead><tr><th>mot</th><th>poids</th><th></th></tr></thead><tbody>' + rows + '</tbody></table></div>';
+  }
+
+  function weights() {
+    const min = (state.data && state.data.weights.min) || 1;
+    const max = (state.data && state.data.weights.max) || 5;
+    const out = [];
+    for (let value = min; value <= max; value += 1) out.push(value);
+    return out;
+  }
+
+  function fillIntentions() {
+    $('mot-intention').innerHTML = '<option value="">mot-outil (indice de langue)</option>' +
+      (state.data.intents || []).map((intent) => '<option value="' + intent + '">' + intent + '</option>').join('');
+    $('mot-poids').innerHTML = weights().map((value) => '<option value="' + value + '"' + (value === 3 ? ' selected' : '') + '>' + value + '</option>').join('');
+  }
+
+  $('add-lang').addEventListener('click', async () => {
+    const code = $('new-code').value;
+    if (!code) return;
+    await act('langue', { code, nom: $('new-nom').value, alias: split($('new-alias').value), sources: split($('new-sources').value) });
+    $('new-nom').value = ''; $('new-alias').value = ''; $('new-sources').value = '';
+  });
+
+  $('save-lang').addEventListener('click', () => {
+    if (!state.code) return;
+    act('langue', { code: state.code, nom: $('nom').value, alias: split($('alias').value), sources: split($('sources').value) });
+  });
+
+  $('export-lang').addEventListener('click', async () => {
+    if (!state.code) return;
+    const json = await act('exporter', { code: state.code });
+    if (json.ok) notice('lang-notice', true, json.message);
+  });
+
+  $('add-mot').addEventListener('click', async () => {
+    if (!state.code) return;
+    const json = await act('mot', {
+      code: state.code,
+      intention: $('mot-intention').value || null,
+      texte: $('mot-texte').value,
+      poids: Number($('mot-poids').value),
+    });
+    if (json.ok) $('mot-texte').value = '';
+  });
+
+  $('test').addEventListener('click', async () => {
+    const response = await fetch('/api/langues/tester', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phrase: $('phrase').value }),
+    });
+    $('test-out').textContent = JSON.stringify(await response.json(), null, 2);
+  });
+
+  function split(value) {
+    return String(value || '').split(/[,|]/).map((item) => item.trim()).filter(Boolean);
+  }
+
+  load().catch((error) => { $('state').textContent = 'erreur : ' + error.message; });
+</script>
+</body>
+</html>

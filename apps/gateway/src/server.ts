@@ -15,7 +15,9 @@ import { fileURLToPath } from 'node:url';
 import type { AddressInfo } from 'node:net';
 import { Gateway } from './gateway.js';
 import { SafinumBank } from './bank.js';
+import { handleAtm } from './atm.js';
 import { handleIvr, type IvrState } from './ivr.js';
+import { adminAction, adminState } from './lang-admin.js';
 import { TtlStore } from './session.js';
 import { isSafinumLanguage, isUiTranslation, statusModeFrom, type InboundTurn, type StatusMode } from '@nkap/safinum';
 import { loadEnv } from './env.js';
@@ -56,6 +58,36 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
         res.end(page);
         return;
+      }
+
+      // Page d'administration de la base de mots : locale uniquement (voir `isLoopback`).
+      if (req.method === 'GET' && (url.pathname === '/langues-admin' || url.pathname === '/langues-admin/')) {
+        if (!isLoopback(req)) return json(res, 403, { error: 'Page locale uniquement' });
+        const page = fs.readFileSync(fileURLToPath(new URL('../public/langues.html', import.meta.url)), 'utf8');
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+        res.end(page);
+        return;
+      }
+
+      // API de la page : lecture de la base et écriture (ajout, correction, suppression, export).
+      if (url.pathname === '/api/langues' || url.pathname.startsWith('/api/langues/')) {
+        if (!isLoopback(req)) return json(res, 403, { error: 'Administration locale uniquement' });
+        if (url.pathname === '/api/langues' || url.pathname === '/api/langues/') {
+          if (req.method !== 'GET') return json(res, 405, { error: 'GET attendu' });
+          return json(res, 200, adminState());
+        }
+        if (req.method !== 'POST') return json(res, 405, { error: 'POST attendu' });
+        let body: unknown;
+        try {
+          body = await readJson(req);
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          return json(res, message === 'TOO_LARGE' ? 413 : 400, { error: message === 'TOO_LARGE' ? 'Corps trop volumineux' : 'JSON invalide' });
+        }
+        const action = url.pathname.split('/')[3] ?? '';
+        const result = adminAction(action, typeof body === 'object' && body !== null ? (body as Record<string, unknown>) : {});
+        log(`lang-admin ${action} HTTP ${result.status}`);
+        return json(res, result.status, result.body);
       }
 
       // Catalogue des langues : ce que nous comprenons, ce que nous servons, où en sont les packs.
@@ -132,6 +164,36 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
           { bank, sessions: ivrSessions },
         );
         log(`trace=${trace || '-'} channel=ivr`);
+        return json(res, 200, reply);
+      }
+
+      // Canal ATM local : même règle que l'IVR, jamais sur le contrat SAFINUM.
+      if (req.method === 'POST' && url.pathname === '/atm') {
+        if (!options.localChannels) return json(res, 404, { error: 'Route inconnue' });
+        let atmBody: {
+          session_id?: string;
+          card?: string;
+          language?: string | null;
+          input?: { digits?: string; text?: string };
+        };
+        try {
+          atmBody = (await readJson(req)) as typeof atmBody;
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          return json(res, message === 'TOO_LARGE' ? 413 : 400, { error: message === 'TOO_LARGE' ? 'Corps trop volumineux' : 'JSON invalide' });
+        }
+        const trace = traceFrom(req.headers['x-trace-id'], undefined) ?? '';
+        const bank = new SafinumBank({ baseUrl: options.bankUrl, teamKey: options.teamKey, traceId: trace });
+        const reply = await handleAtm(
+          {
+            session_id: atmBody.session_id,
+            card: atmBody.card,
+            language: atmBody.language ?? null,
+            input: atmBody.input,
+          },
+          { bank },
+        );
+        log(`trace=${trace || '-'} channel=atm`);
         return json(res, 200, reply);
       }
 
@@ -234,6 +296,15 @@ export function traceFrom(header: string | string[] | undefined, body: string | 
   if (fromHeader) return fromHeader;
   const fromBody = body?.trim();
   return fromBody ? fromBody : undefined;
+}
+
+/**
+ * Vrai seulement pour la boucle locale : l'administration écrit `data/langues.json` et ne doit
+ * jamais être joignable à travers un tunnel public.
+ */
+function isLoopback(req: http.IncomingMessage): boolean {
+  const address = req.socket.remoteAddress ?? '';
+  return address === '127.0.0.1' || address === '::1' || address === '::ffff:127.0.0.1';
 }
 
 function json(res: http.ServerResponse, status: number, body: unknown): void {

@@ -26,7 +26,7 @@ altérer un montant, un nom ou un numéro**.
 | **Contrat** `@nkap/contracts` | intentions canoniques, tours, traces jury (§6.D), port financier, schémas zod |
 | **Banque simulée** `@nkap/banking-sim` | comptes, contacts, grilles de frais, plafonds, historique, codes de retrait |
 | **Mode hors-ligne** | menus USSD pré-traduits servis depuis un cache local quand la banque est injoignable ; corrections mises en file puis synchronisées ([ADR 0005](docs/adr/0005-mode-hors-ligne-ussd.md)) |
-| **Tests** | **154/154** au dernier contrôle local, dont des parcours des **10 scénarios standardisés du §7** et des tests du middleware SAFINUM |
+| **Tests** | **229/229** au dernier contrôle local, dont des parcours des **10 scénarios standardisés du §7**, des cinq canaux et de la base de mots |
 
 ## Ce qui est prêt (J2 — clients)
 
@@ -56,7 +56,7 @@ le tunnel et la déclaration des trois canaux, la console jury, la voix — voir
 ```bash
 corepack enable            # pnpm 10
 pnpm install
-pnpm test                  # 218 tests au dernier contrôle local (27/11/2026)
+pnpm test                  # 229 tests au dernier contrôle local (27/11/2026)
 pnpm typecheck             # TypeScript strict, zéro any (9 projets)
 
 pnpm dev:web               # http://localhost:3000 — banque en ligne + assistant

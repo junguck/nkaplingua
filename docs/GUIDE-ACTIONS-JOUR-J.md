@@ -131,9 +131,14 @@ cloudflared tunnel login
 cloudflared tunnel create nkaplingua
 cloudflared tunnel route dns nkaplingua gateway.<votre-domaine>
 
-# à chaque démarrage
+# à chaque démarrage — variante scriptée : vérifie /health public PUIS déclare les 3 canaux
+# CLOUDFLARE_TUNNEL=nkaplingua PUBLIC_URL=https://gateway.<votre-domaine> pnpm --filter @nkap/gateway tunnel:named
 cloudflared tunnel run --url http://127.0.0.1:8080 nkaplingua
 ```
+
+Détail (jeton Cloudflare, config.yml, dépannage DNS, machine de secours) : **`docs/TUNNEL-NOMME.md`**.
+Le script `scripts/tunnel-named.mjs` fait la même chose que les commandes ci-dessous, mais s'arrête
+proprement si l'URL publique ne répond pas — il ne déclare jamais une URL morte.
 
 Puis déclarer les trois canaux et vérifier :
 
@@ -147,6 +152,8 @@ curl -s https://gateway.<votre-domaine>/health
 `{"ok":true,…}` ; un tour USSD depuis le simulateur arrive dans le journal local.
 
 **Pièges** :
+- La base de mots ne s'administre **pas** à travers le tunnel : `/langues-admin` et `/api/langues`
+  répondent `403` hors boucle locale. C'est voulu : un tunnel public ne doit jamais écrire le lexique.
 - Un tunnel **rapide** (`trycloudflare.com`) change d'URL à chaque redémarrage : interdit le jour J
   (l'URL déclarée ne serait plus la bonne). `scripts/tunnel-stable.mjs` ne fait que **redéclarer** une URL
   rapide toutes les 10 s — utile en répétition, jamais pendant l'évaluation (la configuration est verrouillée).
@@ -185,17 +192,17 @@ Pendant le passage, `POST /sandbox/endpoint` répond `CONFIG_LOCKED` : tout se d
 Source de vérité :
 
 ```bash
-pnpm test                 # 17 fichiers, 218 tests (27/11/2026)
+pnpm test                 # 18 fichiers, 229 tests (27/11/2026)
 ```
 
 Chiffres corrigés dans ce dépôt (mêmes valeurs que l'exécution) :
 
 | Document | Avant | Après |
 | --- | --- | --- |
-| `README.md` (racine) | 154 tests | **218 tests** |
-| `docs/GUIDE-SAFINUM.md` | 57 tests dédiés, 154 au total, 38 middleware | **117 tests gateway, 218 au total, 40 middleware** |
-| `docs/PRESENTATION-TECHNIQUE.md` | 154 tests | **218 tests** |
-| `apps/gateway/README.md` | 80 tests | **117 tests** |
+| `README.md` (racine) | 154 tests | **229 tests** |
+| `docs/GUIDE-SAFINUM.md` | 57 tests dédiés, 154 au total, 38 middleware | **128 tests gateway, 229 au total, 40 middleware** |
+| `docs/PRESENTATION-TECHNIQUE.md` | 154 tests | **229 tests** |
+| `apps/gateway/README.md` | 80 tests | **128 tests** |
 
 **Règle** : toute modification de test met à jour ces quatre endroits dans le **même commit**. Un chiffre
 sans date (« 218 tests ») est faux dès le lendemain : écrire « 218 tests au dernier contrôle (27/11/2026) ».
