@@ -6,6 +6,7 @@
 import type { Redis } from 'ioredis';
 import { z } from 'zod';
 import { REDIS, languageSchema } from '@nkap/lingua-core';
+import { screenSchema } from '../i18n/render.ts';
 
 export const STEPS = [
   'menu',
@@ -33,16 +34,18 @@ const sessionSchema = z.object({
   to: z.string().nullable(),
   toName: z.string().nullable(),
   candidates: z.array(z.object({ name: z.string(), phone: z.string() })).max(9),
+  /** Montant déjà dit par l'utilisateur avant que le bénéficiaire soit levé (jamais une donnée bancaire). */
+  pendingAmount: z.number().int().positive().nullable(),
   biller: z.string().nullable(),
   kind: z.enum(['transfer', 'airtime', 'bill']).nullable(),
   txId: z.string().nullable(),
   /** Dernier écran affiché, pour le rejouer dans une autre langue sans perdre le fil. */
-  screen: z.unknown().nullable(),
+  screen: screenSchema.nullable(),
 });
 export type Session = z.infer<typeof sessionSchema>;
 
 export function freshSession(): Session {
-  return { step: 'menu', lang: null, chosenLang: null, to: null, toName: null, candidates: [], biller: null, kind: null, txId: null, screen: null };
+  return { step: 'menu', lang: null, chosenLang: null, to: null, toName: null, candidates: [], pendingAmount: null, biller: null, kind: null, txId: null, screen: null };
 }
 
 export interface SessionStore {

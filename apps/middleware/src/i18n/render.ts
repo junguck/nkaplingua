@@ -7,6 +7,7 @@
  * déclarée en duala.
  */
 
+import { z } from 'zod';
 import { fill, foldToGsm7, type Language } from '@nkap/lingua-core';
 import type { Catalog } from './catalog.ts';
 
@@ -28,6 +29,14 @@ export interface Screen {
   readonly lines: readonly Line[];
   readonly options: readonly Option[];
 }
+
+const varSchema = z.union([z.string(), z.number()]);
+const lineSchema = z
+  .object({ key: z.string(), vars: z.record(varSchema).optional() })
+  .transform((l): Line => (l.vars === undefined ? { key: l.key } : { key: l.key, vars: l.vars }));
+const optionSchema = z.object({ n: z.number().int(), label: z.union([z.object({ key: z.string() }), z.object({ literal: z.string() })]) });
+/** Écran mémorisé en session (rejoué dans une autre langue) : validé à la relecture depuis Redis. */
+export const screenSchema: z.ZodType<Screen, z.ZodTypeDef, unknown> = z.object({ lines: z.array(lineSchema), options: z.array(optionSchema) });
 
 export interface Rendered {
   readonly text: string;

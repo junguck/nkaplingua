@@ -5,6 +5,9 @@
  */
 
 import { createServer, type Server } from 'node:http';
+import { z } from 'zod';
+
+const bodySchema = z.record(z.unknown());
 
 interface Tier {
   readonly min: number;
@@ -189,7 +192,8 @@ export function startFakeBankServer(bank: FakeBank, port: number, latencyMs = 0)
     req.on('end', () => {
       let body: Record<string, unknown> = {};
       try {
-        body = raw === '' ? {} : (JSON.parse(raw) as Record<string, unknown>);
+        const parsed = bodySchema.safeParse(raw === '' ? {} : JSON.parse(raw));
+        body = parsed.success ? parsed.data : {};
       } catch {
         body = {};
       }

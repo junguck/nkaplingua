@@ -4,7 +4,8 @@
  */
 
 import Fastify, { type FastifyInstance, type FastifyReply, type FastifyRequest } from 'fastify';
-import { turnSchema, uiTranslationSchema, type Language } from '@nkap/lingua-core';
+import { z } from 'zod';
+import { isLanguage, turnSchema, uiTranslationSchema, type Language } from '@nkap/lingua-core';
 import type { BankPort } from './bank/client.ts';
 import type { Catalog } from './i18n/catalog.ts';
 import type { SessionStore } from './session/store.ts';
@@ -39,6 +40,8 @@ export interface AppDeps {
 }
 
 const MIN_SERVED_KEYS = 40;
+
+const envelopeSchema = z.object({ type: z.string().optional(), trace_id: z.string().optional() }).passthrough();
 
 export function buildApp(deps: AppDeps): FastifyInstance {
   const app = Fastify({
@@ -80,8 +83,9 @@ export function buildApp(deps: AppDeps): FastifyInstance {
     const startedAt = performance.now();
     const traceHeader = request.headers['x-trace-id'];
     const body: unknown = request.body;
-    const record = typeof body === 'object' && body !== null ? (body as Record<string, unknown>) : {};
-    const traceId = typeof traceHeader === 'string' ? traceHeader : typeof record.trace_id === 'string' ? record.trace_id : null;
+    const envelope = envelopeSchema.safeParse(body);
+    const record = envelope.success ? envelope.data : {};
+    const traceId = typeof traceHeader === 'string' ? traceHeader : (record.trace_id ?? null);
 
     if (record.type === 'ui_translation') {
       const parsed = uiTranslationSchema.safeParse(body);
@@ -140,8 +144,8 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   app.get<{ Params: { lang: string; file: string } }>('/voix/:lang/:file', async (request, reply) => {
     const { lang, file } = request.params;
     const match = /^([a-z0-9_.]{1,96})\.mp3$/.exec(file);
-    if (match?.[1] === undefined || !/^[a-z]{2,3}$/.test(lang)) return reply.code(404).send();
-    const audio = await deps.audio.get(lang as Language, match[1]);
+    if (match?.[1] === undefined || !isLanguage(lang)) return reply.code(404).send();
+    const audio = await deps.audio.get(lang, match[1]);
     if (audio === null) return reply.code(404).send();
     return reply.header('content-type', 'audio/mpeg').header('cache-control', 'public, max-age=86400, immutable').send(audio);
   });

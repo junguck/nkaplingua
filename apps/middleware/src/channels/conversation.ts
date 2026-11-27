@@ -70,7 +70,7 @@ function out(session: Session, s: Screen, intent: Intent, extra: Partial<Pick<Ou
 }
 
 function menu(session: Session, prefix: readonly ReturnType<typeof line>[] = []): Outcome {
-  const next: Session = { ...session, step: 'menu', to: null, toName: null, candidates: [], biller: null, kind: null };
+  const next: Session = { ...session, step: 'menu', to: null, toName: null, candidates: [], pendingAmount: null, biller: null, kind: null };
   return out(next, screen([...prefix, line('menu.title')], MENU), prefix.length > 0 ? 'CLARIFICATION_NEEDED' : 'UNKNOWN');
 }
 
@@ -194,7 +194,7 @@ async function resolveBeneficiary(session: Session, query: string, amount: numbe
   // Homonymes : on ne choisit JAMAIS à la place de la personne.
   const candidates = list.slice(0, 5).map((c) => ({ name: c.name, phone: c.phone }));
   return {
-    ...ask({ ...session, candidates }, 'transfer.pick', 'choose.beneficiary', pickList(candidates)),
+    ...ask({ ...session, candidates, pendingAmount: amount }, 'transfer.pick', 'choose.beneficiary', pickList(candidates)),
     params: { candidates: candidates.length, pending_amount: amount },
   };
 }
@@ -291,7 +291,7 @@ export async function converse(previous: Session | null, input: TurnInput, deps:
   // Premier tour (code composé, texte vide) : menu, ou reprise d'une opération en attente.
   // Un premier SMS « solde » n'est pas vide : il est compris directement.
   if (text === '') {
-    if (session.step === 'confirm' && session.screen !== null) return out(session, session.screen as Screen, 'CLARIFICATION_NEEDED', { tx: { id: session.txId, status: 'pending' } });
+    if (session.step === 'confirm' && session.screen !== null) return out(session, session.screen, 'CLARIFICATION_NEEDED', { tx: { id: session.txId, status: 'pending' } });
     return menu(session);
   }
 
@@ -299,7 +299,7 @@ export async function converse(previous: Session | null, input: TurnInput, deps:
   const switched = detectLanguageSwitch(text);
   if (switched !== null && !/^\d+$/.test(text)) {
     const next: Session = { ...session, chosenLang: switched };
-    const replay = (session.screen as Screen | null) ?? screen([line('menu.title')], MENU);
+    const replay = session.screen ?? screen([line('menu.title')], MENU);
     return {
       ...out(next, screen([line('language.done'), ...replay.lines], replay.options), 'LANGUAGE_SWITCH', {
         params: { language: switched },
@@ -330,7 +330,7 @@ export async function converse(previous: Session | null, input: TurnInput, deps:
       if (!/^\d$/.test(text) || chosen === undefined) {
         return ask(session, 'transfer.pick', 'choose.beneficiary', pickList(session.candidates), [line('invalid.choice')]);
       }
-      return withBeneficiary({ ...session, to: chosen.phone, toName: chosen.name, candidates: [] }, null, input, deps);
+      return withBeneficiary({ ...session, to: chosen.phone, toName: chosen.name, candidates: [], pendingAmount: null }, session.pendingAmount, input, deps);
     }
 
     case 'transfer.amount':

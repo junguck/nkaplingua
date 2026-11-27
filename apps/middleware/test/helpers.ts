@@ -1,4 +1,3 @@
-import type { AddressInfo } from 'node:net';
 import type { Server } from 'node:http';
 import { Agent } from 'undici';
 import type { FastifyInstance } from 'fastify';
@@ -35,7 +34,9 @@ let traceSeq = 0;
 export async function harness(overrides: Partial<AppDeps> = {}): Promise<Harness> {
   const bank = new FakeBank();
   const server: Server = await startFakeBankServer(bank, 0);
-  const port = (server.address() as AddressInfo).port;
+  const address = server.address();
+  if (address === null || typeof address === 'string') throw new Error('adresse de la banque simulée inattendue');
+  const port = address.port;
   const dispatcher = new Agent({ keepAliveTimeout: 60_000 });
   const catalog = Catalog.from(seedRecords());
   const app = buildApp({

@@ -70,6 +70,14 @@ describe('USSD : transfert en deux tours', () => {
     expect(h.bank.calls.some((c) => c.path === '/transactions')).toBe(false);
   });
 
+  it('homonyme levé : le montant déjà dit n’est pas redemandé', async () => {
+    await h.turn({});
+    await h.turn(say('envoie 5000 a paul'));
+    const r = await h.turn(say('2'));
+    expect(r.interpretation.intent).toBe('TRANSFER');
+    expect(r.response.text).toContain('5 000 FCFA à Paul Etoa');
+  });
+
   it('correction avant confirmation : frais recalculés et nouvelle relecture', async () => {
     await h.turn({});
     await h.turn(say('envoie 5000 a 677000001'));

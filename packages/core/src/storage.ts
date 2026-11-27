@@ -87,3 +87,13 @@ export interface LexiconDoc {
   readonly term: string;
   readonly weight: number;
 }
+
+/** Phrase de référence à traduire (texte source français). `_id` = clé du catalogue. */
+export interface ReferenceDoc {
+  readonly _id: string;
+  readonly fr: string;
+  readonly context: string | null;
+  readonly maxChars: number | null;
+  readonly channels: readonly string[];
+  readonly discoveredAt?: Date;
+}

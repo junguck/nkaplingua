@@ -5,7 +5,8 @@
   "type": "module",
   "description": "Contrat SAFINUM (zod), GSM-7 en septets, pliage des tons pour l'USSD. Partagé par le middleware et le studio.",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./server": "./src/server.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json"

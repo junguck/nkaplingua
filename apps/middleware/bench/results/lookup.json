@@ -1,0 +1,23 @@
+{
+  "keys_per_screen": 40,
+  "iterations": 2000,
+  "at": "2026-11-27T23:13:43.503Z",
+  "results": [
+    {
+      "mode": "kit (readFileSync + JSON.parse)",
+      "per_screen_us": 22.91
+    },
+    {
+      "mode": "redis (HGET par clé)",
+      "per_screen_us": 1864.98
+    },
+    {
+      "mode": "redis (HMGET groupé)",
+      "per_screen_us": 81.47
+    },
+    {
+      "mode": "L1 mémoire (NkapLingua v3)",
+      "per_screen_us": 1.89
+    }
+  ]
+}
