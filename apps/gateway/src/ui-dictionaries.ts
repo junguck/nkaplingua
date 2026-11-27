@@ -67,7 +67,9 @@ const EN: Dictionary = {
   'pay.amount_label': 'Amount',
   'review.title': 'Check before you confirm',
   'review.to': 'Recipient',
-  'review.service': 'Service',
+  // « Service » est identique au français : la sandbox le compte `untranslated`. On nomme
+  // ce que l'écran affiche (l'opérateur ou le service payé) pour que l'anglais soit réel.
+  'review.service': 'Service used',
   'review.amount': 'Amount',
   'review.fee': 'Fee',
   'review.total': 'Total debited',
@@ -85,7 +87,8 @@ const EN: Dictionary = {
   'receipt.cancelled': 'Transaction cancelled. Nothing was debited.',
   'history.title': 'History',
   'history.empty': 'No transactions yet.',
-  'history.col_date': 'Date',
+  // Idem : « Date » ne se distingue pas du français. L'en-tête annonce date ET heure.
+  'history.col_date': 'Date & time',
   'history.col_label': 'Transaction',
   'history.col_amount': 'Amount',
   'history.col_status': 'Status',

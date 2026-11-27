@@ -1,5 +1,5 @@
 {
-  "genere_le": "2026-11-27T17:11:00.810Z",
+  "genere_le": "2026-11-27T17:18:11.974Z",
   "base": "https://safinum.cm/api/v1",
   "equipe": 10,
   "telephone": "237650626114",
@@ -89,7 +89,7 @@
       "requete": {
         "team_id": 10,
         "phone": "237650626114",
-        "session_id": "ecrans-mobile-home-1795799447225",
+        "session_id": "ecrans-mobile-home-1795799876828",
         "screen": "home",
         "text": "",
         "input_type": "text",
@@ -176,7 +176,7 @@
       "requete": {
         "team_id": 10,
         "phone": "237650626114",
-        "session_id": "ecrans-mobile-transfer-1795799447948",
+        "session_id": "ecrans-mobile-transfer-1795799877559",
         "screen": "transfer",
         "text": "",
         "input_type": "text",
@@ -275,7 +275,7 @@
       "requete": {
         "team_id": 10,
         "phone": "237650626114",
-        "session_id": "ecrans-mobile-pay-1795799448522",
+        "session_id": "ecrans-mobile-pay-1795799878124",
         "screen": "pay",
         "text": "",
         "input_type": "text",
@@ -294,9 +294,7 @@
         "total": 31,
         "translated": 31,
         "missing": [],
-        "untranslated": [
-          "review.service"
-        ],
+        "untranslated": [],
         "over_limit": [],
         "placeholder_errors": [],
         "unknown_keys": []
@@ -348,7 +346,7 @@
         "common.stop_listening": "Stop reading",
         "review.title": "Check before you confirm",
         "review.to": "Recipient",
-        "review.service": "Service",
+        "review.service": "Service used",
         "review.amount": "Amount",
         "review.fee": "Fee",
         "review.total": "Total debited",
@@ -370,7 +368,7 @@
       "requete": {
         "team_id": 10,
         "phone": "237650626114",
-        "session_id": "ecrans-mobile-review-1795799449063",
+        "session_id": "ecrans-mobile-review-1795799878686",
         "screen": "review",
         "text": "",
         "input_type": "text",
@@ -439,7 +437,7 @@
       "requete": {
         "team_id": 10,
         "phone": "237650626114",
-        "session_id": "ecrans-mobile-receipt-1795799449641",
+        "session_id": "ecrans-mobile-receipt-1795799879284",
         "screen": "receipt",
         "text": "",
         "input_type": "text",
@@ -520,7 +518,7 @@
       "requete": {
         "team_id": 10,
         "phone": "237650626114",
-        "session_id": "ecrans-mobile-history-1795799450210",
+        "session_id": "ecrans-mobile-history-1795799879833",
         "screen": "history",
         "text": "",
         "input_type": "text",
@@ -615,7 +613,7 @@
       "requete": {
         "team_id": 10,
         "phone": "237650626114",
-        "session_id": "ecrans-web-home-1795799450757",
+        "session_id": "ecrans-web-home-1795799880411",
         "screen": "home",
         "text": "",
         "input_type": "text",
@@ -706,7 +704,7 @@
       "requete": {
         "team_id": 10,
         "phone": "237650626114",
-        "session_id": "ecrans-web-transfer-1795799451304",
+        "session_id": "ecrans-web-transfer-1795799880992",
         "screen": "transfer",
         "text": "",
         "input_type": "text",
@@ -809,7 +807,7 @@
       "requete": {
         "team_id": 10,
         "phone": "237650626114",
-        "session_id": "ecrans-web-pay-1795799451872",
+        "session_id": "ecrans-web-pay-1795799881594",
         "screen": "pay",
         "text": "",
         "input_type": "text",
@@ -828,9 +826,7 @@
         "total": 33,
         "translated": 33,
         "missing": [],
-        "untranslated": [
-          "review.service"
-        ],
+        "untranslated": [],
         "over_limit": [],
         "placeholder_errors": [],
         "unknown_keys": []
@@ -886,7 +882,7 @@
         "common.stop_listening": "Stop reading",
         "review.title": "Check before you confirm",
         "review.to": "Recipient",
-        "review.service": "Service",
+        "review.service": "Service used",
         "review.amount": "Amount",
         "review.fee": "Fee",
         "review.total": "Total debited",
@@ -908,7 +904,7 @@
       "requete": {
         "team_id": 10,
         "phone": "237650626114",
-        "session_id": "ecrans-web-review-1795799452498",
+        "session_id": "ecrans-web-review-1795799882215",
         "screen": "review",
         "text": "",
         "input_type": "text",
@@ -981,7 +977,7 @@
       "requete": {
         "team_id": 10,
         "phone": "237650626114",
-        "session_id": "ecrans-web-receipt-1795799453057",
+        "session_id": "ecrans-web-receipt-1795799883421",
         "screen": "receipt",
         "text": "",
         "input_type": "text",
@@ -1000,9 +996,7 @@
         "total": 31,
         "translated": 31,
         "missing": [],
-        "untranslated": [
-          "history.col_date"
-        ],
+        "untranslated": [],
         "over_limit": [],
         "placeholder_errors": [],
         "unknown_keys": []
@@ -1058,7 +1052,7 @@
         "history.filter_all": "All",
         "history.filter_out": "Outgoing",
         "history.filter_in": "Incoming",
-        "history.col_date": "Date",
+        "history.col_date": "Date & time",
         "history.col_label": "Transaction",
         "history.col_amount": "Amount",
         "history.col_status": "Status",
@@ -1076,7 +1070,7 @@
       "requete": {
         "team_id": 10,
         "phone": "237650626114",
-        "session_id": "ecrans-web-history-1795799453668",
+        "session_id": "ecrans-web-history-1795799884530",
         "screen": "history",
         "text": "",
         "input_type": "text",
@@ -1119,7 +1113,7 @@
       "requete": {
         "team_id": 10,
         "phone": "237650626114",
-        "session_id": "ecrans-atm-atm_welcome-1795799454275",
+        "session_id": "ecrans-atm-atm_welcome-1795799885448",
         "screen": "atm_welcome",
         "text": "",
         "language": "en"
@@ -1161,7 +1155,7 @@
       "requete": {
         "team_id": 10,
         "phone": "237650626114",
-        "session_id": "ecrans-atm-atm_pin-1795799454865",
+        "session_id": "ecrans-atm-atm_pin-1795799886026",
         "screen": "atm_pin",
         "text": "",
         "language": "en"
@@ -1207,7 +1201,7 @@
       "requete": {
         "team_id": 10,
         "phone": "237650626114",
-        "session_id": "ecrans-atm-atm_menu-1795799455445",
+        "session_id": "ecrans-atm-atm_menu-1795799886607",
         "screen": "atm_menu",
         "text": "",
         "language": "en"
@@ -1259,7 +1253,7 @@
       "requete": {
         "team_id": 10,
         "phone": "237650626114",
-        "session_id": "ecrans-atm-atm_amount-1795799456069",
+        "session_id": "ecrans-atm-atm_amount-1795799887185",
         "screen": "atm_amount",
         "text": "",
         "language": "en"
@@ -1315,7 +1309,7 @@
       "requete": {
         "team_id": 10,
         "phone": "237650626114",
-        "session_id": "ecrans-atm-atm_confirm-1795799456684",
+        "session_id": "ecrans-atm-atm_confirm-1795799887842",
         "screen": "atm_confirm",
         "text": "",
         "language": "en"
@@ -1355,7 +1349,7 @@
       "requete": {
         "team_id": 10,
         "phone": "237650626114",
-        "session_id": "ecrans-atm-atm_cash-1795799457261",
+        "session_id": "ecrans-atm-atm_cash-1795799888422",
         "screen": "atm_cash",
         "text": "",
         "language": "en"
@@ -1403,7 +1397,7 @@
       "requete": {
         "team_id": 10,
         "phone": "237650626114",
-        "session_id": "ecrans-atm-atm_receipt-1795799457844",
+        "session_id": "ecrans-atm-atm_receipt-1795799889022",
         "screen": "atm_receipt",
         "text": "",
         "language": "en"
@@ -1463,7 +1457,7 @@
       "requete": {
         "team_id": 10,
         "phone": "237650626114",
-        "session_id": "ecrans-atm-atm_statement-1795799458417",
+        "session_id": "ecrans-atm-atm_statement-1795799889605",
         "screen": "atm_statement",
         "text": "",
         "language": "en"
@@ -1507,7 +1501,7 @@
       "requete": {
         "team_id": 10,
         "phone": "237650626114",
-        "session_id": "ecrans-atm-atm_balance-1795799458986",
+        "session_id": "ecrans-atm-atm_balance-1795799890168",
         "screen": "atm_balance",
         "text": "",
         "language": "en"
@@ -1555,7 +1549,7 @@
       "requete": {
         "team_id": 10,
         "phone": "237650626114",
-        "session_id": "ecrans-atm-atm_other-1795799459609",
+        "session_id": "ecrans-atm-atm_other-1795799890737",
         "screen": "atm_other",
         "text": "",
         "language": "en"
@@ -1595,7 +1589,7 @@
       "requete": {
         "team_id": 10,
         "phone": "237650626114",
-        "session_id": "ecrans-atm-atm_end-1795799460231",
+        "session_id": "ecrans-atm-atm_end-1795799891368",
         "screen": "atm_end",
         "text": "",
         "language": "en"

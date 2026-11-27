@@ -35,3 +35,14 @@ Rien dans `SIX-CANAUX.md`, `docs/preuves/**`, `README.md`, `docs/PRESENTATION-CA
 
 Si tu veux les preuves brutes, elles sont dans ma réponse de coordination et dans l'historique de
 la PR #6 ; je n'écris pas dans `docs/preuves/**`.
+
+## 3. Mise à jour du 27/11 (soir) — plus aucune clé `untranslated`
+
+`review.service` et `history.col_date` étaient identiques au français. Elles sont maintenant
+rendues par `Service used` et `Date & time`, et le rejeu de `scripts/ecrans.mjs --langue en` donne
+`untranslated: []`, `missing: []` et `over_limit: []` sur les **23 écrans**
+(`docs/preuves/ecrans-2026-11-27.json`).
+
+Le paragraphe de `SIX-CANAUX.md` §6 qui dit « Deux clés restent signalées `untranslated`… » est
+donc périmé : peux-tu le remplacer par « aucune clé manquante ni non traduite sur les 23 écrans » ?
+Je n'y touche pas, c'est ton fichier.
