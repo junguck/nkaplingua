@@ -120,7 +120,8 @@ Soldes relus par un tour USSD séparé : `639 495` avant, `634 445` après le tr
 
 Les 23 écrans atteignables ont été rejoués en direct le 27/11 avec `language: "en"` :
 6 écrans `mobile`, les 6 mêmes en `web`, et les 11 écrans ATM. Preuve brute :
-`docs/preuves/ecrans-2026-11-27.json`, produite par `node scripts/ecrans.mjs --langue en`.
+`docs/preuves/ecrans-en-2026-11-27.json`, produite par `node scripts/ecrans.mjs --langue en`.
+La même campagne a été rejouée en `fub` : `docs/preuves/ecrans-fub-2026-11-27.json`.
 
 | Canal | Écrans | Rapport de traduction |
 | --- | --- | --- |
@@ -135,9 +136,24 @@ dialogue local (`say` / `screen`), elle envoie les libellés de l'écran (`strin
 `strings` quand elles sont présentes (`server.ts`), et `POST /atm` garde le dialogue local
 (carte, code, montant) hors contrat. Un test le verrouille dans `local-channels.test.ts`.
 
-Les 47 clés `atm.*` sont dans `ui-dictionaries.ts` pour `en`. Aucune n'a été inventée en fulfulde :
-par la règle de repli de `ui.ts` (0 clé traduite), un écran ATM demandé en `fub` repart en `fr`
-avec `language: "fr"` — un repli déclaré, jamais une fausse traduction.
+### Ce que le fulfulde sert réellement (mesuré le 27/11)
+
+| Canal | Langue rendue | Clés présentes | Non traduites | Dépassements |
+| --- | --- | --- | --- | --- |
+| 6 écrans `mobile` | `fub` | 19/19 à 34/34 selon l'écran | aucune | aucun |
+| 6 écrans `web` | `fub` | 21/21 à 36/36 selon l'écran | `shell.secure` (reste français, 6/6) | aucun |
+| 11 écrans `atm` | **`fr`** | 5/5 à 15/15 selon l'écran | **toutes** (aucune clé fub) | `atm.error_step` 42 > 40 sur 3 écrans |
+
+- Le dictionnaire fub couvre **88 clés sur 89** : `shell.secure` n'a pas d'équivalent relu et
+  reste « Connexion sécurisée ». Elle n'est **pas** traduite ; la sandbox la compte `untranslated`
+  sur les 6 écrans web, les seuls qui la demandent (les écrans mobile ne l'envoient pas). Les autres
+  clés demandées sont bien en fulfulde, `missing: []`.
+- Les 47 clés `atm.*` existent en `en`, **aucune** en fub. Par la règle de repli de `ui.ts` (0 clé
+  traduite), l'écran ATM entier repart en `fr` et `language` vaut `fr` : le `translated: 6/6` du
+  rapport est la complétude de l'écran **français**, pas une traduction fulfulde. Rien n'est inventé.
+- Le repli ATM a une limite mesurée : `atm.error_step` fait 42 caractères en français pour un
+  `max_chars` de 40 ; la sandbox signale `over_limit` sur `atm_amount`, `atm_confirm` et
+  `atm_other`. En `en`, la traduction (33 caractères) passe.
 
 Deux clés restent signalées `untranslated` par la sandbox parce que l'anglais est identique au
 français (`review.service` = « Service », `history.col_date` = « Date ») : c'est 1 clé sur 31 et

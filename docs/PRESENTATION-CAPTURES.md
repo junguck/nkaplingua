@@ -215,7 +215,7 @@ atteint, journalise notre tour (`trace_id`), et la contrainte d'écran est mesur
 ```
 
 **On voit** : `screen: home`, 30 clés renvoyées, aucun code d'erreur ; le même écran rejoué en `en`
-donne **30/30 traduites, `missing: []`** (`docs/preuves/ecrans-2026-11-27.json`). **On raconte** :
+donne **30/30 traduites, `missing: []`** (`docs/preuves/ecrans-en-2026-11-27.json`). **On raconte** :
 « Chaque clé demandée revient, dans la langue demandée ; aucune n'est omise, aucun emplacement
 `{name}` n'est cassé. » **Ce que ça prouve** : la traduction clé par clé du contrat `ui_translation`
 fonctionne sur le canal mobile.
@@ -257,7 +257,8 @@ pas seulement par nos tests.
 avait un avant le correctif : le canal ATM attend une traduction d'écran, pas un dialogue).
 **On raconte** : « Le distributeur parle la même langue que l'application. » **Ce que ça prouve** :
 le canal ATM est branché sur le contrat d'écran ; les 11 écrans et 47 clés `atm.*` sont servis en
-`en` (preuve `ecrans-2026-11-27.json`, `missing: []`).
+`en` (preuve `ecrans-en-2026-11-27.json`, `missing: []`). En `fub`, faute de clés ATM, l'écran est
+replié en `fr` — résultat mesuré dans la section suivante.
 
 ### 6. IVR — le téléphone reçoit un texte, pas un faux audio
 
@@ -296,6 +297,32 @@ annulé (écart 0). Le solde est relu par un vrai tour USSD, jamais recopié d'u
 > Les montants datent du 27/11/2026 et se débitent à chaque rejeu : la preuve fige les chiffres de
 > l'exécution, elle ne promet pas un solde constant.
 
+## Les 23 écrans en fulfulde — ce qui est réellement servi (27/11/2026)
+
+`node scripts/ecrans.mjs --langue fub`, même protocole, preuve
+`docs/preuves/ecrans-fub-2026-11-27.json` (23/23 en 200).
+
+| Canal | Écrans | Langue rendue | Clés présentes | Non traduites | Dépassements |
+| --- | --- | --- | --- | --- | --- |
+| `mobile` | 6 | `fub` | 19/19 à 34/34 selon l'écran | aucune | aucun |
+| `web` | 6 | `fub` | 21/21 à 36/36 selon l'écran | `shell.secure` (6/6 écrans) | aucun |
+| `atm` | 11 | **`fr`** | 5/5 à 15/15 selon l'écran | **toutes** (aucune clé fub) | `atm.error_step` 42 > 40 sur 3 écrans |
+
+- **88 clés sur 89, pas 89/89.** Le dictionnaire fub n'a pas d'équivalent relu pour `shell.secure` :
+  la réponse renvoie « Connexion sécurisée », identique au français. La clé est **présente**
+  (`missing: []`) mais la sandbox la compte **`untranslated` sur les 6 écrans web**, les seuls qui
+  la demandent (les écrans mobile ne l'envoient pas). On ne peut donc pas dire que le web est
+  intégralement en fulfulde : une clé reste française.
+- **ATM : repli `fr` déclaré, zéro clé fub.** Aucun des 47 `atm.*` n'existe en fulfulde ; `ui.ts`
+  applique sa règle (0 clé traduite) et renvoie tout l'écran en `fr`, avec `language: "fr"`. Le
+  `translated: n/n` du rapport est la complétude de l'écran **français** ; `untranslated` liste
+  toutes les clés. Aucune n'est présentée comme traduite.
+- **Un dépassement dans le repli** : `atm.error_step` (« Le montant doit être un multiple de
+  {step} ») fait 42 caractères pour un `max_chars` de 40. En `en`, la traduction (33) passe ; en
+  repli `fr`, la sandbox signale `over_limit` sur `atm_amount`, `atm_confirm` et `atm_other`.
+- En `en`, la campagne `ecrans-en-2026-11-27.json` donne `missing: []`, `untranslated: []` et
+  `over_limit: []` sur les 23 écrans : c'est la seule campagne sans réserve de traduction.
+
 ## Fonctionnalité → route → test → preuve
 
 Chaque ligne se vérifie sans nous croire : le test s'exécute en local, la preuve est un JSON daté
@@ -314,8 +341,8 @@ le corps ; `POST /middleware/<canal>` est l'alias explicite du même contrat.
 | Paiement de facture | `POST /channel/ussd` | même test | `parcours` › `facture` |
 | Transfert confirmé | `POST /channel/ussd` | `middleware.test.ts` › « crée la transaction en pending, puis la confirme » ; jury 2 | `parcours` › `transfert-confirme` |
 | Transfert annulé | `POST /channel/ussd` | `middleware.test.ts` › « annule une opération en attente sans débiter » ; jury « “non” seul annule » | `parcours` › `transfert-annule` |
-| Écrans mobile / web | `POST /channel/{mobile,web}` → `POST /` (canal dans le corps) | `middleware.test.ts` › traductions en / fulfulde, repli | `ecrans-2026-11-27.json` (12 écrans, `missing: []`) |
-| Écrans ATM (47 clés) | `POST /channel/atm` → `POST /` (canal dans le corps) | `local-channels.test.ts` › « traduit les écrans ATM… » | `ecrans` (11 écrans, `missing: []`) |
+| Écrans mobile / web | `POST /channel/{mobile,web}` → `POST /` (canal dans le corps) | `middleware.test.ts` › traductions en / fulfulde, repli | `ecrans-en-…` (12 écrans, `missing: []`) ; `ecrans-fub-…` (12 en `fub`, `shell.secure` `untranslated`) |
+| Écrans ATM (47 clés) | `POST /channel/atm` → `POST /` (canal dans le corps) | `local-channels.test.ts` › « traduit les écrans ATM… » | `ecrans-en-…` (11 écrans, `missing: []`) ; `ecrans-fub-…` (repli `fr` déclaré) |
 | Découpage SMS | `POST /channel/sms` | `sms.test.ts` (160/70, 153/67, UCS-2) | `six-canaux` › `sms` ; `parcours` › `sms-solde` |
 | IVR (DTMF, texte) | `POST /channel/ivr` → `POST /` | `local-channels.test.ts` › « sert /ivr » ; `voice.test.ts` | `six-canaux` › `ivr` ; `parcours` › `ivr-solde` |
 | Voix (fr/en, jamais fub) | `POST /ivr`, `GET /audio/*` | `voice.test.ts` (8 tests) | `docs/VOIX-MMS.md` ; `GET /audio/index.json` |

@@ -89,7 +89,7 @@ SAFINUM_SIMULATOR_PASS=… node scripts/ecrans.mjs --langue en     # 23 écrans,
 ```
 
 Les réponses brutes sont dans `docs/preuves/six-canaux-2026-11-27.json`,
-`docs/preuves/parcours-2026-11-27.json` et `docs/preuves/ecrans-2026-11-27.json` ; la synthèse est
+`docs/preuves/parcours-2026-11-27.json` et `docs/preuves/ecrans-en-2026-11-27.json` ; la synthèse est
 dans [`docs/PRESENTATION-CAPTURES.md`](../../docs/PRESENTATION-CAPTURES.md).
 
 ## Tunnel

@@ -41,7 +41,7 @@ la PR #6 ; je n'écris pas dans `docs/preuves/**`.
 `review.service` et `history.col_date` étaient identiques au français. Elles sont maintenant
 rendues par `Service used` et `Date & time`, et le rejeu de `scripts/ecrans.mjs --langue en` donne
 `untranslated: []`, `missing: []` et `over_limit: []` sur les **23 écrans**
-(`docs/preuves/ecrans-2026-11-27.json`).
+(`docs/preuves/ecrans-en-2026-11-27.json`).
 
 Le paragraphe de `SIX-CANAUX.md` §6 qui dit « Deux clés restent signalées `untranslated`… » est
 donc périmé : peux-tu le remplacer par « aucune clé manquante ni non traduite sur les 23 écrans » ?

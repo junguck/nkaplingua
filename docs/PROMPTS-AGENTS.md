@@ -48,7 +48,7 @@ CONTEXTE VÉRIFIÉ (27/11/2026, ne le re-découvre pas)
 - La banque réelle ne renvoie pas de solde après `confirm` : le middleware relit /accounts et
   n'annonce rien s'il ne peut pas lire (déjà corrigé, testé). Ne réintroduis pas `?? 0`.
 - Les 23 écrans mobile/web/ATM répondent 200 avec `missing: []` en `en`, et les 47 clés `atm.*`
-  sont dans `ui-dictionaries.ts` : cf. docs/preuves/ecrans-2026-11-27.json. Sur ATM, la sandbox
+  sont dans `ui-dictionaries.ts` : cf. docs/preuves/ecrans-en-2026-11-27.json. Sur ATM, la sandbox
   envoie `strings` et attend une traduction d'écran (pas notre dialogue `POST /atm`).
 
 MISSION

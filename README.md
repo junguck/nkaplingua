@@ -51,10 +51,12 @@ altérer un montant, un nom ou un numéro**.
 | [`docs/GUIDE-STUDIO-ENREGISTREMENT.md`](docs/GUIDE-STUDIO-ENREGISTREMENT.md) : enregistrer les voix des langues sans modèle TTS |
 
 État vérifié le 27/11/2026 : la clé `sbx_…` est **acceptée** (`GET /sandbox/endpoint` → 200, team `shun-and-co`,
-id 10), les **six canaux** sont déclarés et répondent 200, les **23 écrans** mobile/web/ATM sont
-joués en `en` avec `missing: []` (`docs/preuves/ecrans-2026-11-27.json`), et les **11 parcours** par
-fonctionnalité (solde, frais, historique, crédit, facture, transfert confirmé **et annulé**) sont
-prouvés (`docs/preuves/parcours-2026-11-27.json`). Reste : un **tunnel nommé** (aucun certificat
+id 10), les **six canaux** sont déclarés et répondent 200, et les **23 écrans** mobile/web/ATM sont
+joués en `en` avec `missing: []` (`docs/preuves/ecrans-en-2026-11-27.json`). En `fub`, 88 clés sur 89
+sont servies : `shell.secure` reste française et `untranslated` sur les écrans web, et l'ATM est
+replié en `fr` déclaré, sans aucune clé fub (`docs/preuves/ecrans-fub-2026-11-27.json`). Les
+**11 parcours** par fonctionnalité (solde, frais, historique, crédit, facture, transfert confirmé
+**et annulé**) sont prouvés (`docs/preuves/parcours-2026-11-27.json`). Reste : un **tunnel nommé** (aucun certificat
 Cloudflare sur la machine) et les packs de langues camerounaises (gabarits vides dans
 [`docs/relecture/gabarits/`](docs/relecture/gabarits/README.md), 0/89 écrans : voir
 [`docs/ROADMAP.md`](docs/ROADMAP.md)).

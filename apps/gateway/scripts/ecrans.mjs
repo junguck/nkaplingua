@@ -6,7 +6,7 @@
  *
  * Le script fait ce que le jury fera : déverrouille le simulateur une seule fois (quota de
  * tentatives), puis appelle `POST /channel/<canal>` avec le `screen` attendu. Il écrit
- * `docs/preuves/ecrans-<date>.json` : statut, langue rendue, rapport de traduction de la sandbox
+ * `docs/preuves/ecrans-<langue>-<date>.json` : statut, langue rendue, rapport de traduction de la sandbox
  * (`translated`, `missing`, `over_limit`, `placeholder_errors`) et textes source, pour que chaque
  * clé manquante soit une preuve et non une impression.
  *
@@ -138,9 +138,12 @@ for (const turn of TURNS) {
       `manquant=${report ? report.missing.length : '-'} ` +
       `code=${body.diagnostics?.error_code ?? '-'}`;
     console.log(line);
-    if (report && report.missing.length > 0) console.log(`   missing: ${report.missing.join(', ')}`);
-    if (report && report.over_limit.length > 0) console.log(`   over_limit: ${report.over_limit.join(', ')}`);
-    if (report && report.placeholder_errors.length > 0) console.log(`   placeholders: ${report.placeholder_errors.join(', ')}`);
+    // La sandbox renvoie parfois des objets (`{key, length, max}`) : les afficher lisibles.
+    const lisible = (list) =>
+      list.map((entry) => (typeof entry === 'string' ? entry : `${entry.key} (${entry.length}>${entry.max})`)).join(', ');
+    if (report && report.missing.length > 0) console.log(`   missing: ${lisible(report.missing)}`);
+    if (report && report.over_limit.length > 0) console.log(`   over_limit: ${lisible(report.over_limit)}`);
+    if (report && report.placeholder_errors.length > 0) console.log(`   placeholders: ${lisible(report.placeholder_errors)}`);
   } catch (error) {
     results.push({ canal: turn.channel, ecran: turn.screen, http: 0, erreur: String(error), requete: payload });
     console.log(`${turn.channel.padEnd(6)} ${turn.screen.padEnd(14)} ERREUR ${String(error).slice(0, 120)}`);
@@ -151,7 +154,8 @@ const now = new Date();
 const stamp = now.toISOString().slice(0, 10);
 const outDir = fileURLToPath(new URL('../../../docs/preuves/', import.meta.url));
 fs.mkdirSync(outDir, { recursive: true });
-const outFile = path.join(outDir, `ecrans-${stamp}.json`);
+// La langue fait partie du nom : une campagne `en` ne doit pas écraser une campagne `fub`.
+const outFile = path.join(outDir, `ecrans-${LANGUAGE}-${stamp}.json`);
 fs.writeFileSync(
   outFile,
   JSON.stringify(

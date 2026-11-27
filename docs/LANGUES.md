@@ -34,6 +34,12 @@ a de quoi la servir (USSD : catalogue complet ; écrans : ≤ 25 % de français)
 | `bas` Basaa | ✗ | ✗ → `fr` | **0/89** → `fr` | aucune : le dictionnaire SIL (Njock 2005) exige une connexion (HTTP 403) |
 | `byv` Medumba | ✗ | ✗ → `fr` | **0/89** → `fr` | aucune : Kemelang refuse les clients automatisés (HTTP 403) |
 
+Mesuré en direct le 27/11 (`docs/preuves/ecrans-fub-2026-11-27.json`) : **88 clés sur 89** sont en
+fulfulde ; `shell.secure` reste « Connexion sécurisée » et est signalée `untranslated` sur les
+**6 écrans web** (les écrans mobile ne demandent pas cette clé). Les 11 écrans ATM sont **repliés en
+`fr`** : aucune clé `atm.*` n'existe en fub, et le repli est déclaré (`language: "fr"`), pas présenté
+comme traduit.
+
 ### Sources consultées le 26/11
 
 - **Duala** — Helmlinger, P. (1972). *Dictionnaire duala-français suivi d'un lexique français-duala*. Klincksieck.
