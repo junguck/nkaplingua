@@ -168,13 +168,13 @@ export class BankClient implements BankPort {
     return this.#call('POST', `transactions/${enc(id)}/cancel`, {}, ctx, transactionSchema);
   }
 
-  async #call<S extends z.ZodTypeAny>(
+  async #call<T>(
     method: 'GET' | 'POST',
     path: string,
     body: unknown,
     ctx: CallContext,
-    schema: S,
-  ): Promise<BankResult<z.output<S>>> {
+    schema: z.ZodType<T, z.ZodTypeDef, unknown>,
+  ): Promise<BankResult<T>> {
     const budget = Math.floor(Math.min(this.#cap, ctx.deadline - performance.now() - this.#margin));
     if (budget <= 50) return { ok: false, status: 0, code: 'UNREACHABLE', candidates: [] };
 
@@ -195,7 +195,7 @@ export class BankClient implements BankPort {
       if (response.statusCode >= 200 && response.statusCode < 300) {
         const parsed = schema.safeParse(json);
         return parsed.success
-          ? { ok: true, data: parsed.data as z.output<S> }
+          ? { ok: true, data: parsed.data }
           : { ok: false, status: response.statusCode, code: 'BAD_BANK_RESPONSE', candidates: [] };
       }
       const failure = errorSchema.safeParse(json);

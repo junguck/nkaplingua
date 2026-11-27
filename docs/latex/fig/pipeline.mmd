@@ -1,0 +1,29 @@
+flowchart TB
+    subgraph Collecte
+        P1[Trafic UI réel] -- textes source inconnus --> REF[(references)]
+        P2[Amorçage fr, en, lexique] --> REF
+        C1[Contributeur : texte] --> CO[(contributions)]
+        C2[Contributeur : voix webm] --> GF[(GridFS brut)]
+        GF --> CO
+    end
+    subgraph Validation
+        CO --> RV{Relecteur tiers}
+        RV -- rejet --> CO
+        RV -- validation --> TC[Transcodage mp3 16 kHz]
+        TC --> GF2[(GridFS mp3)]
+        RV --> TR[(translations : base définitive)]
+        GF2 --> TR
+    end
+    subgraph Diffusion
+        TR -- démarrage --> RS[(Redis i18n:t:lang)]
+        TR -- validation --> RS
+        RS -- PUBLISH i18n:changed --> L1[L1 de chaque instance]
+        L1 --> F[Pliage GSM-7 précalculé]
+        F --> SRV[USSD, SMS]
+        L1 --> SRV2[Écrans mobile, web, GAB]
+        GF2 --> SRV3[IVR : /voix/lang/clé.mp3]
+    end
+    subgraph Synthèse
+        TR -- phrases fixes sans voix humaine --> PG[Pré-génération PyTorch]
+        PG --> GF2
+    end

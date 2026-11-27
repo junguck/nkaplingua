@@ -1,0 +1,24 @@
+sequenceDiagram
+    autonumber
+    actor U as Usager
+    participant G as Passerelle
+    participant M as Middleware
+    participant R as Redis
+    participant B as Banque
+    U->>G: envoie 5000 a paul
+    G->>M: tour N (trace A)
+    M->>R: GET session
+    M->>B: GET /beneficiaries?q=paul (trace A)
+    B-->>M: 2 homonymes
+    M-->>G: CLARIFICATION_NEEDED, 1. Paul Mbarga 2. Paul Etoa
+    U->>G: 1
+    G->>M: tour N+1 (trace B)
+    M->>B: POST /transactions (trace B)
+    B-->>M: pending, frais 150, total 5150
+    M->>R: SET session (référence seulement)
+    M-->>G: TRANSFER, relecture montant, frais, total
+    U->>G: 1 (confirmer)
+    G->>M: tour N+2 (trace C)
+    M->>B: POST /transactions/id/confirm (trace C)
+    B-->>M: confirmed
+    M-->>G: CONFIRM, reçu, fin de session

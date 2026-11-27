@@ -1,0 +1,8 @@
+flowchart TB
+    CF[cloudflared, tunnel nommé] --> MW1[middleware x N]
+    MW1 --> RD[(Redis)]
+    MW1 --> MG[(MongoDB)]
+    ST[studio] --> MG
+    ST --> RD
+    ST --> TTS[audio : torch CPU]
+    TTS --> MG

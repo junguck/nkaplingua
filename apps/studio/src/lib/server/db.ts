@@ -10,7 +10,10 @@ interface Clients {
 }
 
 // Un seul pool par processus, y compris sous le rechargement à chaud de Next.
-const globalClients = globalThis as typeof globalThis & { __nkapStudio?: Clients };
+declare global {
+  var __nkapStudio: Clients | undefined;
+}
+const globalClients = globalThis;
 
 function clients(): Clients {
   if (globalClients.__nkapStudio === undefined) {

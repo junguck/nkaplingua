@@ -1,0 +1,266 @@
+% Document d'architecture technique NkapLingua v3. Compiler : latexmk -lualatex nkaplingua.tex
+\documentclass[11pt,a4paper]{article}
+\usepackage{fontspec}
+\setmainfont{DejaVu Serif}[Scale=0.92]
+\setsansfont{DejaVu Sans}[Scale=0.92]
+\setmonofont{DejaVu Sans Mono}[Scale=0.82]
+\usepackage[french]{babel}
+\usepackage[margin=2.2cm]{geometry}
+\usepackage{graphicx,booktabs,tabularx,array,xcolor,enumitem,float}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
+\usepackage{titlesec}
+
+\definecolor{nkap}{HTML}{0B6E4F}
+\definecolor{ink}{HTML}{1F2937}
+\titleformat{\section}{\sffamily\Large\bfseries\color{nkap}}{\thesection}{0.8em}{}
+\titleformat{\subsection}{\sffamily\large\bfseries\color{ink}}{\thesubsection}{0.6em}{}
+\setlist{itemsep=2pt,topsep=4pt}
+\renewcommand{\arraystretch}{1.25}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\newcommand{\F}{\textsf{\textbf{\color{nkap}[F]}}}
+\newcommand{\M}{\textsf{\textbf{\color{blue!60!black}[M]}}}
+\newcommand{\Hy}{\textsf{\textbf{\color{orange!80!black}[H]}}}
+\newcommand{\fig}[3]{\begin{figure}[H]\centering\includegraphics[width=#2]{fig/#1.pdf}\caption{#3}\end{figure}}
+
+\title{\sffamily\Huge\bfseries NkapLingua v3\\[0.3em]\Large\mdseries Document d'architecture technique et modèle économique}
+\author{Équipe NkapLingua \\ Hackathon SAFINUM Innovate Challenge 2026, Yaoundé}
+\date{27 novembre 2026}
+
+\begin{document}
+\maketitle
+\begin{center}
+  \colorbox{nkap!10}{\parbox{0.86\textwidth}{\centering\vspace{0.6em}
+  {\sffamily\Large\itshape\color{nkap} « Tout le monde devrait pouvoir parler le langage de l'argent. »}
+  \vspace{0.6em}}}
+\end{center}
+
+\vspace{1em}
+\noindent\textbf{Convention de lecture.} \F{} fait sourcé (références en fin de document), \M{} mesuré par nous et rejouable depuis le dépôt, \Hy{} hypothèse à valider. Aucun chiffre de ce document n'appartient à une autre catégorie.
+
+\section*{Résumé exécutif}
+NkapLingua est la couche linguistique entre la passerelle SAFINUM et la banque : elle fait parler les services financiers en duala, ewondo, fulfulde et dans les autres langues du Cameroun, sur USSD, SMS, serveur vocal, mobile, web et GAB. La version 3 reconstruit le middleware et ajoute un studio où les locuteurs proposent puis valident, à quatre yeux, chaque phrase avant qu'elle ne soit servie.
+
+\begin{table}[H]\centering\small
+\begin{tabularx}{\textwidth}{L r}
+\toprule
+\textbf{Résultat} & \textbf{Valeur} \\
+\midrule
+Lecture des traductions d'un écran de 40 clés \M & 1,9 µs (contre 1\,865 µs en Redis naïf) \\
+Appel bancaire après un temps de lecture, RTT 150 ms \M & 152 ms au lieu de 307 ms \\
+Validation dans le studio puis phrase servie \M & 1,2 ms (p50), sans redémarrage \\
+Capacité d'un écran USSD en langue nationale \M & 182 septets au lieu de 70 caractères \\
+Vol de la clé d'équipe par payload forgé \M & possible avec le kit officiel, impossible en v3 \\
+Coût de construction d'une langue complète \Hy & 8\,685 FCFA (13,24 €) \\
+Tests automatisés \M & 33 TypeScript, 4 Python, 1 parcours navigateur \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\tableofcontents
+\newpage
+
+\section{Contexte et problème}
+\begin{itemize}
+  \item \F{} 60,87 \% des adultes camerounais ont un compte en banque ou en mobile money (Global Findex, données 2024).
+  \item \F{} Le Cameroun compte 30,9 millions de comptes mobile money fin 2024, soit 65,1 \% de la CEMAC, et 2,73 milliards d'opérations dans l'année (BEAC).
+  \item \F{} Au recensement de 2005, 28,8 \% des personnes de 12 ans et plus ne lisaient ni le français ni l'anglais. Aucun recensement plus récent n'a été trouvé : ce chiffre est ancien, mais il donne l'ordre de grandeur de la population exclue d'un menu USSD en français.
+\end{itemize}
+
+Le défi technique tient en trois contraintes du contrat SAFINUM : 3 secondes par tour USSD, appels bancaires compris ; 182 septets GSM-7 par écran ; une langue déclarée qui doit être la langue réellement affichée.
+
+\section{Architecture d'ensemble}
+\fig{vue-ensemble}{\textwidth}{Vue d'ensemble : la passerelle appelle le middleware, qui seul détient la clé bancaire.}
+
+\begin{table}[H]\centering\small
+\begin{tabularx}{\textwidth}{l L L}
+\toprule
+\textbf{Composant} & \textbf{Technologie} & \textbf{Rôle} \\
+\midrule
+Middleware & Node.js 22, Fastify, TypeScript strict, zod & contrat SAFINUM, conversation, appels bancaires \\
+Vérité & MongoDB 7, GridFS & références, propositions, base définitive, audio \\
+Diffusion & Redis 7 & instantané du catalogue, sessions, pub/sub, limite de débit \\
+Voix & PyTorch, MMS-VITS, ffmpeg & synthèse des phrases fixes, transcodage mp3 \\
+Studio & Next.js 15, shadcn/ui & contribution texte ou voix, relecture à quatre yeux \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\paragraph{Frontière de sécurité.} Sur mobile, web et GAB, le middleware ne reçoit que des gabarits (\texttt{\{amount\}}, \texttt{\{name\}}) : les montants sont remplis par l'application, qui exécute elle-même les opérations. Le module de traduction d'écrans ne reçoit d'ailleurs aucun client bancaire par injection. Sur USSD, SMS et IVR, le contrat impose que la saisie transite par le middleware : on y réduit l'état au strict nécessaire (étape, référence de l'opération) et, après création, les montants affichés sont relus à la banque.
+
+\section{Le middleware}
+\fig{middleware}{0.72\textwidth}{Chaîne de traitement d'un tour.}
+
+\subsection{Latence : trois décisions mesurées}
+\begin{enumerate}
+  \item \textbf{Catalogue L1 en mémoire.} La consigne initiale était de charger les traductions dans Redis au démarrage. Nous l'avons gardée, mais Redis n'est pas lu pendant un tour : il amorce et met à jour une copie en mémoire. \M{} Un \texttt{HGET} par clé coûte 1\,865 µs par écran même en local, le L1 1,9 µs, soit près de 1\,000 fois moins.
+  \item \textbf{Pool HTTP chaud.} Le \texttt{fetch} par défaut ferme une connexion inactive après 4 s ; un usager USSD lit et tape plus longtemps. \M{} En labo, avec un RTT injecté de 50 et 150 ms et des tours espacés de 6 s : 55 et 155 ms gagnés par appel. C'est une borne basse : le relais ne retarde pas la poignée TCP, le gain réel est proche de 2 RTT.
+  \item \textbf{Budget du tour.} Chaque appel bancaire reçoit le temps restant avant l'échéance du canal, moins 250 ms de marge, au lieu d'un délai fixe de 2,5 s qui fait dépasser les 3 s dès le second appel.
+\end{enumerate}
+
+\subsection{Coût assumé}
+\M{} Sans réseau, un tour v3 prend 1,49 ms (p50) contre 1,17 ms pour le kit : +0,3 ms de validation zod, de session Redis et de limite de débit. C'est 0,01 \% du budget USSD, en échange de la sécurité et du passage à plusieurs instances.
+
+\section{Conversation en deux tours}
+\fig{transfert}{0.92\textwidth}{Transfert : homonymes levés, relecture des frais, confirmation au tour suivant.}
+\begin{itemize}
+  \item Jamais de confirmation dans le tour qui crée l'opération (règle du jury).
+  \item Jamais de montant ni de bénéficiaire deviné : \texttt{CLARIFICATION\_NEEDED}.
+  \item « non, plutôt 30000 » est compris comme une correction : frais recalculés par la banque, nouvelle relecture.
+  \item Changement de langue en pleine relecture : l'écran est rejoué dans la nouvelle langue, l'opération reste en attente.
+  \item Langue déclarée honnête : s'il manque une seule clé, tout l'écran part en français, déclaré \texttt{fr}.
+\end{itemize}
+
+\section{Lettres à tons et budget USSD}
+Un seul caractère hors GSM-7 fait passer le message en UCS-2 : la limite tombe de 182 à 70 caractères. Le pliage est calculé une fois, à l'écriture dans le L1.
+
+\begin{table}[H]\centering\small
+\begin{tabularx}{\textwidth}{l l c L}
+\toprule
+\textbf{Source} & \textbf{GSM-7} & \textbf{Septets} & \textbf{Raison} \\
+\midrule
+ŋ ɓ ɗ ƙ ƴ & ng bh dh kh yh & 2 & consonnes composées \\
+ɛ ɔ & è ò & 1 & déjà dans GSM-7, distinctes de e et o \\
+ə & eu & 2 & lecture francophone de la voyelle centrale \\
+tons (á à â ǎ) & retirés & 0 & de façon uniforme \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\noindent Exemple vérifié par les tests : « Ɓɔ́ŋ ndzáŋ mɔ́ni » devient « Bhòng ndzang mòni ». Nous avons écarté les digraphes pour les voyelles (« eh », « oh ») : ils entrent en collision avec des suites réelles des langues et coûtent deux septets. Les règles sont des données, modifiables langue par langue.
+
+\section{Studio linguistique et pipeline de données}
+\fig{cycle-traduction}{0.62\textwidth}{Cycle de vie d'une traduction.}
+
+Le contributeur voit la phrase de référence française, son contexte et ses contraintes. Il écrit sa traduction ou l'enregistre au micro. Le navigateur affiche en direct les contrôles et l'aperçu tel qu'un téléphone basique l'affichera. Un \emph{autre} locuteur valide ou rejette, motif obligatoire. Cette règle des quatre yeux est inscrite dans la requête Mongo (\texttt{authorId} différent du relecteur), pas seulement dans l'interface. Le passage de \emph{en attente} à \emph{validée} est atomique : deux relecteurs simultanés ne publient pas deux fois.
+
+\fig{pipeline}{0.66\textwidth}{Pipeline de données, de la collecte au service.}
+
+\begin{table}[H]\centering\small
+\begin{tabularx}{\textwidth}{l l L}
+\toprule
+\textbf{Étape} & \textbf{Stockage} & \textbf{Garantie} \\
+\midrule
+Référence & \texttt{references} & découverte automatique sur le trafic réel, par lot hors du chemin critique \\
+Proposition & \texttt{contributions}, GridFS & jamais servie \\
+Validation & \texttt{translations} & relue par un tiers, auteur et relecteur tracés, versionnée \\
+Instantané & Redis & écrit en transaction \texttt{MULTI} \\
+Service & L1 mémoire & O(1), variante GSM-7 précalculée \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\noindent Repli au démarrage : Mongo, sinon instantané Redis, sinon graine embarquée. \M{} 229 traductions chargées en 21 ms. Les 88 propositions fulfulde de la version 2, jamais relues, ont été importées comme propositions \emph{en attente} et non comme traductions publiées.
+
+\section{Voix : PyTorch pour la synthèse}
+Le service audio charge les modèles \texttt{facebook/mms-tts} (VITS) paresseusement, une fois par langue, et met chaque clip en cache disque par empreinte (langue, texte), avec écriture atomique. Il refuse de synthétiser un gabarit à trous : le montant est lu par la synthèse SAFINUM (\texttt{\{"say": "5 000 FCFA"\}}). Une langue sans modèle publié est déclarée indisponible, jamais simulée. La voix humaine validée dans le studio a toujours priorité et n'est jamais écrasée par la synthèse.
+
+\M{} Chaîne vérifiée de bout en bout : micro du navigateur (webm/opus), GridFS, transcodage en mp3 mono 16 kHz à 32 kb/s (6,4 Ko pour un clip court), servi par le middleware sous \texttt{/voix/<langue>/<clé>.mp3}, format exigé par l'IVR SAFINUM.
+
+\noindent\textbf{Limite.} Les modèles MMS sont sous licence CC-BY-NC 4.0. Leur usage commercial suppose une autre licence, ou un modèle entraîné sur notre propre corpus de voix validées.
+
+\section{Sécurité}
+\fig{securite}{0.42\textwidth}{La faille du kit officiel, fermée en v3.}
+
+\M{} \textbf{Faille trouvée dans le kit officiel.} Le kit appelle l'URL bancaire fournie \emph{dans le payload} (\texttt{bank\_api.base\_url}) avec la clé d'équipe. Or l'URL du middleware est publique (tunnel) : n'importe qui peut lui envoyer un tour forgé et recevoir la clé. Notre démonstration l'a reproduit : le kit l'a envoyée à notre faux attaquant, la v3 n'a rien envoyé.
+
+\begin{table}[H]\centering\small
+\begin{tabularx}{\textwidth}{L L}
+\toprule
+\textbf{Menace} & \textbf{Contre-mesure} \\
+\midrule
+Vol de la clé par URL forgée & URL bancaire fixée par la configuration, origines en liste blanche \\
+Appels par un tiers & URL déclarée secrète \texttt{/hook/<secret>}, comparaison à temps constant \\
+Abus de la banque à travers nous & limite de débit par numéro dans Redis \\
+Fuite dans les journaux & numéros masqués, saisies jamais journalisées \\
+Données financières côté écrans & gabarits seulement, aucun client bancaire injecté \\
+Relecture complaisante & quatre yeux imposés en base \\
+Session du studio & JWT HS256 httpOnly, rôles relus en base à chaque requête \\
+Clé commitée dans le dépôt & fichier retiré du suivi ; révocation de la clé à demander \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\section{Mesures vérifiées}
+\begin{table}[H]\centering\small
+\begin{tabularx}{\textwidth}{L l l}
+\toprule
+\textbf{Mesure} \M & \textbf{Avant} & \textbf{v3} \\
+\midrule
+Traductions d'un écran de 40 clés & 22,9 µs (kit) ; 1\,865 µs (Redis) & 1,9 µs \\
+Appel bancaire, RTT 50 ms, après 6 s & 107 ms & 52 ms \\
+Appel bancaire, RTT 150 ms, après 6 s & 307 ms & 152 ms \\
+Validation puis phrase servie & redémarrage & 1,2 ms (p95 2,7 ms) \\
+Écran USSD avec ɛ, ɔ, ŋ & 70 caractères & 182 septets \\
+Surcoût par tour, sans réseau & 1,17 ms (kit) & 1,49 ms \\
+\bottomrule
+\end{tabularx}
+\end{table}
+\noindent\textbf{Transparence.} Contre la vraie sandbox, depuis notre conteneur, kit et v3 mesurent tous deux environ 245 ms : le proxy de l'environnement termine le TLS et mutualise ses connexions, ce qui masque l'effet du keep-alive. C'est pourquoi les gains de keep-alive sont donnés en labo, à latence injectée. La clé d'équipe du dépôt ayant été refusée par la sandbox (401), les parcours bancaires ont été testés contre une banque simulée qui applique la grille de frais publiée.
+
+\section{Modèle économique}
+\subsection{Quatre options}
+\begin{table}[H]\centering\small
+\begin{tabularx}{\textwidth}{l L L L}
+\toprule
+ & \textbf{Client} & \textbf{Force} & \textbf{Risque} \\
+\midrule
+A. Licence SaaS & banques, EMF, opérateurs & récurrent, aligné sur l'usage & vente bancaire longue \\
+B. Locuteurs payés & (moteur de A) & langue quasi gratuite, emplois locaux & qualité (couverte) \\
+C. Licence de corpus & opérateurs, IA, universités & forte marge & consentement, licences \\
+D. Subventions & bailleurs, régulateur & finance le démarrage & non récurrent \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Recommandation : A et B, puis C}
+La banque paie \Hy{} 2 FCFA par session localisée. Les locuteurs sont payés en mobile money : \Hy{} 25 FCFA par traduction validée, 15 FCFA par relecture, 50 FCFA par voix validée, et 20 \% du revenu reversé au fonds des contributeurs. Le slogan devient littéral : en apprenant aux services financiers à parler leur langue, les locuteurs gagnent eux-mêmes de l'argent.
+
+\begin{table}[H]\centering\small
+\begin{tabularx}{\textwidth}{L r r r}
+\toprule
+\textbf{Coût d'une langue} & \textbf{Volume} \M & \textbf{Tarif} \Hy & \textbf{Coût} \\
+\midrule
+Traduction et relecture & 144 phrases & 40 FCFA & 5\,760 FCFA \\
+Voix et relecture & 45 phrases fixes & 65 FCFA & 2\,925 FCFA \\
+\textbf{Langue complète} & & & \textbf{8\,685 FCFA (13,24 €)} \\
+Dix langues nationales & & & 86\,850 FCFA (132,40 €) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{table}[H]\centering\small
+\begin{tabularx}{\textwidth}{L r r r}
+\toprule
+\textbf{Part d'opérations localisées} \Hy & \textbf{Prix} \Hy & \textbf{Revenu annuel} & \textbf{Fonds locuteurs} \\
+\midrule
+0,5 \% des 2,73 Md \F & 2 FCFA & 27,3 M FCFA (41\,600 €) & 5,5 M FCFA \\
+1 \% & 2 FCFA & 54,6 M FCFA (83\,200 €) & 10,9 M FCFA \\
+2 \% & 3 FCFA & 163,8 M FCFA (249\,700 €) & 32,8 M FCFA \\
+\bottomrule
+\end{tabularx}
+\end{table}
+\noindent Lecture : dans le scénario le plus prudent, une langue complète est remboursée par moins de 4\,400 sessions localisées. Parité fixe : 1 € = 655,957 FCFA.
+
+\subsection{À valider ensemble}
+Le prix par session (ou une part des frais de transaction), les tarifs des locuteurs sur une langue pilote avec 20 locuteurs, et le client de lancement (un EMF régional plutôt qu'une banque).
+
+\section{Déploiement et feuille de route}
+\fig{deploiement}{0.5\textwidth}{Déploiement : le middleware est sans état et se multiplie derrière le tunnel.}
+\begin{enumerate}
+  \item Jour J : tunnel nommé, URL secrète déclarée, clé d'équipe régénérée.
+  \item Mois 1 : langue pilote validée par 20 locuteurs, paiement mobile money des contributions.
+  \item Mois 3 : reconnaissance vocale pour l'IVR (aujourd'hui, une prise de parole déclenche une demande de touche).
+  \item Mois 6 : modèle de synthèse entraîné sur le corpus validé, licence commerciale propre.
+\end{enumerate}
+
+\section*{Sources}
+\begin{itemize}\small
+  \item Banque mondiale, Global Findex 2025, indicateur FX.OWN.TOTL.ZS. \url{https://data.worldbank.org/indicator/FX.OWN.TOTL.ZS}
+  \item BEAC, Rapport 2024 sur les services de paiement dans la CEMAC. \url{https://www.beac.int/wp-content/uploads/2026/04/RAPPORT-SUR-LES-SERVICES-DE-PAIEMENT-DANS-LA-CEMAC-2024-.pdf}
+  \item Agence Ecofin, mobile money CEMAC 2024. \url{https://www.agenceecofin.com/actualites/0705-138200-mobile-money-le-cameroun-domine-l-espace-cemac-avec-65-des-comptes-en-2024}
+  \item Investir au Cameroun, mobile money 2024. \url{https://www.investiraucameroun.com/finance/0405-23354-cemac-le-cameroun-reste-roi-du-mobile-money-en-2024-avec-65-1-des-comptes-et-57-de-la-valeur-des-transactions}
+  \item Langues du Cameroun, recensement de 2005. \url{https://en.wikipedia.org/wiki/Languages_of_Cameroon}
+  \item SAFINUM, documentation de la sandbox. \url{https://safinum.cm/sandbox/docs}
+\end{itemize}
+\end{document}

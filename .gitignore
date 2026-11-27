@@ -13,3 +13,5 @@ docs/latex/*.out
 docs/latex/*.toc
 docs/latex/*.fls
 docs/latex/*.fdb_latexmk
+__pycache__/
+.pytest_cache/
