@@ -20,6 +20,7 @@ import { SafinumBank } from './bank.js';
 import { handleAtm } from './atm.js';
 import { handleIvr, type IvrState } from './ivr.js';
 import { handleSms } from './sms.js';
+import { handleUi } from './ui.js';
 import { adminAction, adminState } from './lang-admin.js';
 import { audioDir, audioUrl, clipForText, loadAudioIndex, voiceModel, voiceSummary } from './voice.js';
 import { TtlStore } from './session.js';
@@ -336,6 +337,17 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
               status: reply.state.pending_id === undefined ? 'none' : 'pending',
             },
           });
+        }
+        // Écrans ATM : la sandbox envoie les libellés de l'écran (`strings`) et attend la même
+        // traduction clé par clé que mobile/web — pas notre dialogue local. Renvoyer `say`/`screen`
+        // ici donne `INVALID_RESPONSE` et 47 clés `atm.*` marquées manquantes (mesuré le 27/11).
+        // Le dialogue (carte, code, montant) reste servi par `POST /atm`, hors contrat.
+        if (payload.strings !== undefined && payload.strings !== null) {
+          const reply = handleUi(turn);
+          log(
+            `trace=${v2Trace || '-'} channel=atm screen=${payload.screen ?? '-'} strings=${Object.keys(payload.strings).length} language=${reply.language}`,
+          );
+          return json(res, 200, { screen: payload.screen, ...reply });
         }
         const atm = await handleAtm(
           {

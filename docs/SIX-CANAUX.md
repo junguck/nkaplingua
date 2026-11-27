@@ -104,22 +104,42 @@ sandbox : le chiffre n'est pas calculé chez nous, il vient de la banque.
   au lieu de mentir. Vérifié : `665 995` = `681 145 − 5 050 (premier test) − 5 050 (second) − 5 050
   (sonde)`.
 
-## 6. Ce que ce test ne prouve pas
+## 6. Tous les écrans, en anglais (23/23)
+
+Les 23 écrans atteignables ont été rejoués en direct le 27/11 avec `language: "en"` :
+6 écrans `mobile`, les 6 mêmes en `web`, et les 11 écrans ATM. Preuve brute :
+`docs/preuves/ecrans-2026-11-27.json`, produite par `node scripts/ecrans.mjs --langue en`.
+
+| Canal | Écrans | Rapport de traduction |
+| --- | --- | --- |
+| `mobile` | `home` (30 clés), `transfer` (28), `pay` (34), `review` (31), `receipt` (19), `history` (25) | 6/6 en 200, `missing: []` |
+| `web` | mêmes écrans, 32/30/36/33/21/31 clés | 6/6 en 200, `missing: []` |
+| `atm` | `atm_welcome` (6), `atm_pin` (6), `atm_menu` (8), `atm_amount` (11), `atm_confirm` (13), `atm_cash` (5), `atm_receipt` (9), `atm_statement` (15), `atm_balance` (7), `atm_other` (9), `atm_end` (5) | 11/11 en 200, `missing: []`, `over_limit: []`, `placeholder_errors: []` |
+
+**Défaut trouvé et corrigé pendant ce test** : sur le canal ATM, la sandbox n'attend pas notre
+dialogue local (`say` / `screen`), elle envoie les libellés de l'écran (`strings`) et attend la
+**même traduction clé par clé que mobile/web**. Notre route renvoyait `handleAtm` : réponse
+`INVALID_RESPONSE` et 47 clés `atm.*` marquées `missing`. Le dispatch ATM traduit maintenant
+`strings` quand elles sont présentes (`server.ts`), et `POST /atm` garde le dialogue local
+(carte, code, montant) hors contrat. Un test le verrouille dans `local-channels.test.ts`.
+
+Les 47 clés `atm.*` sont dans `ui-dictionaries.ts` pour `en`. Aucune n'a été inventée en fulfulde :
+par la règle de repli de `ui.ts` (0 clé traduite), un écran ATM demandé en `fub` repart en `fr`
+avec `language: "fr"` — un repli déclaré, jamais une fausse traduction.
+
+Deux clés restent signalées `untranslated` par la sandbox parce que l'anglais est identique au
+français (`review.service` = « Service », `history.col_date` = « Date ») : c'est 1 clé sur 31 et
+sur 33, très loin du seuil de 25 % qui ferait basculer l'écran entier en `fr`.
+
+## 7. Ce que ces tests ne prouvent pas
 
 - **Pas de tunnel stable** : l'URL est un quick tunnel, elle mourra au prochain redémarrage.
-- **Les écrans ne sont prouvés que sur `home` et `atm_welcome`** : les autres écrans
-  (`transfer`, `pay`, `review`, `receipt`, `history`, et le reste de l'ATM) n'ont pas encore été
-  joués en direct.
-- **Les clés `atm.*` ne sont pas traduites** : la sandbox en envoie 47 (`atm.bank`, `atm.key_withdraw`,
-  `atm.pin_title`…). Elles n'existent ni dans `ui-dictionaries.ts` ni dans `data/langues.json`, donc
-  le rapport de traduction les marque `missing` et l'écran retombe en français. C'est visible dans
-  la preuve (`report.missing`), et c'est honnête : mieux vaut un repli déclaré qu'un faux gala.
-- **Une seule langue par écran** : `language` était `fr`. Les 5 langues camerounaises restent au
-  repli français tant qu'aucun pack n'est livré (voir `docs/LANGUES.md`).
-- **L'ATM ne fait pas de retrait réel** : la sandbox n'a pas de route de retrait ; la simulation
-  le dit dans chaque réponse (`simulation.bankRoute: "none"`).
+- **Une seule langue de test** : les écrans ont été joués en `en`. Les 5 langues camerounaises
+  restent au repli français tant qu'aucun pack n'est livré (voir `docs/LANGUES.md`).
+- **L'ATM ne fait pas de retrait réel** : la sandbox n'a pas de route de retrait ; le dialogue
+  local le dit dans chaque réponse (`simulation.bankRoute: "none"`).
 
-## 7. Reproduire
+## 8. Reproduire
 
 ```bash
 # 1. middleware sur la vraie banque, six canaux, routes locales actives
@@ -137,7 +157,11 @@ node scripts/safinum.mjs status
 
 # 4. preuve des six canaux (PASS dans l'environnement, jamais dans un fichier versionné)
 SAFINUM_SIMULATOR_PASS=… node scripts/six-canaux.mjs
+
+# 5. tous les écrans mobile/web/ATM, en anglais (23 appels, un seul déverrouillage)
+SAFINUM_SIMULATOR_PASS=… node scripts/ecrans.mjs --langue en
 ```
 
-Le script écrit `docs/preuves/six-canaux-<date>.json` et sort en code 0 seulement si les six canaux
-répondent 200.
+Les scripts écrivent `docs/preuves/six-canaux-<date>.json` et `docs/preuves/ecrans-<date>.json`, et
+sortent en code 0 seulement si tous les appels répondent 200. `ecrans.mjs` imprime aussi, écran par
+écran, `traduit=n/n` et la liste des clés `missing`, `over_limit` ou aux emplacements cassés.

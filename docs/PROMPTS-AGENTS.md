@@ -47,19 +47,14 @@ CONTEXTE VÉRIFIÉ (27/11/2026, ne le re-découvre pas)
   puis en-tête X-Sandbox-Access. team_id est un ENTIER. mobile/web/atm exigent `screen`.
 - La banque réelle ne renvoie pas de solde après `confirm` : le middleware relit /accounts et
   n'annonce rien s'il ne peut pas lire (déjà corrigé, testé). Ne réintroduis pas `?? 0`.
-- Les écrans ATM envoient 47 clés `atm.*` absentes de nos dictionnaires → repli fr signalé
-  `missing` par la sandbox.
+- Les 23 écrans mobile/web/ATM répondent 200 avec `missing: []` en `en`, et les 47 clés `atm.*`
+  sont dans `ui-dictionaries.ts` : cf. docs/preuves/ecrans-2026-11-27.json. Sur ATM, la sandbox
+  envoie `strings` et attend une traduction d'écran (pas notre dialogue `POST /atm`).
 
 MISSION
-1. Traduire les 47 clés `atm.*` dans les dictionnaires intégrés (`ui-dictionaries.ts`) pour `en`,
-   et documenter honnêtement l'absence de fulfulde (pas d'invention : le repli fr est déclaré).
-   La liste exacte vient du bundle de la sandbox et de docs/SIX-CANAUX.md §6.
-2. Jouer les écrans mobile/web manquants (`transfer`, `pay`, `review`, `receipt`, `history`) et
-   les écrans ATM (`atm_pin`, `atm_menu`, `atm_amount`, `atm_confirm`, `atm_cash`, `atm_receipt`,
-   `atm_statement`) via POST /channel/<canal> avec le bon `screen`, et corriger ce qui casse.
-3. Vérifier le cycle transactionnel complet sur la sandbox : transfert confirmé, transfert annulé
+1. Vérifier le cycle transactionnel complet sur la sandbox : transfert confirmé, transfert annulé
    (`2` au récapitulatif), et solde relu correctement dans les deux cas.
-4. Voix : garder la règle « jamais de voix française sur du fulfulde ». Si des clips humains sont
+2. Voix : garder la règle « jamais de voix française sur du fulfulde ». Si des clips humains sont
    déposés dans `audio/fub/`, les déclarer dans `audio/index.json` (engine: "human",
    model: "locuteurs") et vérifier qu'ils sortent dans POST /ivr.
 
@@ -86,14 +81,13 @@ MÉTHODE
    et une ligne dans docs/SIX-CANAUX.md §6 si une limite tombe — par note à B si le fichier lui appartient.
 5. COMMIT + PUSH :
    git switch -c feat/canaux-voix
-   git add -A && git commit -m "Six canaux: ecrans ATM, cycle confirme/annule, voix sans invention"
+   git add -A && git commit -m "Six canaux: cycle confirme/annule, voix sans invention"
    git pull --rebase origin main
    git push -u origin feat/canaux-voix
    puis ouvre la PR vers main (titre, corps : ce qui marche, ce qui manque, tests exécutés).
 
-FINI QUAND : les écrans listés répondent 200 avec leurs clés servies, le cycle confirmé/annulé
-est prouvé, les tests passent, la doc est à jour, la branche est poussée et la PR ouverte avec
-son lien dans ta réponse finale.
+FINI QUAND : le cycle confirmé/annulé est prouvé sur la sandbox, les tests passent, la doc est à
+jour, la branche est poussée et la PR ouverte avec son lien dans ta réponse finale.
 ```
 
 ---

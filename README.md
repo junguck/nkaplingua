@@ -51,9 +51,10 @@ altérer un montant, un nom ou un numéro**.
 | [`docs/GUIDE-STUDIO-ENREGISTREMENT.md`](docs/GUIDE-STUDIO-ENREGISTREMENT.md) : enregistrer les voix des langues sans modèle TTS |
 
 État vérifié le 27/11/2026 : la clé `sbx_…` est **acceptée** (`GET /sandbox/endpoint` → 200, team `shun-and-co`,
-id 10), les **six canaux** sont déclarés et répondent 200. Reste : un **tunnel nommé** (aucun certificat
-Cloudflare sur la machine), les écrans autres que `home`/`atm_welcome`, les 47 clés `atm.*` en anglais,
-et les packs de langues (aucun pack livré : voir [`docs/ROADMAP.md`](docs/ROADMAP.md)).
+id 10), les **six canaux** sont déclarés et répondent 200, et les **23 écrans** mobile/web/ATM sont
+joués en `en` avec `missing: []` (`docs/preuves/ecrans-2026-11-27.json`). Reste : un **tunnel nommé**
+(aucun certificat Cloudflare sur la machine) et les packs de langues camerounaises (aucun pack livré :
+voir [`docs/ROADMAP.md`](docs/ROADMAP.md)).
 
 ## Démarrer
 

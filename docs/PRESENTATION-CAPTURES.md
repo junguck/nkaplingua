@@ -194,6 +194,8 @@ sandbox, recopiées depuis `docs/preuves/six-canaux-2026-11-27.json`.
 | ATM | `screen: atm_welcome`, `strings` ATM | « Le distributeur parle la même langue. » | le canal ATM est branché (retrait simulé, déclaré) |
 | IVR | `Choisissez: 1. Solde 2. Envoyer…` | « Le téléphone reçoit du texte, prêt à être dit. » | le canal vocal répond sans audio inventé |
 
-Ce que ces six captures **ne** prouvent pas : les écrans autres que `home`/`atm_welcome`, les
-langues autres que `fr`, et les 47 clés `atm.*` (absentes de nos dictionnaires → repli français
-signalé `missing`). C'est écrit dans [SIX-CANAUX](SIX-CANAUX.md) §6.
+Ce que ces six captures **ne** prouvent pas : elles sont en `fr` et ne montrent que `home` et
+`atm_welcome`. Les **23 écrans** (6 mobile, 6 web, 11 ATM) ont depuis été rejoués en `en` sur la
+sandbox, `missing: []` et 47 clés `atm.*` servies : voir `docs/preuves/ecrans-2026-11-27.json` et
+[SIX-CANAUX](SIX-CANAUX.md) §6. Les langues camerounaises restent au repli `fr` faute de packs
+relus, et le retrait ATM reste simulé (la sandbox n'a pas de route de retrait).

@@ -291,7 +291,7 @@ temps d'un script (`apps/gateway/scripts/six-canaux.mjs`) et n'est jamais écrit
 | `ussd` | `{ team_id, phone, text, session_id, language, input_type }` | `text: ""` ouvre le menu |
 | `mobile`, `web` | + **`screen`** (`home`, `transfer`, `pay`, `review`, `receipt`, `history`) | 422 sans `screen` |
 | `sms` | comme `ussd` | la réponse porte `sms.segments` / `sms.encoding` |
-| `atm` | + **`screen`** : `atm_welcome`, `atm_pin`, `atm_menu`, `atm_amount`, `atm_confirm`, `atm_cash`, `atm_receipt`, `atm_statement`, `atm_balance`, `atm_other`, `atm_end` | 422 sans `screen` |
+| `atm` | + **`screen`** : `atm_welcome`, `atm_pin`, `atm_menu`, `atm_amount`, `atm_confirm`, `atm_cash`, `atm_receipt`, `atm_statement`, `atm_balance`, `atm_other`, `atm_end` | 422 sans `screen` ; la sandbox envoie `strings` et attend une **traduction d'écran** comme mobile/web, pas un dialogue (mesuré le 27/11 : `INVALID_RESPONSE` sinon) |
 | `ivr` | comme `ussd` | réponse en texte (`say` / `response.text`) |
 
 Autres faits utiles :
