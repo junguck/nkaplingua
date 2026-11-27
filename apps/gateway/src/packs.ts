@@ -43,7 +43,13 @@ export interface PackLoad {
 }
 
 /** `NKAP_TRANSLATIONS_DIR` permet de pointer un autre dossier (tests, livraison du jour J à part). */
-export const DEFAULT_PACK_DIR = process.env.NKAP_TRANSLATIONS_DIR ?? fileURLToPath(new URL('../translations/', import.meta.url));
+function defaultPackDir(): string {
+  const packaged = fileURLToPath(new URL('./translations/', import.meta.url));
+  if (fs.existsSync(packaged)) return packaged;
+  return fileURLToPath(new URL('../translations/', import.meta.url));
+}
+
+export const DEFAULT_PACK_DIR = process.env.NKAP_TRANSLATIONS_DIR ?? defaultPackDir();
 
 /** Lit `translations/*.json` (les fichiers commençant par `_` sont des modèles, ignorés). */
 export function loadPacks(dir: string = DEFAULT_PACK_DIR): PackLoad {

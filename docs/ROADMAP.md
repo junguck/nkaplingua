@@ -1,6 +1,6 @@
 # Roadmap — ce qui reste à faire
 
-**État au 26/11/2026** : `work/hausa` intègre maintenant le middleware SAFINUM et les correctifs de conformité de la branche `upstream/ccr-1ced25dd-1kjima`, tout en conservant les ajouts locaux. Les tâches ci-dessous restent des critères à démontrer, pas des fonctionnalités présumées validées en sandbox.
+**État au 27/11/2026** : la clé SAFINUM de l'équipe `shun-and-co` est valide, les endpoints des trois canaux sont enregistrés et le middleware répond sur le tunnel actuel. Les tâches ci-dessous restent des critères à démontrer, pas des fonctionnalités présumées validées en sandbox.
 
 **Règle d'or** : ce qui est sur `main` doit être démontrable à tout moment. On coupe des fonctionnalités,
 jamais la stabilité. **Gel des fonctionnalités : J3 à 14 h.**
@@ -12,10 +12,10 @@ Ce qui est livré est décrit dans le [README](../README.md) et les [ADR](adr/) 
 
 | Tâche | Bloqué par | Fait quand |
 |---|---|---|
-| **Clé d'équipe `sbx_…` et `team_id` valides** | Organisation SAFINUM : la clé fournie le 26/11 est refusée (`401`), `team_id: nkaplingua` est inconnu (`422`) | `node apps/gateway/scripts/safinum.mjs status` répond `200` |
-| **Test en direct sur la sandbox** (3 canaux) | clé ci-dessus | Simulateurs USSD, mobile et web sans `INVALID_RESPONSE`, `NO_BANK_CALL` ni `TIMEOUT` ; `X-Trace-Id` visible dans le journal du jury |
+| Clé d'équipe et `team_id` valides | — | **Vérifié** : `GET /sandbox/endpoint` répond `200` pour `shun-and-co` |
+| **Test complet en direct sur la sandbox** (3 canaux) | scénario complet × langues tirées au sort et traces jury | Menu + solde USSD, écrans mobile et web vérifiés ; rejouer les dix scénarios et confirmer les traces côté jury |
 | **Valider le statut de transaction** renvoyé après confirmation et annulation | clé ci-dessus | La sandbox accepte le cycle du kit officiel (`confirmed`, `cancelled`, défaut) ; sinon `SAFINUM_STATUS=contract` |
-| **Tunnel public + `POST /sandbox/endpoint`** pour `ussd`, `mobile`, `web` | clé ci-dessus | `GET /sandbox/endpoint` renvoie nos URL — **avant** le passage (`CONFIG_LOCKED` pendant l'évaluation) |
+| **Tunnel HTTPS stable + endpoints** pour `ussd`, `mobile`, `web` | Tunnel Cloudflare actuel temporaire ; prévoir un hostname nommé avant l'évaluation | `GET /sandbox/endpoint` renvoie les trois URL ; redéclarer le hostname stable avant le passage (`CONFIG_LOCKED` pendant l'évaluation) |
 | **Packs de langue relus par deux locuteurs** : écrans (89 clés) puis USSD (56 phrases) pour **dua, ewo, bas, bbj, byv** ; relecture des formes fulfulde critiques | Locuteurs à recruter ; aucune source écrite accessible pour bas et byv ([LANGUES](LANGUES.md)) | `pnpm --filter @nkap/gateway i18n verifier` vert ; la langue tirée par le jury est servie ou repliée en `fr` déclaré |
 | **Préparer le jour J** : tunnel nommé, machine de secours, vidéo de secours, rôles | — | Déroulé [JOUR-J](JOUR-J.md) répété une fois |
 | **Spécification API** (`docs/API.md`, générée depuis zod) et documentation finale | — | Livrable §11 « Spécifications API » |

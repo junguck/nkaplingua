@@ -63,19 +63,18 @@ Comptes fictifs : `237699000003` Fadimatou (250 000) · `237690000002` Aicha (80
 
 ## 3. Brancher la sandbox
 
-### 3.1 La clé (seul prérequis manquant aujourd'hui)
+### 3.1 Clé et identifiants d'équipe
 
-État au 26/11 : la sandbox répond, mais la clé enregistrée pour l'équipe est refusée
-(`401 Clé d'API absente ou invalide`) sur toutes les routes bancaires, et `team_id: nkaplingua` donne
-`422 Équipe inconnue` sur `/channel/*`. Il faut une clé `sbx_…` et un `team_id` confirmés par l'organisation.
+État vérifié le 27/11 : la clé fonctionne pour `team_id: shun-and-co`. Le script lit automatiquement
+`apps/gateway/.env` ; ce fichier est ignoré par Git et ne doit jamais être commité.
 
 ```bash
 cp apps/gateway/.env.example apps/gateway/.env
-# SAFINUM_TEAM_KEY=sbx_...        ← remise par l'organisation, jamais commitée
-# SAFINUM_BANK_URL=https://safinum.cm/api/v1
+# Renseigner SAFINUM_TEAM_KEY, SAFINUM_TEAM_ID et SAFINUM_PHONE.
+# SAFINUM_PHONE doit avoir un compte dans le jeu de données de l'équipe.
 ```
 
-Sans clé, la sandbox répond `422 Équipe inconnue` (constaté le 26/11 : `teams: []`).
+`SAFINUM_TEAM_ID` est distinct du nom du projet ; `nkaplingua` n'est pas l'identifiant SAFINUM.
 
 ### 3.2 Une URL publique
 
@@ -93,10 +92,10 @@ L'URL gratuite change à chaque redémarrage du tunnel — il faut alors redécl
 ### 3.3 Déclarer les trois canaux
 
 ```bash
-SAFINUM_TEAM_KEY=sbx_... SAFINUM_TEAM_ID=nkaplingua \
+SAFINUM_TEAM_KEY=sbx_... SAFINUM_TEAM_ID=shun-and-co \
   node apps/gateway/scripts/safinum.mjs declare https://mon-tunnel.example
 
-SAFINUM_TEAM_KEY=sbx_... node apps/gateway/scripts/safinum.mjs status
+node apps/gateway/scripts/safinum.mjs status
 ```
 
 Une seule URL sert les trois canaux : le middleware aiguille sur `type: "ui_translation"`.
@@ -107,10 +106,16 @@ Une seule URL sert les trois canaux : le middleware aiguille sur `type: "ui_tran
 - En ligne de commande :
 
 ```bash
+# Renseigner apps/gateway/.env avec la clé, le team_id et un téléphone qui possède
+# réellement un compte dans le jeu de données SAFINUM de l'équipe.
 node apps/gateway/scripts/safinum.mjs turn ussd ""        # menu
 node apps/gateway/scripts/safinum.mjs turn ussd "1"       # solde
 node apps/gateway/scripts/safinum.mjs ui web              # écran (fub par défaut)
 ```
+
+Les commandes `turn` réutilisent la même session USSD entre deux lancements. Remplacer le numéro de test
+par un numéro reconnu par `GET /accounts/{phone}` ; les anciens exemples `237699000003` ne sont pas présents
+dans tous les jeux de données SAFINUM et peuvent répondre `UNKNOWN_ACCOUNT`.
 
 ## 4. Texte libre sur USSD
 

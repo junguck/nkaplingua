@@ -6,6 +6,8 @@
  */
 import { build } from 'esbuild';
 import { fileURLToPath } from 'node:url';
+import fs from 'node:fs';
+import path from 'node:path';
 
 const root = fileURLToPath(new URL('..', import.meta.url));
 
@@ -20,4 +22,11 @@ await build({
   sourcemap: true,
   logLevel: 'info',
 });
-// `public/console.html` est lu à `../public` depuis `dist/` : rien à copier.
+// Garde les packs de langues avec l'artefact : le gateway peut ainsi être déployé depuis dist seul.
+const translations = path.join(root, 'translations');
+if (fs.existsSync(translations)) {
+  const packagedTranslations = path.join(root, 'dist', 'translations');
+  fs.rmSync(packagedTranslations, { recursive: true, force: true });
+  fs.cpSync(translations, packagedTranslations, { recursive: true });
+}
+// `public/console.html` est une ressource de l'interface et reste servie depuis le paquet source.
