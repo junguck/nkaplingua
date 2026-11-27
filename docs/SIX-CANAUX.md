@@ -104,6 +104,18 @@ sandbox : le chiffre n'est pas calculé chez nous, il vient de la banque.
   au lieu de mentir. Vérifié : `665 995` = `681 145 − 5 050 (premier test) − 5 050 (second) − 5 050
   (sonde)`.
 
+### Le même cycle, annulé
+
+```
+> 2 → 237653397927 → 5000   200  récapitulatif (statut = pending)
+> 2                         200  "Operation annulee. Aucun montant debite."
+                                statut = cancelled
+```
+
+Soldes relus par un tour USSD séparé : `639 495` avant, `634 445` après le transfert confirmé,
+`634 445` après l'annulation — **écart 0**. Preuve datée : `docs/preuves/parcours-2026-11-27.json`
+(parcours `transfert-confirme` et `transfert-annule`).
+
 ## 6. Tous les écrans, en anglais (23/23)
 
 Les 23 écrans atteignables ont été rejoués en direct le 27/11 avec `language: "en"` :
@@ -131,7 +143,29 @@ Deux clés restent signalées `untranslated` par la sandbox parce que l'anglais 
 français (`review.service` = « Service », `history.col_date` = « Date ») : c'est 1 clé sur 31 et
 sur 33, très loin du seuil de 25 % qui ferait basculer l'écran entier en `fr`.
 
-## 7. Ce que ces tests ne prouvent pas
+## 7. Les onze parcours par fonctionnalité (11/11)
+
+`node scripts/six-canaux.mjs --parcours` rejoue, sur la même URL déclarée, un parcours par
+fonctionnalité et écrit `docs/preuves/parcours-<date>.json`. Exécution du 27/11/2026 (code 0) :
+
+| Fonctionnalité | Réponse réelle | Statut |
+| --- | --- | --- |
+| Solde | `Votre solde est de 641 595 FCFA.` | `none` |
+| Frais (25 000) | `frais 150 FCFA. Total 25 150 FCFA.` | `none` |
+| Historique | `Vos dernieres operations: 27/11 transfer … bill … airtime …` | `none` |
+| Terminologie | `Les frais sont ce que la banque retient pour executer une operation.` | `none` |
+| Langue → fulfulde | `Demngal: fub. Safinum. Subo: …` | `LANGUAGE_SWITCH` |
+| Crédit 1 000 | `Credit de 1 000 FCFA envoye au 650 626 114. Ref TRX-52A480950F.` | `confirmed` |
+| Facture ENEO 1 000 | `Facture ENEO payee: 1 000 FCFA. Ref TRX-BA721D302D.` | `confirmed` |
+| Transfert confirmé | `Ref TRX-2C97A08A2B. Solde 634 445 FCFA.` | `confirmed` |
+| Transfert annulé | `Operation annulee. Aucun montant debite.` | `cancelled` |
+| Solde par SMS | `Votre solde est de 634 445 FCFA.` · `gsm7`, 1 segment | `none` |
+| Solde par IVR | `Votre solde est de 634 445 FCFA.` | `none` |
+
+Le script reprend automatiquement sur `429` (quota du simulateur) : une preuve trouée ne vaut pas
+une preuve. Il sort en code 1 si un seul tour n'a pas répondu 200.
+
+## 8. Ce que ces tests ne prouvent pas
 
 - **Pas de tunnel stable** : l'URL est un quick tunnel, elle mourra au prochain redémarrage.
 - **Une seule langue de test** : les écrans ont été joués en `en`. Les 5 langues camerounaises
@@ -139,7 +173,7 @@ sur 33, très loin du seuil de 25 % qui ferait basculer l'écran entier en `fr`.
 - **L'ATM ne fait pas de retrait réel** : la sandbox n'a pas de route de retrait ; le dialogue
   local le dit dans chaque réponse (`simulation.bankRoute: "none"`).
 
-## 8. Reproduire
+## 9. Reproduire
 
 ```bash
 # 1. middleware sur la vraie banque, six canaux, routes locales actives
@@ -160,8 +194,13 @@ SAFINUM_SIMULATOR_PASS=… node scripts/six-canaux.mjs
 
 # 5. tous les écrans mobile/web/ATM, en anglais (23 appels, un seul déverrouillage)
 SAFINUM_SIMULATOR_PASS=… node scripts/ecrans.mjs --langue en
+
+# 6. onze parcours par fonctionnalité, solde et cycle confirmé/annulé compris
+SAFINUM_SIMULATOR_PASS=… node scripts/six-canaux.mjs --parcours
 ```
 
-Les scripts écrivent `docs/preuves/six-canaux-<date>.json` et `docs/preuves/ecrans-<date>.json`, et
-sortent en code 0 seulement si tous les appels répondent 200. `ecrans.mjs` imprime aussi, écran par
-écran, `traduit=n/n` et la liste des clés `missing`, `over_limit` ou aux emplacements cassés.
+Les scripts écrivent `docs/preuves/six-canaux-<date>.json`, `docs/preuves/ecrans-<date>.json` et
+`docs/preuves/parcours-<date>.json`, et sortent en code 0 seulement si tous les appels répondent 200.
+`ecrans.mjs` imprime aussi, écran par écran, `traduit=n/n` et la liste des clés `missing`,
+`over_limit` ou aux emplacements cassés. `--parcours` reprend sur `429` au lieu de rendre une preuve
+incomplète.

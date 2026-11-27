@@ -1,8 +1,13 @@
 # NkapLingua — la démonstration, capture par capture
 
-Neuf captures prises **sur le projet tel qu'il tourne** (banque de démonstration + middleware local,
-`ENABLE_V2_CHANNELS=1`, 27/11/2026), avec le même parcours que le jour J. Chaque capture dit trois
-choses : **ce qu'on voit**, **ce qu'on raconte**, **ce que ça prouve**.
+Neuf captures **locales** prises sur le projet tel qu'il tourne (banque de démonstration + middleware
+local, `ENABLE_V2_CHANNELS=1`, 27/11/2026), avec le même parcours que le jour J. Chaque capture dit
+trois choses : **ce qu'on voit**, **ce qu'on raconte**, **ce que ça prouve**.
+
+S'y ajoutent, plus bas, les **réponses HTTP réelles de la sandbox** : un tour par canal (les six) et
+onze parcours par fonctionnalité, copiés de `docs/preuves/six-canaux-2026-11-27.json` et
+`docs/preuves/parcours-2026-11-27.json`. Ce ne sont pas des maquettes : les textes, intentions,
+statuts et références sont ceux que la passerelle a renvoyés le 27/11/2026.
 
 Console : <http://127.0.0.1:8080/console> · base de mots : <http://127.0.0.1:8080/langues-admin>
 
@@ -22,8 +27,9 @@ les indicateurs de réponse.
 **On raconte** : « C'est la même page que je vais utiliser pour tous les canaux. À gauche ce que le
 client tape, à droite ce que le middleware répond, avec la langue réellement servie. »
 
-**Ce que ça prouve** : un seul middleware, une seule URL, cinq canaux — et la console ne triche pas :
-elle envoie de vraies requêtes HTTP.
+**Ce que ça prouve** : un seul middleware, une seule URL, **six** canaux — et la console ne triche
+pas : elle envoie de vraies requêtes HTTP. Le SMS n'a pas d'onglet dédié : il passe par le même menu,
+avec le découpage GSM-7 mesuré (voir plus bas).
 
 ## 2. USSD — transfert, récapitulatif avant toute action
 
@@ -93,9 +99,9 @@ de concurrents en démonstration.
 3. Frais / 4. Historique / 0. Quitter`, et à droite `channel: "ivr"`, `gather: {type:"menu",
 terminator:"#", cancel:"*", timeout_ms:8000}`.
 
-**On raconte** : « C'est un canal *local*, hors contrat SAFINUM : la sandbox n'expose que trois
-canaux. Mais c'est le même moteur : transaction en attente, confirmation séparée, `*` annule et
-annule la transaction côté banque. »
+**On raconte** : « Cette page appelle notre route locale, mais la sandbox ouvre elle aussi un canal
+`ivr` : même moteur, même menu, même banque. Transaction en attente, confirmation séparée, `*`
+annule et annule la transaction côté banque. »
 
 **Ce que ça prouve** : l'IVR n'est pas une maquette — il appelle la même banque, et la réponse est
 un vrai `gather` DTMF, exploitable par n'importe quel central.
@@ -108,9 +114,10 @@ un vrai `gather` DTMF, exploitable par n'importe quel central.
 Fadimatou Bouba` puis `1. Retrait / 2. Solde / 3. Quitter`, et dans le JSON
 `simulation: {…}` avec `bankRoute: "none"`.
 
-**On raconte** : « L'API bancaire SAFINUM n'a pas de route de retrait : le distributeur applique les
-vraies règles (multiple de 5 000, plafond, frais, solde suffisant) mais **dit** que la remise
-d'espèces est simulée. On préfère l'écrire que le laisser croire. »
+**On raconte** : « Sur la sandbox, le canal `atm` est un canal d'écrans : on traduit les 11 écrans
+(`atm_welcome`…`atm_end`, 47 clés). Le retrait, lui, n'a pas de route bancaire : le distributeur
+local applique les vraies règles (multiple de 5 000, plafond, frais, solde suffisant) mais **dit**
+que la remise d'espèces est simulée. On préfère l'écrire que le laisser croire. »
 
 **Ce que ça prouve** : le canal le plus tentant à falsifier est celui où l'honnêteté est la plus
 visible — et il est testé (plafond, coupures, code non vérifié par la banque).
@@ -155,16 +162,16 @@ sans redéploiement. C'est ce qui rend le vocabulaire corrigeable le jour de la 
 
 | Temps | Action | Ce qu'on dit |
 | --- | --- | --- |
-| 0:00 | Capture 1 | « Un seul middleware, cinq canaux, une console qui envoie de vraies requêtes. » |
+| 0:00 | Capture 1 | « Un seul middleware, six canaux, une console qui envoie de vraies requêtes. » |
 | 0:40 | Capture 2 | « Récapitulatif avant débit, confirmation au tour suivant, 103 septets sur 182. » |
 | 1:30 | Capture 3 | « Changement de langue en pleine confirmation : rien n'est perdu. » |
 | 2:20 | Captures 4 et 5 | « Écrans traduits en fulfulde puis en anglais, emplacements préservés. » |
-| 3:20 | Captures 6 et 7 | « IVR et ATM : même moteur ; le distributeur dit qu'il simule. » |
+| 3:20 | Captures 6 et 7 | « IVR et ATM : même moteur ; sur la sandbox l'ATM traduit ses écrans, le retrait local dit qu'il simule. » |
 | 4:20 | Capture 8 | « Une langue s'ajoute ici, sans code ni redéploiement. » |
 | 5:10 | Capture 9 | « Et on vérifie tout de suite ce que le moteur comprend. » |
 | 5:40 | `docs/preuves/` | « Les preuves : 10 scénarios et un tour par canal, horodatés. » |
 
-## Ce que ces captures ne prouvent pas
+## Ce que les captures locales ne prouvent pas
 
 - **Les captures locales ne prouvent pas la sandbox.** Celles de ce document viennent du serveur
   local et de la banque de démonstration. Les six canaux ont par ailleurs été joués **en direct**
@@ -180,22 +187,171 @@ sans redéploiement. C'est ce qui rend le vocabulaire corrigeable le jour de la 
   `POST /ivr` ; les cinq langues camerounaises n'ont **aucun** modèle publié et restent sans audio
   (`voice.model: null`). Le studio humain est décrit dans `docs/GUIDE-STUDIO-ENREGISTREMENT.md`.
 
-## Les six canaux (preuve en direct, 27/11/2026)
+## Les six canaux, réponse par réponse (sandbox, 27/11/2026)
 
-Les captures ci-dessous sont les réponses **réelles** de `POST /api/v1/channel/<canal>` sur la
-sandbox, recopiées depuis `docs/preuves/six-canaux-2026-11-27.json`.
+Un appel réel par canal via `POST /api/v1/channel/<canal>`, avec `X-Team-Key` et `X-Sandbox-Access`,
+vers l'URL déclarée. Preuve brute : `docs/preuves/six-canaux-2026-11-27.json` (générée par
+`node scripts/six-canaux.mjs`, code de sortie 0).
 
-| Canal | Ce qu'on voit | Ce qu'on raconte | Ce que ça prouve |
+### 1. USSD — le menu vient du middleware
+
+```json
+{"channel":"ussd","response":{"text":"Safinum. Choisissez: 1. Mon solde … 8. Langue"},
+ "interpretation":{"language":"fr"},"transaction":{"status":"none"},
+ "diagnostics":{"response_length":139,"max_chars":182,"over_limit":false,"gsm7_violations":[]}}
+```
+
+**On voit** : les huit entrées du menu, `langue fr`, aucun code d'erreur, **139 caractères sur 182**
+et zéro violation GSM-7. **On raconte** : « Ce menu n'est pas celui du simulateur : c'est notre
+middleware qui l'a composé et la passerelle l'a affiché. » **Ce que ça prouve** : la passerelle nous
+atteint, journalise notre tour (`trace_id`), et la contrainte d'écran est mesurée, pas supposée.
+
+### 2. Mobile — 30 clés d'écran, aucune manquante
+
+```json
+{"channel":"mobile","screen":"home","translation":{"language":"fr",
+ "strings":{"nav.home":"Accueil","nav.transfer":"Envoyer","home.balance_label":"Solde disponible",
+            "shell.greeting":"Bonjour {name}", …}}}
+```
+
+**On voit** : `screen: home`, 30 clés renvoyées, aucun code d'erreur ; le même écran rejoué en `en`
+donne **30/30 traduites, `missing: []`** (`docs/preuves/ecrans-2026-11-27.json`). **On raconte** :
+« Chaque clé demandée revient, dans la langue demandée ; aucune n'est omise, aucun emplacement
+`{name}` n'est cassé. » **Ce que ça prouve** : la traduction clé par clé du contrat `ui_translation`
+fonctionne sur le canal mobile.
+
+### 3. Web — le même contrat, 32 clés
+
+```json
+{"channel":"web","screen":"home","translation":{"language":"fr",
+ "strings":{"nav.home":"Accueil","shell.logout":"Se déconnecter","shell.secure":"Connexion sécurisée", …}}}
+```
+
+**On voit** : le même écran `home`, deux clés de plus qu'en mobile (`shell.logout`, `shell.secure`) ;
+en `en`, le relevé complet donne **32/32 traduites, `missing: []`**. **On raconte** : « Même moteur,
+même URL, autre canal : le web reçoit ses propres clés. » **Ce que ça prouve** : un seul middleware
+sert les deux canaux d'écran, sans mélange de jeux de clés.
+
+### 4. SMS — le découpage facturé est annoncé
+
+```json
+{"channel":"sms","response":{"text":"Safinum. Choisissez: … 8. Langue"},
+ "sms":{"encoding":"gsm7","segments":1,"awaiting_reply":false},
+ "diagnostics":{"response_length":139,"max_chars":160,"over_limit":false}}
+```
+
+**On voit** : le même menu que l'USSD, mais **139 caractères sur 160**, `gsm7`, **1 segment**.
+**On raconte** : « Un SMS se facture au segment : on annonce le nombre exact, ici un seul. »
+**Ce que ça prouve** : la contrainte 160/70 puis 153/67 est appliquée et mesurée par la sandbox,
+pas seulement par nos tests.
+
+### 5. ATM — l'écran d'accueil, 6 clés servies
+
+```json
+{"channel":"atm","screen":"atm_welcome","translation":{"language":"fr",
+ "strings":{"atm.bank":"Banque Safinum","atm.insert_card":"Insérez votre carte","atm.welcome":"Bienvenue", …},
+ "report":{"total":6,"translated":6,"missing":[],"over_limit":[],"placeholder_errors":[]}}}
+```
+
+**On voit** : `screen: atm_welcome`, **6/6 clés**, `missing: []`, aucun `INVALID_RESPONSE` (il y en
+avait un avant le correctif : le canal ATM attend une traduction d'écran, pas un dialogue).
+**On raconte** : « Le distributeur parle la même langue que l'application. » **Ce que ça prouve** :
+le canal ATM est branché sur le contrat d'écran ; les 11 écrans et 47 clés `atm.*` sont servis en
+`en` (preuve `ecrans-2026-11-27.json`, `missing: []`).
+
+### 6. IVR — le téléphone reçoit un texte, pas un faux audio
+
+```json
+{"channel":"ivr","response":{"text":"Choisissez: 1. Solde 2. Envoyer 3. Frais 4. Historique 0. Quitter"},
+ "diagnostics":{"response_length":65,"max_chars":400}}
+```
+
+**On voit** : le menu vocal, 65 caractères sur 400, `end_session: false`. **On raconte** : « Le
+central reçoit le texte à prononcer ; quand une phrase a un clip exact, on lui ajoute l'audio ; sinon
+on n'invente rien. » **Ce que ça prouve** : le canal IVR répond sur la sandbox, et la règle « jamais
+de voix française sur du fulfulde » reste tenue (`fub` → `audio: null`, vérifié).
+
+## Les onze parcours par fonctionnalité (sandbox, 27/11/2026)
+
+Même compte de test, même jeton. Preuve brute : `docs/preuves/parcours-2026-11-27.json`.
+
+| Fonctionnalité | Entrée | Réponse réelle | Statut |
 | --- | --- | --- | --- |
-| USSD | `Safinum. Choisissez:` + 8 entrées | « Le menu vient de notre middleware, pas du simulateur. » | la passerelle nous appelle et journalise le tour |
-| Mobile | `screen: home`, `translation.language: fr`, `strings` complets | « Chaque clé d'écran est traduite ou déclarée. » | la traduction clé par clé fonctionne |
-| Web | idem mobile | « Même contrat, même moteur. » | un seul middleware sert deux canaux d'écran |
-| SMS | même menu, `sms: {encoding: gsm7, segments: 1}` | « Le découpage facturé est annoncé. » | la contrainte 160/70 est mesurée, pas supposée |
-| ATM | `screen: atm_welcome`, `strings` ATM | « Le distributeur parle la même langue. » | le canal ATM est branché (retrait simulé, déclaré) |
-| IVR | `Choisissez: 1. Solde 2. Envoyer…` | « Le téléphone reçoit du texte, prêt à être dit. » | le canal vocal répond sans audio inventé |
+| Solde | `1` | `Votre solde est de 641 595 FCFA.` | `none` · `BALANCE_INQUIRY` |
+| Frais | `3` → `25000` | `Pour 25 000 FCFA: frais 150 FCFA. Total 25 150 FCFA.` | `none` · `FEE_INQUIRY` |
+| Historique | `4` | `Vos dernieres operations: 27/11 transfer -5 000 FCFA … bill -1 000 … airtime -1 000` | `none` · `TRANSACTION_HISTORY` |
+| Terminologie | `7` → `1` | `Les frais sont ce que la banque retient pour executer une operation.` | `none` · `TERM_EXPLANATION` |
+| Langue | `8` → `3` | `Demngal: fub. Safinum. Subo: 1. Ceede am keddiide …` | `fub` · `LANGUAGE_SWITCH` |
+| Crédit | `5` → `1` → `1000` → `1` | `Credit de 1 000 FCFA envoye au 650 626 114. Ref TRX-52A480950F.` | `confirmed` |
+| Facture | `6` → `1` → `123456789` → `1000` → `1` | `Facture ENEO payee: 1 000 FCFA. Ref TRX-BA721D302D.` | `confirmed` |
+| Transfert confirmé | `2` → `237653397927` → `5000` → `1` | `5 000 FCFA envoye a 653397927 (653 397 927). Ref TRX-2C97A08A2B. Solde 634 445 FCFA.` | `confirmed` |
+| Transfert annulé | `2` → `237653397927` → `5000` → `2` | `Operation annulee. Aucun montant debite.` | `cancelled` |
+| Solde par SMS | `1` (canal `sms`) | `Votre solde est de 634 445 FCFA.` · `gsm7`, 1 segment | `none` |
+| Solde par IVR | `1` (canal `ivr`) | `Votre solde est de 634 445 FCFA.` | `none` |
 
-Ce que ces six captures **ne** prouvent pas : elles sont en `fr` et ne montrent que `home` et
-`atm_welcome`. Les **23 écrans** (6 mobile, 6 web, 11 ATM) ont depuis été rejoués en `en` sur la
-sandbox, `missing: []` et 47 clés `atm.*` servies : voir `docs/preuves/ecrans-2026-11-27.json` et
-[SIX-CANAUX](SIX-CANAUX.md) §6. Les langues camerounaises restent au repli `fr` faute de packs
-relus, et le retrait ATM reste simulé (la sandbox n'a pas de route de retrait).
+Le cycle est prouvé **dans la même exécution** : le solde passe de `639 495` à `634 445` après le
+transfert confirmé (−5 050 = 5 000 + 50 de frais), puis **reste à `634 445`** après le transfert
+annulé (écart 0). Le solde est relu par un vrai tour USSD, jamais recopié d'une valeur supposée.
+
+> Les montants datent du 27/11/2026 et se débitent à chaque rejeu : la preuve fige les chiffres de
+> l'exécution, elle ne promet pas un solde constant.
+
+## Fonctionnalité → route → test → preuve
+
+Chaque ligne se vérifie sans nous croire : le test s'exécute en local, la preuve est un JSON daté
+d'une réponse réelle de la sandbox. L'URL déclarée est la **racine** (`POST /`) : le canal est dans
+le corps ; `POST /middleware/<canal>` est l'alias explicite du même contrat.
+
+| Fonctionnalité | Route (sandbox → middleware) | Test | Preuve |
+| --- | --- | --- | --- |
+| Menu USSD | `POST /channel/ussd` → `POST /` | `middleware.test.ts` › « sert le menu du kit officiel » | `six-canaux-2026-11-27.json` › `ussd` |
+| Solde | `POST /channel/ussd` | `middleware.test.ts` › « répond au solde depuis GET /accounts » ; `jury-scenarios.test.ts` › 1 | `parcours-2026-11-27.json` › `solde` |
+| Frais | `POST /channel/ussd` | `middleware.test.ts` › « répond aux frais avec GET /fees (25 000 → 150) » ; jury 3 | `parcours` › `frais` |
+| Historique | `POST /channel/ussd` | `jury-scenarios.test.ts` › 4 | `parcours` › `historique` |
+| Terminologie | `POST /channel/ussd` | `middleware.test.ts` › « Que veut dire frais ? » ; jury 10 | `parcours` › `aide` |
+| Changement de langue | `POST /channel/ussd` | `middleware.test.ts` › « bascule en fulfulde… » ; jury 8 | `parcours` › `langue` |
+| Crédit téléphonique | `POST /channel/ussd` | `middleware.test.ts` › « achète du crédit et paie une facture » | `parcours` › `credit` |
+| Paiement de facture | `POST /channel/ussd` | même test | `parcours` › `facture` |
+| Transfert confirmé | `POST /channel/ussd` | `middleware.test.ts` › « crée la transaction en pending, puis la confirme » ; jury 2 | `parcours` › `transfert-confirme` |
+| Transfert annulé | `POST /channel/ussd` | `middleware.test.ts` › « annule une opération en attente sans débiter » ; jury « “non” seul annule » | `parcours` › `transfert-annule` |
+| Écrans mobile / web | `POST /channel/{mobile,web}` → `POST /` (canal dans le corps) | `middleware.test.ts` › traductions en / fulfulde, repli | `ecrans-2026-11-27.json` (12 écrans, `missing: []`) |
+| Écrans ATM (47 clés) | `POST /channel/atm` → `POST /` (canal dans le corps) | `local-channels.test.ts` › « traduit les écrans ATM… » | `ecrans` (11 écrans, `missing: []`) |
+| Découpage SMS | `POST /channel/sms` | `sms.test.ts` (160/70, 153/67, UCS-2) | `six-canaux` › `sms` ; `parcours` › `sms-solde` |
+| IVR (DTMF, texte) | `POST /channel/ivr` → `POST /` | `local-channels.test.ts` › « sert /ivr » ; `voice.test.ts` | `six-canaux` › `ivr` ; `parcours` › `ivr-solde` |
+| Voix (fr/en, jamais fub) | `POST /ivr`, `GET /audio/*` | `voice.test.ts` (8 tests) | `docs/VOIX-MMS.md` ; `GET /audio/index.json` |
+| Base de mots / langues | `GET /api/langues`, `POST /api/langues/*` | `word-base.test.ts`, `lang-admin.test.ts` | `docs/LANGUES.md` ; console `/langues-admin` |
+
+## Vérifications du 27/11/2026 (sortie brute)
+
+```text
+$ node scripts/six-canaux.mjs --parcours
+ussd   200  Safinum. Choisissez: 1. Mon solde 2. Envoyer de l'argent 3. Frais 4. Historique 5. Acheter
+mobile 200  home
+web    200  home
+sms    200  Safinum. Choisissez: 1. Mon solde 2. Envoyer de l'argent 3. Frais 4. Historique 5. Acheter
+atm    200  atm_welcome
+ivr    200  Choisissez: 1. Solde 2. Envoyer 3. Frais 4. Historique 0. Quitter
+
+6/6 canaux ont répondu 200 · preuve écrite dans ..\..\docs\preuves\six-canaux-2026-11-27.json
+solde                200  Votre solde est de 641 595 FCFA.
+frais                200  Pour 25 000 FCFA: frais 150 FCFA. Total 25 150 FCFA.
+historique           200  Vos dernieres operations: 27/11 transfer -5 000 FCFA 27/11 transfer -5 000 FCFA
+aide                 200  Les frais sont ce que la banque retient pour executer une operation.
+langue               200  Demngal: fub. Safinum. Subo: 1. Ceede am keddiide 2. Neldu ceede 3. Njobdi 4. Go
+credit               200  Credit de 1 000 FCFA envoye au 650 626 114. Ref TRX-52A480950F.
+facture              200  Facture ENEO payee: 1 000 FCFA. Ref TRX-BA721D302D.
+transfert-confirme   200  5 000 FCFA envoye a 653397927 (653 397 927). Ref TRX-2C97A08A2B. Solde 634 445 F  (639495 → 634445)
+   429 ussd, reprise dans 3 s
+   429 ussd, reprise dans 3 s
+   429 ussd, reprise dans 3 s
+   429 ussd, reprise dans 3 s
+transfert-annule     200  Operation annulee. Aucun montant debite.  (634445 → 634445)
+sms-solde            200  Votre solde est de 634 445 FCFA.
+ivr-solde            200  Votre solde est de 634 445 FCFA.
+
+11/11 parcours ont répondu 200 · preuve écrite dans ..\..\docs\preuves\parcours-2026-11-27.json
+```
+
+Exécution du 27/11/2026 à **17:25 UTC**, code de sortie **0**. La sortie est recopiée telle quelle :
+les textes sont tronqués à 80 caractères par le script, et les quatre lignes `429` sont les reprises
+automatiques du quota du simulateur (aucun tour perdu).

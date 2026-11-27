@@ -1,5 +1,5 @@
 {
-  "genere_le": "2026-11-27T16:55:00.821Z",
+  "genere_le": "2026-11-27T17:25:05.145Z",
   "base": "https://safinum.cm/api/v1",
   "equipe": 10,
   "telephone": "237650626114",
@@ -14,7 +14,7 @@
       "sms": null,
       "diagnostics": {
         "http_status": 200,
-        "duration_ms": 272,
+        "duration_ms": 281,
         "error_code": null,
         "error_detail": null,
         "response_length": 139,
@@ -24,11 +24,11 @@
         "realism_flags": []
       },
       "erreur": null,
-      "brut": "{\"trace_id\":\"95dccd78-c7b3-486b-90b4-7cb8e38a75c3\",\"session_id\":\"six-ussd-1795798496950\",\"channel\":\"ussd\",\"response\":{\"text\":\"Safinum. Choisissez:\\n1. Mon solde\\n2. Envoyer de l'argent\\n3. Frais\\n4. Historique\\n5. Acheter du credit\\n6. Payer une facture\\n7. Aide\\n8. Langue\",\"end_session\":false,\"options\":[\"Mon solde\",\"Envoyer de l'argent\",\"Frais\",\"Historique\",\"Acheter du credit\",\"Payer une facture\",\"Aide\",\"Langue\"]},\"interpretation\":{\"intent\":\"UNKNOWN\",\"parameters\":[],\"language\":\"fr\"},\"transaction\":{\"id\":null,\"status\":\"none\"},\"diagnostics\":{\"http_status\":200,\"duration_ms\":272,\"error_code\":null,\"error_detail\":null,\"response_length\":139,\"max_chars\":182,\"over_limit\":false,\"gsm7_violations\":[],\"realism_flags\":[]},\"sms\":null,\"audio\":null,\"reply_audio\":null}",
+      "brut": "{\"trace_id\":\"c4cd2e29-b1ac-4ecf-8516-0b583bfd1658\",\"session_id\":\"six-ussd-1795800300727\",\"channel\":\"ussd\",\"response\":{\"text\":\"Safinum. Choisissez:\\n1. Mon solde\\n2. Envoyer de l'argent\\n3. Frais\\n4. Historique\\n5. Acheter du credit\\n6. Payer une facture\\n7. Aide\\n8. Langue\",\"end_session\":false,\"options\":[\"Mon solde\",\"Envoyer de l'argent\",\"Frais\",\"Historique\",\"Acheter du credit\",\"Payer une facture\",\"Aide\",\"Langue\"]},\"interpretation\":{\"intent\":\"UNKNOWN\",\"parameters\":[],\"language\":\"fr\"},\"transaction\":{\"id\":null,\"status\":\"none\"},\"diagnostics\":{\"http_status\":200,\"duration_ms\":281,\"error_code\":null,\"error_detail\":null,\"response_length\":139,\"max_chars\":182,\"over_limit\":false,\"gsm7_violations\":[],\"realism_flags\":[]},\"sms\":null,\"audio\":null,\"reply_audio\":null}",
       "requete": {
         "team_id": 10,
         "phone": "237650626114",
-        "session_id": "six-ussd-1795798496950",
+        "session_id": "six-ussd-1795800300727",
         "text": "",
         "input_type": "text"
       }
@@ -43,17 +43,17 @@
       "sms": null,
       "diagnostics": {
         "http_status": 200,
-        "duration_ms": 211,
+        "duration_ms": 242,
         "error_code": null,
         "error_detail": null,
         "realism_flags": []
       },
       "erreur": null,
-      "brut": "{\"trace_id\":\"97644608-dc79-4fc2-a0c8-fec1c7cea7ec\",\"session_id\":\"six-mobile-1795798497593\",\"channel\":\"mobile\",\"screen\":\"home\",\"translation\":{\"language\":\"fr\",\"strings\":{\"nav.home\":\"Accueil\",\"nav.transfer\":\"Envoyer\",\"nav.pay\":\"Payer\",\"nav.history\":\"Historique\",\"shell.greeting\":\"Bonjour {name}\",\"common.back\":\"Retour\",\"common.continue\":\"Continuer\",\"common.cancel\":\"Annuler\",\"common.loading\":\"Chargement\",\"common.listen\":\"Écouter\",\"common.stop_listening\":\"Arrêter la lecture\",\"home.balance_label\":\"Solde disponible\",\"home.account\":\"Compte {phone}\",\"home.quick_actions\":\"Que voulez-vous faire ?\",\"home.action_transfer\":\"Envoyer de l'argent\",\"home.action_bill\":\"Payer une facture\",\"home.action_airtime\":\"Acheter du crédit\",\"home.action_history\":\"Mes opérations\",\"home.recent\":\"Dernières opérations\",\"home.see_all\":\"Tout voir\",\"home.empty\":\"Aucune opération pour le moment.\",\"tx.transfer_out\":\"Envoi à {name}\",\"tx.transfer_in\":\"Reçu de {name}\",\"tx.airtime\":\"Crédit {operator}\",\"tx.bill\":\"Facture {biller}\",\"tx.withdrawal\":\"Retrait\",\"tx.status.confirmed\":\"Effectuée\",\"tx.status.pending\":\"En attente\",\"tx.status.failed\":\"Échouée\",\"tx.status.cancelled\":\"Annulée\"},\"source\":{\"nav.home\":\"Accueil\",\"nav.transfer\"",
+      "brut": "{\"trace_id\":\"316689c5-3a0a-414b-bf70-2134ef1e23ab\",\"session_id\":\"six-mobile-1795800301352\",\"channel\":\"mobile\",\"screen\":\"home\",\"translation\":{\"language\":\"fr\",\"strings\":{\"nav.home\":\"Accueil\",\"nav.transfer\":\"Envoyer\",\"nav.pay\":\"Payer\",\"nav.history\":\"Historique\",\"shell.greeting\":\"Bonjour {name}\",\"common.back\":\"Retour\",\"common.continue\":\"Continuer\",\"common.cancel\":\"Annuler\",\"common.loading\":\"Chargement\",\"common.listen\":\"Écouter\",\"common.stop_listening\":\"Arrêter la lecture\",\"home.balance_label\":\"Solde disponible\",\"home.account\":\"Compte {phone}\",\"home.quick_actions\":\"Que voulez-vous faire ?\",\"home.action_transfer\":\"Envoyer de l'argent\",\"home.action_bill\":\"Payer une facture\",\"home.action_airtime\":\"Acheter du crédit\",\"home.action_history\":\"Mes opérations\",\"home.recent\":\"Dernières opérations\",\"home.see_all\":\"Tout voir\",\"home.empty\":\"Aucune opération pour le moment.\",\"tx.transfer_out\":\"Envoi à {name}\",\"tx.transfer_in\":\"Reçu de {name}\",\"tx.airtime\":\"Crédit {operator}\",\"tx.bill\":\"Facture {biller}\",\"tx.withdrawal\":\"Retrait\",\"tx.status.confirmed\":\"Effectuée\",\"tx.status.pending\":\"En attente\",\"tx.status.failed\":\"Échouée\",\"tx.status.cancelled\":\"Annulée\"},\"source\":{\"nav.home\":\"Accueil\",\"nav.transfer\"",
       "requete": {
         "team_id": 10,
         "phone": "237650626114",
-        "session_id": "six-mobile-1795798497593",
+        "session_id": "six-mobile-1795800301352",
         "screen": "home",
         "text": "",
         "input_type": "text",
@@ -70,17 +70,17 @@
       "sms": null,
       "diagnostics": {
         "http_status": 200,
-        "duration_ms": 218,
+        "duration_ms": 205,
         "error_code": null,
         "error_detail": null,
         "realism_flags": []
       },
       "erreur": null,
-      "brut": "{\"trace_id\":\"2c493f17-c766-447b-80ae-b58d73cbf82d\",\"session_id\":\"six-web-1795798498213\",\"channel\":\"web\",\"screen\":\"home\",\"translation\":{\"language\":\"fr\",\"strings\":{\"nav.home\":\"Accueil\",\"nav.transfer\":\"Envoyer\",\"nav.pay\":\"Payer\",\"nav.history\":\"Historique\",\"shell.greeting\":\"Bonjour {name}\",\"shell.logout\":\"Se déconnecter\",\"shell.secure\":\"Connexion sécurisée\",\"common.back\":\"Retour\",\"common.continue\":\"Continuer\",\"common.cancel\":\"Annuler\",\"common.loading\":\"Chargement\",\"common.listen\":\"Écouter\",\"common.stop_listening\":\"Arrêter la lecture\",\"home.balance_label\":\"Solde disponible\",\"home.account\":\"Compte {phone}\",\"home.quick_actions\":\"Que voulez-vous faire ?\",\"home.action_transfer\":\"Envoyer de l'argent\",\"home.action_bill\":\"Payer une facture\",\"home.action_airtime\":\"Acheter du crédit\",\"home.action_history\":\"Mes opérations\",\"home.recent\":\"Dernières opérations\",\"home.see_all\":\"Tout voir\",\"home.empty\":\"Aucune opération pour le moment.\",\"tx.transfer_out\":\"Envoi à {name}\",\"tx.transfer_in\":\"Reçu de {name}\",\"tx.airtime\":\"Crédit {operator}\",\"tx.bill\":\"Facture {biller}\",\"tx.withdrawal\":\"Retrait\",\"tx.status.confirmed\":\"Effectuée\",\"tx.status.pending\":\"En attente\",\"tx.status.failed\":\"Échouée\",\"tx.status.canc",
+      "brut": "{\"trace_id\":\"0ecd4670-5a70-46bb-ac23-5848501bf4a7\",\"session_id\":\"six-web-1795800301971\",\"channel\":\"web\",\"screen\":\"home\",\"translation\":{\"language\":\"fr\",\"strings\":{\"nav.home\":\"Accueil\",\"nav.transfer\":\"Envoyer\",\"nav.pay\":\"Payer\",\"nav.history\":\"Historique\",\"shell.greeting\":\"Bonjour {name}\",\"shell.logout\":\"Se déconnecter\",\"shell.secure\":\"Connexion sécurisée\",\"common.back\":\"Retour\",\"common.continue\":\"Continuer\",\"common.cancel\":\"Annuler\",\"common.loading\":\"Chargement\",\"common.listen\":\"Écouter\",\"common.stop_listening\":\"Arrêter la lecture\",\"home.balance_label\":\"Solde disponible\",\"home.account\":\"Compte {phone}\",\"home.quick_actions\":\"Que voulez-vous faire ?\",\"home.action_transfer\":\"Envoyer de l'argent\",\"home.action_bill\":\"Payer une facture\",\"home.action_airtime\":\"Acheter du crédit\",\"home.action_history\":\"Mes opérations\",\"home.recent\":\"Dernières opérations\",\"home.see_all\":\"Tout voir\",\"home.empty\":\"Aucune opération pour le moment.\",\"tx.transfer_out\":\"Envoi à {name}\",\"tx.transfer_in\":\"Reçu de {name}\",\"tx.airtime\":\"Crédit {operator}\",\"tx.bill\":\"Facture {biller}\",\"tx.withdrawal\":\"Retrait\",\"tx.status.confirmed\":\"Effectuée\",\"tx.status.pending\":\"En attente\",\"tx.status.failed\":\"Échouée\",\"tx.status.canc",
       "requete": {
         "team_id": 10,
         "phone": "237650626114",
-        "session_id": "six-web-1795798498213",
+        "session_id": "six-web-1795800301971",
         "screen": "home",
         "text": "",
         "input_type": "text",
@@ -101,7 +101,7 @@
       },
       "diagnostics": {
         "http_status": 200,
-        "duration_ms": 439,
+        "duration_ms": 194,
         "error_code": null,
         "error_detail": null,
         "response_length": 139,
@@ -111,11 +111,11 @@
         "realism_flags": []
       },
       "erreur": null,
-      "brut": "{\"trace_id\":\"03039a95-bc76-4b58-bc07-0f5eb576aa13\",\"session_id\":\"sms-03039a95-bc76-4b58-bc07-0f5eb576aa13\",\"channel\":\"sms\",\"response\":{\"text\":\"Safinum. Choisissez:\\n1. Mon solde\\n2. Envoyer de l'argent\\n3. Frais\\n4. Historique\\n5. Acheter du credit\\n6. Payer une facture\\n7. Aide\\n8. Langue\",\"end_session\":false,\"options\":[\"Mon solde\",\"Envoyer de l'argent\",\"Frais\",\"Historique\",\"Acheter du credit\",\"Payer une facture\",\"Aide\",\"Langue\"]},\"interpretation\":{\"intent\":\"UNKNOWN\",\"parameters\":[],\"language\":\"fr\"},\"transaction\":{\"id\":null,\"status\":\"none\"},\"diagnostics\":{\"http_status\":200,\"duration_ms\":439,\"error_code\":null,\"error_detail\":null,\"response_length\":139,\"max_chars\":160,\"over_limit\":false,\"gsm7_violations\":[],\"realism_flags\":[]},\"sms\":{\"encoding\":\"gsm7\",\"segments\":1,\"awaiting_reply\":false},\"audio\":null,\"reply_audio\":null}",
+      "brut": "{\"trace_id\":\"a6bbb87a-bcd3-4bbf-9f9a-1b7807f09743\",\"session_id\":\"sms-a6bbb87a-bcd3-4bbf-9f9a-1b7807f09743\",\"channel\":\"sms\",\"response\":{\"text\":\"Safinum. Choisissez:\\n1. Mon solde\\n2. Envoyer de l'argent\\n3. Frais\\n4. Historique\\n5. Acheter du credit\\n6. Payer une facture\\n7. Aide\\n8. Langue\",\"end_session\":false,\"options\":[\"Mon solde\",\"Envoyer de l'argent\",\"Frais\",\"Historique\",\"Acheter du credit\",\"Payer une facture\",\"Aide\",\"Langue\"]},\"interpretation\":{\"intent\":\"UNKNOWN\",\"parameters\":[],\"language\":\"fr\"},\"transaction\":{\"id\":null,\"status\":\"none\"},\"diagnostics\":{\"http_status\":200,\"duration_ms\":194,\"error_code\":null,\"error_detail\":null,\"response_length\":139,\"max_chars\":160,\"over_limit\":false,\"gsm7_violations\":[],\"realism_flags\":[]},\"sms\":{\"encoding\":\"gsm7\",\"segments\":1,\"awaiting_reply\":false},\"audio\":null,\"reply_audio\":null}",
       "requete": {
         "team_id": 10,
         "phone": "237650626114",
-        "session_id": "six-sms-1795798498798",
+        "session_id": "six-sms-1795800302571",
         "text": "",
         "input_type": "text"
       }
@@ -130,17 +130,17 @@
       "sms": null,
       "diagnostics": {
         "http_status": 200,
-        "duration_ms": 197,
-        "error_code": "INVALID_RESPONSE",
-        "error_detail": "Champ `strings` manquant ou invalide : un objet { clé: texte } est attendu.",
+        "duration_ms": 270,
+        "error_code": null,
+        "error_detail": null,
         "realism_flags": []
       },
       "erreur": null,
-      "brut": "{\"trace_id\":\"3afcc652-3762-40d9-b3cc-a3dba407f2c0\",\"session_id\":\"six-atm-1795798499627\",\"channel\":\"atm\",\"screen\":\"atm_welcome\",\"translation\":{\"language\":\"fr\",\"strings\":{\"atm.bank\":\"Banque Safinum\",\"atm.cancel_hint\":\"Touche rouge : annuler\",\"atm.please_wait\":\"Veuillez patienter\",\"atm.welcome\":\"Bienvenue\",\"atm.insert_card\":\"Insérez votre carte\",\"atm.available\":\"Service disponible 24h/24\"},\"source\":{\"atm.bank\":\"Banque Safinum\",\"atm.cancel_hint\":\"Touche rouge : annuler\",\"atm.please_wait\":\"Veuillez patienter\",\"atm.welcome\":\"Bienvenue\",\"atm.insert_card\":\"Insérez votre carte\",\"atm.available\":\"Service disponible 24h/24\"},\"report\":{\"total\":6,\"translated\":0,\"missing\":[\"atm.bank\",\"atm.cancel_hint\",\"atm.please_wait\",\"atm.welcome\",\"atm.insert_card\",\"atm.available\"],\"untranslated\":[],\"placeholder_errors\":[],\"over_limit\":[],\"unknown_keys\":[]}},\"diagnostics\":{\"http_status\":200,\"duration_ms\":197,\"error_code\":\"INVALID_RESPONSE\",\"error_detail\":\"Champ `strings` manquant ou invalide : un objet { clé: texte } est attendu.\",\"realism_flags\":[]}}",
+      "brut": "{\"trace_id\":\"317fe4c7-0392-4038-8b3c-44463e9f1e41\",\"session_id\":\"six-atm-1795800303205\",\"channel\":\"atm\",\"screen\":\"atm_welcome\",\"translation\":{\"language\":\"fr\",\"strings\":{\"atm.bank\":\"Banque Safinum\",\"atm.cancel_hint\":\"Touche rouge : annuler\",\"atm.please_wait\":\"Veuillez patienter\",\"atm.welcome\":\"Bienvenue\",\"atm.insert_card\":\"Insérez votre carte\",\"atm.available\":\"Service disponible 24h/24\"},\"source\":{\"atm.bank\":\"Banque Safinum\",\"atm.cancel_hint\":\"Touche rouge : annuler\",\"atm.please_wait\":\"Veuillez patienter\",\"atm.welcome\":\"Bienvenue\",\"atm.insert_card\":\"Insérez votre carte\",\"atm.available\":\"Service disponible 24h/24\"},\"report\":{\"total\":6,\"translated\":6,\"missing\":[],\"untranslated\":[],\"placeholder_errors\":[],\"over_limit\":[],\"unknown_keys\":[]}},\"diagnostics\":{\"http_status\":200,\"duration_ms\":270,\"error_code\":null,\"error_detail\":null,\"realism_flags\":[]}}",
       "requete": {
         "team_id": 10,
         "phone": "237650626114",
-        "session_id": "six-atm-1795798499627",
+        "session_id": "six-atm-1795800303205",
         "screen": "atm_welcome",
         "text": ""
       }
@@ -155,7 +155,7 @@
       "sms": null,
       "diagnostics": {
         "http_status": 200,
-        "duration_ms": 208,
+        "duration_ms": 443,
         "error_code": null,
         "error_detail": null,
         "response_length": 65,
@@ -165,11 +165,11 @@
         "realism_flags": []
       },
       "erreur": null,
-      "brut": "{\"trace_id\":\"3b98ebc3-781f-4e76-9f4e-d5335c46ac4f\",\"session_id\":\"six-ivr-1795798500215\",\"channel\":\"ivr\",\"response\":{\"text\":\"Choisissez:\\n1. Solde\\n2. Envoyer\\n3. Frais\\n4. Historique\\n0. Quitter\",\"end_session\":false,\"options\":[]},\"interpretation\":{\"intent\":\"UNKNOWN\",\"parameters\":[],\"language\":\"fr\"},\"transaction\":{\"id\":null,\"status\":\"none\"},\"diagnostics\":{\"http_status\":200,\"duration_ms\":208,\"error_code\":null,\"error_detail\":null,\"response_length\":65,\"max_chars\":400,\"over_limit\":false,\"gsm7_violations\":[],\"realism_flags\":[]},\"sms\":null,\"audio\":null,\"reply_audio\":null}",
+      "brut": "{\"trace_id\":\"afa1a9d0-7100-41f8-b4dd-32f3d990a9fd\",\"session_id\":\"six-ivr-1795800304036\",\"channel\":\"ivr\",\"response\":{\"text\":\"Choisissez:\\n1. Solde\\n2. Envoyer\\n3. Frais\\n4. Historique\\n0. Quitter\",\"end_session\":false,\"options\":[]},\"interpretation\":{\"intent\":\"UNKNOWN\",\"parameters\":[],\"language\":\"fr\"},\"transaction\":{\"id\":null,\"status\":\"none\"},\"diagnostics\":{\"http_status\":200,\"duration_ms\":443,\"error_code\":null,\"error_detail\":null,\"response_length\":65,\"max_chars\":400,\"over_limit\":false,\"gsm7_violations\":[],\"realism_flags\":[]},\"sms\":null,\"audio\":null,\"reply_audio\":null}",
       "requete": {
         "team_id": 10,
         "phone": "237650626114",
-        "session_id": "six-ivr-1795798500215",
+        "session_id": "six-ivr-1795800304036",
         "text": "",
         "input_type": "text"
       }
