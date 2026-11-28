@@ -19,3 +19,4 @@ apps/gateway/.lang-*/
 infra/.env
 infra/certs/*.crt
 apps/tts/certs/*.crt
+.playwright-mcp/
