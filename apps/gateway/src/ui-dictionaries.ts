@@ -11,6 +11,7 @@
 
 import { isSafinumLanguage, type SafinumLanguage } from '@nkap/safinum';
 import { PACK_LOAD } from './i18n.js';
+import { studioUi } from './studio-catalog.js';
 
 export type UiLanguage = SafinumLanguage;
 
@@ -258,7 +259,7 @@ export const UI_DICTIONARIES: Readonly<Partial<Record<UiLanguage, Dictionary>>> 
 /** Langue demandée pour un écran si nous avons un dictionnaire (intégré ou pack), sinon français. */
 export function resolveUiLanguage(requested: string | null | undefined): UiLanguage {
   if (!isSafinumLanguage(requested)) return 'fr';
-  return requested in UI_DICTIONARIES || PACK_LOAD.packs.has(requested) ? requested : 'fr';
+  return requested in UI_DICTIONARIES || PACK_LOAD.packs.has(requested) || Object.keys(studioUi(requested)).length > 0 ? requested : 'fr';
 }
 
 /** Dictionnaire intégré complété par le pack de la langue (le pack, plus récent, l'emporte). */
@@ -266,6 +267,7 @@ export function dictionaryFor(language: UiLanguage): Dictionary | null {
   if (language === 'fr') return null;
   const builtIn = UI_DICTIONARIES[language];
   const pack = PACK_LOAD.packs.get(language)?.ui;
-  if (!builtIn && !pack) return null;
-  return { ...(builtIn ?? {}), ...(pack ?? {}) };
+  const studio = studioUi(language);
+  if (!builtIn && !pack && Object.keys(studio).length === 0) return null;
+  return { ...(builtIn ?? {}), ...(pack ?? {}), ...studio };
 }

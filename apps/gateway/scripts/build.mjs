@@ -20,6 +20,10 @@ await build({
   target: 'node22',
   format: 'esm',
   sourcemap: true,
+  // Chargés à la demande, seulement si MONGO_URL / REDIS_URL sont définis.
+  external: ['mongodb', 'ioredis'],
+  // undici (connexion bancaire chaude) est en CommonJS : on lui fournit un `require` natif.
+  banner: { js: "import { createRequire as __nkapRequire } from 'node:module'; const require = __nkapRequire(import.meta.url);" },
   logLevel: 'info',
 });
 // Garde les packs de langues avec l'artefact : le gateway peut ainsi être déployé depuis dist seul.

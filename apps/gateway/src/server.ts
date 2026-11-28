@@ -29,6 +29,9 @@ import { loadEnv } from './env.js';
 import { languageCatalog } from './language-catalog.js';
 import { applyWordDb, lastWordBase } from './word-base.js';
 import { RateLimiter, isAllowedBankUrl, routeHook } from './security.js';
+import { installWarmBank } from './warm-bank.js';
+import type { StudioSync } from './studio-sync.js';
+import { studioVoiceFor } from './studio-catalog.js';
 
 const MAX_BODY_BYTES = 512 * 1024;
 
@@ -49,6 +52,8 @@ export interface ServerOptions {
   readonly hookSecret?: string | null;
   /** Tours acceptés par numéro et par minute. */
   readonly rateLimitPerMinute?: number;
+  /** Synchronisation avec le studio (facultative). */
+  readonly studio?: StudioSync | null;
 }
 
 export function createMiddlewareServer(options: ServerOptions): http.Server {
@@ -139,6 +144,15 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
         const index = loadAudioIndex();
         if (index === null) return json(res, 404, { error: 'Aucun clip : lancez pnpm --filter @nkap/gateway tts' });
         return json(res, 200, index);
+      }
+
+      // Voix enregistrées et validées dans le studio (mp3, format attendu par l'IVR).
+      const studioClip = url.pathname.match(/^\/voix\/([a-z]{2,3})\/([a-f0-9]{24})\.mp3$/);
+      if (req.method === 'GET' && studioClip?.[2] !== undefined && options.studio) {
+        const data = await options.studio.audio(studioClip[2]);
+        if (data === null) return json(res, 404, { error: 'Audio introuvable' });
+        res.writeHead(200, { 'content-type': 'audio/mpeg', 'cache-control': 'public, max-age=86400, immutable', 'content-length': data.length });
+        return res.end(data);
       }
 
       const audioClip = url.pathname.match(/^\/audio\/([a-z]{2,3})\/([a-z0-9._-]+)\.wav$/i);
@@ -309,6 +323,7 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
         return json(res, 404, { error: 'CANAL_CONTRADICTOIRE' });
       }
       const requestChannel = pathChannel ?? payload.channel ?? (url.pathname === '/channel/ivr' ? 'ivr' : undefined);
+      if (isUiTranslation(payload) && payload.strings) options.studio?.see(payload.strings, requestChannel ?? 'mobile');
       if (typeof payload.phone === 'string' && payload.phone !== '' && !limiter.allow(`${requestChannel ?? '-'}:${payload.phone}`)) {
         return json(res, 429, { error: 'RATE_LIMITED' });
       }
@@ -348,9 +363,18 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
             { bank: v2Bank, sessions: ivrSessions },
           );
           log(`trace=${v2Trace || '-'} channel=ivr`);
+          // Une voix humaine validée pour cette phrase EXACTE est jouée ; sinon la passerelle lit le texte.
+          const voice = studioVoiceFor(reply.language, reply.say);
+          const host = String(req.headers['x-forwarded-host'] ?? req.headers.host ?? '127.0.0.1');
+          const scheme = String(req.headers['x-forwarded-proto'] ?? 'http').split(',')[0] ?? 'http';
           return json(res, 200, {
             ...reply,
-            response: { text: reply.say, end_session: reply.end, options: [] },
+            response: {
+              text: reply.say,
+              end_session: reply.end,
+              options: [],
+              ...(voice === null ? {} : { audio: [{ url: `${scheme}://${host}/voix/${reply.language}/${voice}.mp3` }] }),
+            },
             interpretation: { intent: 'UNKNOWN', parameters: {}, language: reply.language },
             transaction: {
               id: reply.state.pending_id ?? null,
@@ -457,8 +481,9 @@ function json(res: http.ServerResponse, status: number, body: unknown): void {
 export async function startMiddleware(
   port = Number(process.env.PORT ?? 8080),
   host = process.env.HOST ?? '127.0.0.1',
+  studio: StudioSync | null = null,
 ): Promise<{ url: string; close: () => Promise<void> }> {
-  const { server } = { server: createMiddlewareServer(defaultOptions()) };
+  const { server } = { server: createMiddlewareServer({ ...defaultOptions(), studio }) };
   await new Promise<void>((resolve) => server.listen(port, host, resolve));
   const address = server.address() as AddressInfo;
   return {
@@ -496,7 +521,14 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   } else if (words.report !== null && words.report.languages.length > 0) {
     console.log(`Base de mots : ${words.report.languages.join(', ')} (${words.report.cues} indice(s)) depuis ${words.file}`);
   }
-  void startMiddleware().then(({ url }) => {
+  installWarmBank(defaultOptions().bankUrl);
+  const studioConfigured = Boolean(process.env.MONGO_URL || process.env.REDIS_URL);
+  const studioReady = studioConfigured
+    ? import('./studio-sync.js').then((m) =>
+        m.startStudioSync({ mongoUrl: process.env.MONGO_URL, mongoDb: process.env.MONGO_DB, redisUrl: process.env.REDIS_URL, log: (line) => console.log(line) }),
+      )
+    : Promise.resolve(null);
+  void studioReady.then((studio) => startMiddleware(undefined, undefined, studio)).then(({ url }) => {
     const options = defaultOptions();
     console.log(`Middleware NkapLingua a l'ecoute sur ${url}`);
     console.log(`Banque : ${options.bankUrl}`);

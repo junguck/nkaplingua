@@ -10,6 +10,7 @@
  *     l'écran est surtout français : on le DÉCLARE `fr` plutôt que de prétendre l'avoir traduit.
  */
 
+import { studioUi } from './studio-catalog.js';
 import type { InboundTurn, UiReply, UiStringEntry } from '@nkap/safinum';
 import { dictionaryFor, resolveUiLanguage, type UiLanguage } from './ui-dictionaries.js';
 
@@ -36,7 +37,8 @@ export function translate(
 ): UiReply {
   const base = dictionaryFor(language);
   // Le cache local (corrections, nouvelles traductions) passe avant le dictionnaire embarqué.
-  const dictionary = base ? { ...base, ...(overlay ?? {}) } : null;
+  // Ordre : dictionnaire, corrections locales, puis phrases validées dans le studio (relues par un tiers).
+  const dictionary = base ? { ...base, ...(overlay ?? {}), ...studioUi(language) } : null;
   if (!dictionary) return { language: 'fr', strings: plain(source) };
 
   const strings: Record<string, string> = {};

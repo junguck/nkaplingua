@@ -1,3 +1,5 @@
+import { createRequire as __nkapRequire } from 'node:module'; const require = __nkapRequire(import.meta.url);
+
 // src/demo/server.ts
 import http from "node:http";
 import { fileURLToPath } from "node:url";

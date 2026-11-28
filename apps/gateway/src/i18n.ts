@@ -9,6 +9,7 @@
 
 import { LANGUAGE_INFO } from '@nkap/contracts';
 import type { SafinumLanguage } from '@nkap/safinum';
+import { studioLanguages, studioUssd } from './studio-catalog.js';
 import { loadPacks, type PackLoad } from './packs.js';
 
 /** Toute langue de la sandbox peut être servie, dès qu'elle a un catalogue complet (intégré ou pack). */
@@ -338,13 +339,27 @@ export const USSD_REFERENCE: Readonly<Record<MessageKey, string>> = FR;
 export const USSD_ENGLISH: Readonly<Record<MessageKey, string>> = EN;
 
 function catalogueOf(language: GatewayLanguage): Catalogue | null {
+  // Une phrase validée dans le studio l'emporte sur le catalogue intégré et sur le pack de fichiers.
+  const studio = studioUssd(language);
   const builtIn = BUILT_IN[language];
-  if (builtIn) return builtIn;
-  const pack = PACK_LOAD.packs.get(language);
-  if (!pack) return null;
+  if (builtIn) return { ...builtIn, ...pick(studio) };
+  const merged: Record<string, string> = { ...(PACK_LOAD.packs.get(language)?.ussd ?? {}), ...studio };
   const keys = Object.keys(FR) as MessageKey[];
   // Une langue n'est servie sur USSD que si TOUTES les phrases sont traduites.
-  return keys.every((key) => key in pack.ussd) ? (pack.ussd as Catalogue) : null;
+  if (!keys.every((key) => key in merged)) return null;
+  const complete = { ...FR };
+  for (const key of keys) complete[key] = merged[key] ?? FR[key];
+  return complete;
+}
+
+/** Ne garde que les clés connues du dialogue : une clé inconnue du studio n'entre jamais dans un catalogue. */
+function pick(entries: Readonly<Record<string, string>>): Partial<Catalogue> {
+  const out: Partial<Record<MessageKey, string>> = {};
+  for (const key of Object.keys(FR) as MessageKey[]) {
+    const text = entries[key];
+    if (text !== undefined) out[key] = text;
+  }
+  return out;
 }
 
 export function isServedLanguage(language: unknown): language is GatewayLanguage {
@@ -353,7 +368,8 @@ export function isServedLanguage(language: unknown): language is GatewayLanguage
 
 /** Langues proposées au menu 8, dans un ordre stable : intégrées puis packs complets. */
 export function servedLanguages(): GatewayLanguage[] {
-  const packs = [...PACK_LOAD.packs.keys()].filter((l) => !(l in BUILT_IN) && isServedLanguage(l)).sort();
+  const candidates = new Set<string>([...PACK_LOAD.packs.keys(), ...studioLanguages()]);
+  const packs = [...candidates].filter((l): l is GatewayLanguage => !(l in BUILT_IN) && isServedLanguage(l)).sort();
   return ['fr', 'en', 'fub', ...packs];
 }
 
