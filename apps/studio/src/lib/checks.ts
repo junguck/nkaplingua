@@ -2,7 +2,7 @@
  * Contrôles d'une proposition, identiques côté navigateur (aperçu en direct) et côté serveur
  * (refus définitif). Une seule implémentation : aucune divergence possible.
  */
-import { NATIONAL_RULES, LATIN_RULES, foldToGsm7, placeholderSignature, ussdBudget, type Language } from '@nkap/lingua-core';
+import { USSD_RULES, foldToGsm7, placeholderSignature, ussdBudget, type Language } from '@nkap/lingua-core';
 
 export interface ProposalChecks {
   readonly placeholdersOk: boolean;
@@ -19,7 +19,7 @@ export interface ProposalChecks {
 
 export function checkProposal(source: string, proposal: string, lang: Language, maxChars: number | null): ProposalChecks {
   const text = proposal.trim();
-  const preview = foldToGsm7(text, lang === 'fr' || lang === 'en' ? LATIN_RULES : NATIONAL_RULES);
+  const preview = foldToGsm7(text, USSD_RULES);
   const budget = ussdBudget(preview);
   const length = [...text].length;
   return {

@@ -10,6 +10,7 @@
     "typecheck": "tsc -p tsconfig.json"
   },
   "dependencies": {
-    "@nkap/contracts": "workspace:*"
+    "@nkap/contracts": "workspace:*",
+    "@nkap/lingua-core": "workspace:*"
   }
 }

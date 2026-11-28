@@ -362,7 +362,7 @@ describe('règles de la sandbox', () => {
   });
 
   it('translittère et compte en septets', () => {
-    expect(toGsm7('Ceede ɓennuɗe ŋaaƴi')).toBe('Ceede bennude ngaayi');
+    expect(toGsm7('Ceede ɓennuɗe ŋaaƴi')).toBe('Ceede bhennudhe ngaayhi');
     expect(toGsm7('« 5 000 FCFA » …')).toBe('" 5 000 FCFA " ...');
     expect(gsm7Length('€')).toBe(2);
     expect(gsm7Length('Ceede')).toBe(5);
@@ -384,7 +384,7 @@ describe('règles de la sandbox', () => {
       turn({ language: 'fub', input: { type: 'menu', text: '' } }),
     )) as UssdReply;
     expect(gsm7Length(reply.response.text)).toBeLessThanOrEqual(182);
-    expect(reply.response.text).toContain('8. Demngal');
+    expect(reply.response.text).toContain('8. Dhemngal');
   });
 });
 
@@ -409,8 +409,8 @@ describe('language: null — la détection revient au middleware', () => {
     )) as UssdReply;
     assertContract(reply);
     expect(reply.interpretation).toMatchObject({ language: 'fub', intent: 'BALANCE_INQUIRY' });
-    // ɗ → d au rendu GSM-7 : « keddiiɗe » s'affiche « keddiide ».
-    expect(reply.response.text).toContain('Ceede maa keddiide: 1 000 FCFA.');
+    // ɗ → dh au rendu GSM-7 (consonne composée) : « keddiiɗe » s'affiche « keddiidhe ».
+    expect(reply.response.text).toContain('Ceede maa keddiidhe: 1 000 FCFA.');
     // Le solde clôt la session USSD : rien n'est gardé pour le tour suivant.
     expect(reply.response.end_session).toBe(true);
   });

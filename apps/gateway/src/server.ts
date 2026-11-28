@@ -28,6 +28,7 @@ import { isSafinumLanguage, isUiTranslation, statusModeFrom, type InboundTurn, t
 import { loadEnv } from './env.js';
 import { languageCatalog } from './language-catalog.js';
 import { applyWordDb, lastWordBase } from './word-base.js';
+import { RateLimiter, isAllowedBankUrl, routeHook } from './security.js';
 
 const MAX_BODY_BYTES = 512 * 1024;
 
@@ -44,6 +45,10 @@ export interface ServerOptions {
   /** Canaux locaux (`/ivr`) : désactivés par défaut, jamais exposés au contrat SAFINUM. */
   readonly localChannels?: boolean;
   readonly log?: (line: string) => void;
+  /** Secret de l'URL déclarée : `/hook/<secret>`. Sans lui, `POST /` reste ouvert (développement). */
+  readonly hookSecret?: string | null;
+  /** Tours acceptés par numéro et par minute. */
+  readonly rateLimitPerMinute?: number;
 }
 
 export function createMiddlewareServer(options: ServerOptions): http.Server {
@@ -53,13 +58,19 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
     ...(options.statusMode === undefined ? {} : { statusMode: options.statusMode }),
   });
   const log = options.log ?? ((line: string) => console.log(line));
+  const limiter = new RateLimiter(options.rateLimitPerMinute ?? 60);
+  const hookSecret = options.hookSecret ?? null;
   const ivrSessions = new TtlStore<IvrState>(300_000);
   const smsSessions = new TtlStore<import('./session.js').SessionState>(600_000);
 
   return http.createServer((req, res) => {
     void (async () => {
       const started = Date.now();
-      const url = new URL(req.url ?? '/', 'http://127.0.0.1');
+      const requested = new URL(req.url ?? '/', 'http://127.0.0.1');
+      // Les tours du contrat passent par l'URL secrète ; les pages publiques (santé, audio) restent ouvertes.
+      const routed = req.method === 'POST' ? routeHook(requested.pathname, hookSecret) : { ok: true as const, path: requested.pathname };
+      if (!routed.ok) return json(res, 404, { error: 'Route inconnue' });
+      const url = new URL(routed.path + requested.search, 'http://127.0.0.1');
 
       // Console de test : la même page sert de simulateur USSD / mobile / web en local.
       if (req.method === 'GET' && (url.pathname === '/console' || url.pathname === '/console/')) {
@@ -298,6 +309,13 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
         return json(res, 404, { error: 'CANAL_CONTRADICTOIRE' });
       }
       const requestChannel = pathChannel ?? payload.channel ?? (url.pathname === '/channel/ivr' ? 'ivr' : undefined);
+      if (typeof payload.phone === 'string' && payload.phone !== '' && !limiter.allow(`${requestChannel ?? '-'}:${payload.phone}`)) {
+        return json(res, 429, { error: 'RATE_LIMITED' });
+      }
+      const forgedBank = payload.bank_api?.base_url;
+      if (typeof forgedBank === 'string' && forgedBank.replace(/\/+$/, '') !== options.bankUrl.replace(/\/+$/, '')) {
+        log(`ALERTE bank_api.base_url du tour ignoré (seule l'URL configurée reçoit la clé)`);
+      }
       // Kit officiel : la passerelle envoie l'identifiant du tour dans l'en-tête `X-Trace-Id`, le corps
       // n'est qu'un repli. Une trace erronée sur nos appels bancaires = NO_BANK_CALL (travail invisible).
       const traceId = traceFrom(req.headers['x-trace-id'], payload.trace_id);
@@ -451,9 +469,16 @@ export async function startMiddleware(
 
 export function defaultOptions(): ServerOptions {
   const bankUrl = process.env.SAFINUM_BANK_URL || 'https://safinum.cm/api/v1';
+  if (!isAllowedBankUrl(bankUrl)) {
+    throw new Error(`SAFINUM_BANK_URL refusée (${bankUrl}) : seule la sandbox SAFINUM ou la boucle locale reçoivent la clé d'équipe.`);
+  }
+  const hookSecret = process.env.HOOK_SECRET?.trim() || null;
+  if (hookSecret !== null && hookSecret.length < 24) throw new Error('HOOK_SECRET doit faire au moins 24 caractères.');
   return {
     teamKey: process.env.SAFINUM_TEAM_KEY ?? '',
     bankUrl,
+    hookSecret,
+    rateLimitPerMinute: Number(process.env.RATE_LIMIT_PER_MIN ?? 60),
     statusMode: statusModeFrom(process.env.SAFINUM_STATUS),
     localChannels: process.env.ENABLE_V2_CHANNELS === '1',
   };
@@ -475,6 +500,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
     const options = defaultOptions();
     console.log(`Middleware NkapLingua a l'ecoute sur ${url}`);
     console.log(`Banque : ${options.bankUrl}`);
+    console.log(options.hookSecret ? 'Tours acceptés sur /hook/<secret> uniquement' : 'ATTENTION : HOOK_SECRET vide, POST / est ouvert (développement)');
     if (!options.teamKey) {
       console.warn('ATTENTION : SAFINUM_TEAM_KEY est vide. Copiez .env.example en .env et collez votre cle sbx_...');
     }

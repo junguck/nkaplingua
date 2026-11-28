@@ -135,7 +135,8 @@ export class Gateway {
 
   private rawBank(turn: InboundTurn): BankPort {
     if (this.options.bankFactory) return this.options.bankFactory(turn);
-    const baseUrl = this.options.bankUrl || turn.bank_api?.base_url || 'https://safinum.cm/api/v1';
+    // L'URL du payload n'est jamais suivie : un tour forgé ferait partir notre clé vers un tiers.
+    const baseUrl = this.options.bankUrl || 'https://safinum.cm/api/v1';
     return new SafinumBank({
       baseUrl,
       teamKey: this.options.teamKey,

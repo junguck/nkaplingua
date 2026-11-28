@@ -39,7 +39,7 @@ const LETTERS: Readonly<Record<string, string>> = {
   ʉ: 'u', Ʉ: 'U',
   ʼ: "'", '’': "'", '‘': "'", 'ʻ': "'",
   '“': '"', '”': '"', '«': '"', '»': '"',
-  '\u2013': '-', '\u2014': '-', '\u2026': '...',
+  '\u2013': '-', '\u2014': '-', '\u2212': '-', '\u2026': '...', '\u2022': '-', '\u00b7': '.', '\t': ' ',
   '\u00a0': ' ', '\u202f': ' ', '\u2009': ' ',
   // Latin courant hors GSM-7 (français, anglais).
   ç: 'c', â: 'a', ê: 'e', î: 'i', ô: 'o', û: 'u', ë: 'e', ï: 'i', œ: 'oe', Œ: 'OE',
@@ -48,6 +48,9 @@ const LETTERS: Readonly<Record<string, string>> = {
 
 export const NATIONAL_RULES: FoldRules = { letters: LETTERS, tones: 'strip' };
 export const LATIN_RULES: FoldRules = { letters: LETTERS, tones: 'keep-gsm7' };
+
+/** Règles appliquées à tout écran USSD ou SMS, quelle que soit la langue : celles de l'aperçu du studio. */
+export const USSD_RULES: FoldRules = LATIN_RULES;
 
 const COMBINING = /\p{M}/gu;
 const segmenter = new Intl.Segmenter('und', { granularity: 'grapheme' });
