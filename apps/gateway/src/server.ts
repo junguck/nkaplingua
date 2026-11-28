@@ -27,6 +27,7 @@ import { TtlStore } from './session.js';
 import { isSafinumLanguage, isUiTranslation, statusModeFrom, type InboundTurn, type StatusMode } from '@nkap/safinum';
 import { loadEnv } from './env.js';
 import { languageCatalog } from './language-catalog.js';
+import { CHANNELS, conversationLanguages, languageAvailability } from './language-availability.js';
 import { applyWordDb, lastWordBase } from './word-base.js';
 import { RateLimiter, isAllowedBankUrl, routeHook } from './security.js';
 import { installWarmBank } from './warm-bank.js';
@@ -117,10 +118,14 @@ export function createMiddlewareServer(options: ServerOptions): http.Server {
 
       // Catalogue des langues : ce que nous comprenons, ce que nous servons, où en sont les packs.
       // Sert la console de jury (statut + repli) et la vigie, sans exposer la clé d'équipe.
+      // `matrice` est la même vérité par canal : la preuve, pas une déclaration.
       if (req.method === 'GET' && (url.pathname === '/langues' || url.pathname === '/langues/')) {
         const words = lastWordBase();
         return json(res, 200, {
           languages: languageCatalog(),
+          canaux: CHANNELS,
+          matrice: languageAvailability(),
+          servi: conversationLanguages(),
           wordBase: {
             file: words.file,
             loaded: words.report !== null,
