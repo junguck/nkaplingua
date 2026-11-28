@@ -62,7 +62,7 @@ L'**aperçu téléphone basique** montre la phrase exactement comme elle s'affic
 - Pour chaque proposition : la clé, l'auteur, la phrase de référence, la proposition, l'écoute de la voix et la version publiée actuelle s'il y en a une.
 - Une proposition uniquement orale demande une transcription avant validation.
 - **Rejeter** exige un motif, pour que le contributeur progresse.
-- **Valider et publier** écrit la base définitive puis diffuse la phrase : elle est servie par tous les middlewares en 1,2 ms (médiane), sans redémarrage. Une voix validée est convertie en mp3 et devient disponible pour le serveur vocal.
+- **Valider et publier** écrit la base définitive puis diffuse la phrase : elle est servie par tous les middlewares en 1,8 ms (médiane), sans redémarrage. Une voix validée est convertie en mp3 et devient disponible pour le serveur vocal.
 
 ## Sécurité de l'interface
 

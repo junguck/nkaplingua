@@ -1,8 +1,10 @@
 flowchart TB
-    CF[Tunnel nommé] --> MW1[Middleware x N]
-    MW1 --> RD[(Redis)]
-    MW1 --> MG[(MongoDB)]
-    ST[Studio] --> MG
+    CF[Tunnel nommé] --> GW[gateway :8080]
+    GW --> RD[(redis)]
+    GW --> MG[(mongo)]
+    SD[seed : amorçage idempotent] --> MG
+    ST[studio :3000] --> MG
     ST --> RD
-    ST --> TTS[Service voix]
+    ST --> TTS[tts : voix]
     TTS --> MG
+    DB[demo-bank, profil demo] -.-> GW

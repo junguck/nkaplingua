@@ -6,7 +6,7 @@ Une réalisation **Shun&Co.** pour le SAFINUM Innovate Challenge 2026.
 
 NkapLingua fait parler les services financiers dans les langues du Cameroun, sur six canaux : USSD, SMS, serveur vocal (IVR), application mobile, web et guichet automatique (GAB). Les locuteurs enrichissent les langues depuis un studio web, où chaque phrase est validée par un second locuteur avant d'être servie.
 
-Stack : Node.js 22 (Fastify, TypeScript strict), MongoDB 7, Redis 7, PyTorch (MMS-VITS), Next.js 15 et shadcn/ui.
+Stack : Node.js 22 (serveur HTTP natif, TypeScript strict), MongoDB 7, Redis 7, PyTorch (MMS-VITS), Next.js 15 et shadcn/ui. Livré en conteneurs Docker.
 
 ## 1. Vue d'ensemble
 
@@ -21,8 +21,8 @@ flowchart LR
         BANK[(API bancaire)]
     end
     subgraph NkapLingua
-        MW[Middleware Fastify<br/>catalogue en mémoire]
-        R[(Redis<br/>diffusion, sessions)]
+        MW[Gateway Node.js<br/>catalogues en mémoire]
+        R[(Redis<br/>instantané, diffusion)]
         M[(MongoDB<br/>vérité, audio)]
         TTS[Service voix<br/>PyTorch, ffmpeg]
         ST[Studio web<br/>Next.js + shadcn]
@@ -45,9 +45,9 @@ flowchart LR
 
 | Composant | Technologie | Rôle |
 | --- | --- | --- |
-| Middleware | Node.js 22, Fastify, zod | contrat SAFINUM, conversation, appels bancaires |
+| Gateway | Node.js 22, serveur HTTP natif, TypeScript strict | contrat SAFINUM, conversation, appels bancaires |
 | Vérité | MongoDB 7, GridFS | références, propositions, base définitive, audio |
-| Diffusion | Redis 7 | instantané du catalogue, sessions, pub/sub, limite de débit |
+| Diffusion | Redis 7 | instantané des traductions validées, pub/sub |
 | Voix | PyTorch, MMS-VITS, ffmpeg | synthèse des phrases fixes, transcodage mp3 |
 | Studio | Next.js 15, shadcn/ui | contribution texte ou voix, relecture à quatre yeux |
 
@@ -58,20 +58,20 @@ Deux familles de canaux :
 | mobile, web, GAB | des gabarits (`{amount}`, `{name}`), jamais une valeur | aucun : l'appli opère elle-même |
 | USSD, SMS, IVR | la saisie de l'usager, imposée par le contrat | oui, à chaque étape |
 
-## 2. Le middleware
+## 2. Le gateway
 
 ```mermaid
 flowchart TB
-    IN[POST /hook/secret] --> V{Schéma zod}
-    V -- invalide --> E422[422 + champ fautif]
+    IN[POST /hook/secret] --> V{Contrôles du payload<br/>structure, canal, langue, 512 Ko}
+    V -- invalide --> E400[400 ou 404]
     V -- ui_translation --> UI[Traduction d'écran<br/>aucun accès bancaire]
     V -- ussd, sms, ivr --> RL{Limite de débit<br/>par numéro}
     RL -- dépassée --> E429[429]
-    RL --> S[Session Redis TTL 180 s]
+    RL --> S[Session en mémoire TTL 180 s]
     S --> C[Moteur conversationnel]
     C --> B[Client bancaire<br/>connexion chaude, budget du tour]
     C --> RD[Rendu : langue déclarée,<br/>pliage GSM-7, 182 septets]
-    L1[(Catalogue en mémoire)] --> RD
+    L1[(Catalogues intégrés + packs<br/>+ couche studio, en mémoire)] --> RD
     L1 --> UI
     RD --> OUT[Réponse au contrat]
     UI --> OUT
@@ -79,12 +79,14 @@ flowchart TB
 
 Fonctionnalités clés :
 
-- **Catalogue en mémoire.** Les traductions sont lues en 1,9 µs par écran de 40 clés, sans aucun aller-retour réseau. Redis amorce et met à jour cette copie ; il n'est pas interrogé pendant un tour.
+- **Traductions en mémoire, studio prioritaire.** Un écran de 40 clés est traduit en 24 µs, sans aller-retour réseau. Une phrase validée dans le studio l'emporte, phrase par phrase, sur les dictionnaires intégrés et les packs ; Redis amorce et met à jour cette couche, il n'est pas interrogé pendant un tour.
 - **Connexion bancaire toujours chaude.** Keep-alive de 60 s et ping de maintien toutes les 20 s : quand l'usager a fini de lire et de taper, l'appel suivant ne coûte qu'un aller-retour réseau.
-- **Budget du tour.** Chaque appel bancaire reçoit le temps restant avant l'échéance du canal (3 s en USSD), moins une marge pour répondre à la passerelle.
+- **Délai borné.** Chaque appel bancaire est limité à 2,2 s pour tenir les 3 s d'un tour USSD ; une banque injoignable déclenche un menu hors ligne honnête.
+- **Sessions.** En mémoire, 180 s, effacées en fin d'opération ; elles ne contiennent que l'étape et la référence de l'opération.
 - **Écrans décrits par des clés.** Un écran peut être rejoué dans une autre langue sans perdre l'opération en cours.
 - **Langue déclarée honnête.** Si une seule phrase de l'écran manque dans la langue demandée, tout l'écran part en français, déclaré `fr`.
-- **Compréhension libre.** Lexique pondéré par langue, alimenté depuis la base : « envoie 5000 à Paul » est compris en un seul message.
+- **Compréhension libre.** Lexique pondéré par langue (`data/langues.json`) : « envoie 5000 à Paul » est compris en un seul message.
+- **Douze langues.** Toutes les langues de la sandbox sont acceptées ; une langue n'est servie en USSD qu'une fois toutes ses phrases validées, sinon la réponse est en français, déclarée `fr`.
 
 ## 3. Transfert en deux tours
 
@@ -193,7 +195,7 @@ flowchart LR
 | Instantané | Redis `i18n:t:<lang>` | écrit en transaction `MULTI` |
 | Service | catalogue en mémoire | O(1), variante GSM-7 précalculée |
 
-Au démarrage : Mongo, puis Redis, puis la mémoire (229 traductions chargées en 21 ms). Si Mongo est indisponible, le middleware démarre sur l'instantané Redis ; sans les deux, sur la graine embarquée (fr, en). Le service répond toujours.
+Au démarrage : Mongo, puis Redis, puis la mémoire (308 phrases validées chargées en 240 ms, connexions comprises). Si Mongo est indisponible, le gateway démarre sur l'instantané Redis (vérifié en coupant le conteneur Mongo) ; sans les deux, sur ses catalogues intégrés (fr, en, fub). Le service répond toujours.
 
 ## 7. Voix
 
@@ -212,8 +214,8 @@ Au démarrage : Mongo, puis Redis, puis la mémoire (229 traductions chargées e
 flowchart TB
     I[Requête venue d'Internet] --> C1{1. URL secrète<br/>/hook/secret}
     C1 -- inconnue --> R1[404, rien n'est révélé]
-    C1 --> C2{2. Schéma zod strict}
-    C2 -- invalide --> R2[422 + champ fautif]
+    C1 --> C2{2. Contrôles du payload<br/>structure, canal, langue, 512 Ko}
+    C2 -- invalide --> R2[400, sans trace interne]
     C2 --> C3{3. Limite de débit<br/>par numéro}
     C3 -- dépassée --> R3[429]
     C3 --> C4[4. Moteur en deux tours<br/>rien n'est deviné]
@@ -242,7 +244,7 @@ sequenceDiagram
 | --- | --- |
 | Détournement de la clé d'équipe | l'URL bancaire vient de la configuration, jamais du payload ; origines en liste blanche |
 | Appels par un tiers | URL déclarée secrète, comparaison à temps constant |
-| Abus de la banque à travers le middleware | limite de débit par numéro (Redis) |
+| Abus de la banque à travers le gateway | limite de débit par numéro et par minute |
 | Fuite dans les journaux | numéros masqués, saisies jamais journalisées, secret masqué dans l'URL |
 | Données financières côté écrans | gabarits seulement, aucun accès bancaire pour ce module |
 | Relecture complaisante | quatre yeux imposés en base |
@@ -252,13 +254,35 @@ sequenceDiagram
 
 ```mermaid
 flowchart TB
-    CF[Tunnel nommé] --> MW1[Middleware x N]
-    MW1 --> RD[(Redis)]
-    MW1 --> MG[(MongoDB)]
-    ST[Studio] --> MG
+    CF[Tunnel nommé] --> GW[gateway :8080]
+    GW --> RD[(redis)]
+    GW --> MG[(mongo)]
+    SD[seed : amorçage idempotent] --> MG
+    ST[studio :3000] --> MG
     ST --> RD
-    ST --> TTS[Service voix]
+    ST --> TTS[tts : voix]
     TTS --> MG
+    DB[demo-bank, profil demo] -.-> GW
 ```
 
-`infra/docker-compose.yml` lance l'ensemble. Le middleware est sans état : il se multiplie derrière le tunnel, Redis porte les sessions et la diffusion.
+Toute l'application se lance avec Docker Compose :
+
+```bash
+cp infra/.env.example infra/.env        # SAFINUM_TEAM_KEY, HOOK_SECRET, STUDIO_SECRET, SEED_PASSWORD
+docker compose -f infra/docker-compose.yml --env-file infra/.env up -d --build
+```
+
+| Service | Image | Rôle |
+| --- | --- | --- |
+| mongo | mongo:7 | base définitive, GridFS (volume persistant) |
+| redis | redis:7-alpine | instantané et diffusion, AOF activé (volume persistant) |
+| seed | nkaplingua/gateway | amorçage idempotent du studio, s'exécute puis s'arrête |
+| gateway | nkaplingua/gateway | middleware SAFINUM, port 8080, branché sur `mongodb://mongo` et `redis://redis` |
+| studio | nkaplingua/studio | studio linguistique, port 3000 |
+| tts | nkaplingua/tts | transcodage mp3 et synthèse (PyTorch avec `TTS_TORCH=1`) |
+| demo-bank | nkaplingua/gateway | banque simulée, profil `demo` uniquement |
+
+- Chaque service a un contrôle de santé ; le gateway et le studio attendent Mongo et Redis en bonne santé et la fin de l'amorçage.
+- Les secrets viennent de `infra/.env`, jamais commité ; le service refuse de démarrer s'il en manque un.
+- Les images tournent sous un utilisateur non root.
+- Le gateway garde ses sessions en mémoire : une instance par déploiement. La montée en charge horizontale passera par des sessions partagées dans Redis.

@@ -1,14 +1,14 @@
 flowchart TB
-    IN[POST /hook/secret] --> V{Schéma zod}
-    V -- invalide --> E422[422 + champ fautif]
+    IN[POST /hook/secret] --> V{Contrôles du payload<br/>structure, canal, langue, 512 Ko}
+    V -- invalide --> E400[400 ou 404]
     V -- ui_translation --> UI[Traduction d'écran<br/>aucun accès bancaire]
     V -- ussd, sms, ivr --> RL{Limite de débit<br/>par numéro}
     RL -- dépassée --> E429[429]
-    RL --> S[Session Redis TTL 180 s]
+    RL --> S[Session en mémoire TTL 180 s]
     S --> C[Moteur conversationnel]
     C --> B[Client bancaire<br/>connexion chaude, budget du tour]
     C --> RD[Rendu : langue déclarée,<br/>pliage GSM-7, 182 septets]
-    L1[(Catalogue en mémoire)] --> RD
+    L1[(Catalogues intégrés + packs<br/>+ couche studio, en mémoire)] --> RD
     L1 --> UI
     RD --> OUT[Réponse au contrat]
     UI --> OUT

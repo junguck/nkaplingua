@@ -8,8 +8,8 @@ flowchart LR
         BANK[(API bancaire)]
     end
     subgraph NkapLingua
-        MW[Middleware Fastify<br/>catalogue en mémoire]
-        R[(Redis<br/>diffusion, sessions)]
+        MW[Gateway Node.js<br/>catalogues en mémoire]
+        R[(Redis<br/>instantané, diffusion)]
         M[(MongoDB<br/>vérité, audio)]
         TTS[Service voix<br/>PyTorch, ffmpeg]
         ST[Studio web<br/>Next.js + shadcn]

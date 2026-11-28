@@ -97,8 +97,8 @@ La sécurité guide chaque choix : la clé bancaire ne peut pas être détourné
 Canaux servis & 6 \\
 Langues prévues & 12 \\
 Capacité d'un écran USSD, lettres à tons comprises \M & 182 septets \\
-Délai entre la validation d'une phrase et son service \M & 1,2 ms (médiane) \\
-Lecture des traductions d'un écran de 40 phrases \M & 1,9 µs \\
+Délai entre la validation d'une phrase et son service \M & 1,8 ms (médiane) \\
+Traduction d'un écran de 40 phrases \M & 24 µs \\
 Revenu net projeté pour une banque de 500\,000 clients, année 3 \Hy & 298,8 M FCFA \\
 \end{tabularx}
 \end{cle}
@@ -145,11 +145,11 @@ Rien n'est débité à ce stade : l'opération attend la réponse de l'usager, a
 
 \subsection{Les trois briques}
 \begin{description}[leftmargin=0pt]
-  \item[Le middleware.] Node.js 22, Fastify et TypeScript strict. Il reçoit chaque tour de la passerelle, comprend la saisie, mène la conversation, appelle la banque et répond au format attendu, sur les six canaux.
+  \item[Le gateway.] C'est le middleware SAFINUM : Node.js 22, serveur HTTP natif et TypeScript strict. Il reçoit chaque tour de la passerelle, comprend la saisie, mène la conversation, appelle la banque et répond au format attendu, sur les six canaux.
   \item[Le studio linguistique.] Application web Next.js et shadcn/ui. Un contributeur voit une phrase de référence en français avec son contexte, et propose sa traduction par écrit ou au micro. Les contrôles s'affichent pendant la saisie : emplacements des montants, longueur, rendu sur téléphone basique. Un relecteur, qui ne peut pas être l'auteur, valide ou rejette avec un motif ; la phrase validée est servie aussitôt.
   \item[Le service voix.] PyTorch (modèles MMS-VITS) et ffmpeg. Il synthétise les phrases fixes et convertit les enregistrements validés au format du serveur vocal.
 \end{description}
-Les données reposent sur MongoDB (vérité, fichiers audio) et Redis (diffusion des mises à jour, sessions, limites de débit).
+Les données reposent sur MongoDB (vérité, fichiers audio) et Redis (instantané et diffusion des traductions validées). L'ensemble est livré en conteneurs Docker.
 
 \clearpage
 \section{Sécurité}
@@ -170,9 +170,9 @@ Chaque requête traverse cinq barrières avant d'atteindre la banque.
 
 \textbf{1. URL secrète.} L'adresse déclarée à SAFINUM contient un secret aléatoire (\texttt{/hook/<secret>}). Toute autre adresse répond 404 sans rien révéler. La comparaison se fait à temps constant : la durée de la réponse ne trahit pas le secret.
 
-\textbf{2. Schéma strict.} Chaque payload est validé par zod ; un champ invalide est refusé avec son nom, sans trace interne.
+\textbf{2. Contrôles du payload.} Structure, canal, langue et taille (512 Ko au plus) sont vérifiés ; une requête invalide est refusée, sans trace interne. Le canal du chemin fait foi : un tour ne peut pas se faire passer pour un autre canal.
 
-\textbf{3. Limite de débit.} Un nombre maximal de tours par numéro et par minute, compté dans Redis, empêche d'utiliser le middleware pour bombarder la banque.
+\textbf{3. Limite de débit.} Un nombre maximal de tours par numéro et par minute, compté par le gateway, empêche d'utiliser le middleware pour bombarder la banque.
 
 \textbf{4. Conversation sûre.} Création et confirmation d'une opération sont toujours séparées par une réponse de l'usager.
 
@@ -218,7 +218,7 @@ la règle des quatre yeux est écrite dans la requête de base de données elle-
 \midrule
 Détournement de la clé d'équipe & URL bancaire fixée par la configuration, liste blanche d'origines, alerte \\
 Appels par un tiers & URL secrète, comparaison à temps constant \\
-Payload malformé ou piégé & schéma zod strict, refus motivé sans trace interne \\
+Payload malformé ou piégé & contrôles de structure, de canal, de langue et de taille, refus sans trace interne \\
 Abus de la banque à travers nous & limite de débit par numéro \\
 Exécution non voulue & création et confirmation séparées, jamais de devinette \\
 Données financières exposées & gabarits seulement, aucun accès bancaire côté écrans \\
@@ -228,6 +228,7 @@ Usurpation dans le studio & mots de passe scrypt, jeton signé httpOnly, rôles 
 \bottomrule
 \end{tabularx}
 
+\clearpage
 \section{Architecture}
 
 \subsection{Vue d'ensemble}
@@ -237,28 +238,28 @@ Usurpation dans le studio & mots de passe scrypt, jeton signé httpOnly, rôles 
 \toprule
 \textbf{Composant} & \textbf{Technologie} & \textbf{Rôle} \\
 \midrule
-Middleware & Node.js 22, Fastify, zod & contrat SAFINUM, conversation, appels bancaires \\
+Gateway & Node.js 22, HTTP natif, TypeScript & contrat SAFINUM, conversation, appels bancaires \\
 Vérité & MongoDB 7, GridFS & phrases de référence, propositions, base définitive, audio \\
-Diffusion & Redis 7 & instantané des traductions, sessions, pub/sub, limites \\
+Diffusion & Redis 7 & instantané des traductions validées, pub/sub \\
 Voix & PyTorch, MMS-VITS, ffmpeg & synthèse, conversion mp3 \\
 Studio & Next.js 15, shadcn/ui & contribution et relecture \\
 \bottomrule
 \end{tabularx}
 
-\subsection{Le middleware}
+\subsection{Le gateway}
 \begin{minipage}[t]{0.47\linewidth}\vspace{0pt}\centering
 \includegraphics[width=\linewidth]{fig/middleware.pdf}
 \end{minipage}\hfill
 \begin{minipage}[t]{0.49\linewidth}\vspace{0pt}
-\textbf{Traductions en mémoire.} Chaque instance garde les traductions validées en mémoire : un écran de 40 phrases se lit en 1,9 µs \M, sans aller-retour réseau. Redis amorce cette copie et la tient à jour.
+\textbf{Traductions en mémoire, studio prioritaire.} Le gateway garde ses dictionnaires et les phrases validées dans le studio en mémoire : un écran de 40 phrases est traduit en 24 µs \M, sans aller-retour réseau. Une phrase validée l'emporte, phrase par phrase, sur les dictionnaires intégrés ; Redis amorce et met à jour cette couche.
 
 \textbf{Connexion bancaire toujours chaude.} Keep-alive de 60 s et ping de maintien : quand l'usager a fini de lire et de taper, l'appel suivant ne coûte qu'un aller-retour réseau (52 ms pour une latence de 50 ms) \M.
 
-\textbf{Budget du tour.} Chaque appel bancaire reçoit le temps restant avant l'échéance du canal (3 s en USSD), moins une marge pour répondre.
+\textbf{Délai borné.} Chaque appel bancaire est limité à 2,2 s pour tenir les 3 s d'un tour USSD ; une banque injoignable déclenche un menu hors ligne, jamais une opération à moitié.
 
 \textbf{Écrans décrits par des clés.} Un écran peut être rejoué dans une autre langue sans perdre l'opération en cours.
 
-\textbf{Sans état.} Les sessions vivent dans Redis : on ajoute des instances sans rien changer.
+\textbf{Sessions courtes.} En mémoire, 180 s, effacées en fin d'opération ; elles ne contiennent que l'étape et la référence de l'opération.
 \end{minipage}
 
 \subsection{Conversation en deux tours}
@@ -285,13 +286,37 @@ chaque phrase est « pliée » une fois, à son entrée dans les traductions, ve
 Exemples : Duálá devient Duala, Mə̀dûmbà devient Meudumba, Ghɔmálá devient Ghòmala, Ɓasaá devient Bhasaa. Les règles sont des données modifiables langue par langue, et le studio montre au contributeur le rendu exact sur téléphone basique pendant qu'il écrit.
 
 \subsection{Déploiement}
-\begin{minipage}[c]{0.38\linewidth}\centering
+\begin{minipage}[c]{0.40\linewidth}\centering
 \includegraphics[width=\linewidth]{fig/deploiement.pdf}
 \end{minipage}\hfill
-\begin{minipage}[c]{0.58\linewidth}
-Un fichier \texttt{docker-compose} lance MongoDB, Redis, le middleware, le studio et le service voix. Le middleware étant sans état, il se multiplie derrière un tunnel nommé ; Redis porte les sessions et la diffusion des mises à jour.
+\begin{minipage}[c]{0.56\linewidth}
+Toute l'application se lance en une commande, avec les URI MongoDB et Redis déjà branchées :
+\begin{center}
+\small\texttt{docker compose -f infra/docker-compose.yml up -d --build}
+\end{center}
+Chaque service a un contrôle de santé. Le gateway et le studio attendent MongoDB et Redis en bonne santé, puis la fin de l'amorçage. Les secrets (clé d'équipe, secret de l'URL, secret des sessions) viennent d'un fichier \texttt{.env} jamais commité ; il manque un secret, le service ne démarre pas. Les images tournent sous un utilisateur non root.
 \end{minipage}
 
+\vspace{6pt}
+\begin{center}
+\rowcolors{2}{white}{soft}
+\begin{tabularx}{\linewidth}{l l L}
+\toprule
+\textbf{Service} & \textbf{Image} & \textbf{Rôle} \\
+\midrule
+mongo & mongo:7 & base définitive et fichiers audio, volume persistant \\
+redis & redis:7-alpine & instantané et diffusion, journal AOF, volume persistant \\
+seed & nkaplingua/gateway & amorçage idempotent du studio, s'exécute puis s'arrête \\
+gateway & nkaplingua/gateway & middleware SAFINUM sur le port 8080 \\
+studio & nkaplingua/studio & studio linguistique sur le port 3000 \\
+tts & nkaplingua/tts & conversion mp3 et synthèse PyTorch \\
+demo-bank & nkaplingua/gateway & banque simulée, profil \texttt{demo} uniquement \\
+\bottomrule
+\end{tabularx}
+\end{center}
+Le gateway garde ses sessions en mémoire : un déploiement compte une instance. La montée en charge horizontale passera par des sessions partagées dans Redis (feuille de route).
+
+\clearpage
 \section{Pipeline des données}
 
 \subsection{Cycle de vie d'une traduction}
@@ -304,7 +329,7 @@ Un fichier \texttt{docker-compose} lance MongoDB, Redis, le middleware, le studi
   \item \textbf{Proposition.} Un contributeur propose un texte, une voix, ou les deux. Elle n'est jamais servie.
   \item \textbf{Relecture.} Un autre locuteur valide ou rejette, avec un motif.
   \item \textbf{Publication.} La base définitive est écrite d'abord, puis Redis reçoit la phrase et un événement.
-  \item \textbf{Service.} Chaque middleware met sa mémoire à jour en 1,2 ms en médiane \M, sans redémarrage.
+  \item \textbf{Service.} Le gateway met sa mémoire à jour : 1,8 ms en médiane entre la publication et la phrase servie \M, sans redémarrage.
 \end{enumerate}
 \end{minipage}
 
@@ -325,7 +350,7 @@ Service & mémoire du middleware & lecture immédiate, rendu GSM-7 précalculé 
 \end{tabularx}
 
 \subsection{Démarrage et résilience}
-Au démarrage, le middleware lit MongoDB, publie l'instantané dans Redis puis remplit sa mémoire : 229 traductions en 21 ms \M. Si MongoDB est indisponible, il démarre sur l'instantané Redis ; sans les deux, sur les phrases françaises et anglaises embarquées. Le service répond toujours, dans une langue déclarée honnêtement.
+Au démarrage, le gateway lit MongoDB, publie l'instantané dans Redis puis remplit sa mémoire : 308 phrases validées en 240 ms, connexions comprises \M. Si MongoDB est indisponible, il démarre sur l'instantané Redis, ce que nous avons vérifié en coupant le conteneur MongoDB \M ; sans les deux, sur ses catalogues intégrés (français, anglais, fulfulde). Le service répond toujours, dans une langue déclarée honnêtement.
 
 \subsection{La voix}
 \begin{itemize}
@@ -405,19 +430,21 @@ Le coût de production des langues reste marginal : les dix langues nationales c
 
 {\small\color{muted}Parité fixe : 1 € = 655,957 FCFA. Tous les volumes et tarifs marqués \Hy\ sont à valider avec un premier client pilote.}
 
+\clearpage
 \section{Performances mesurées}
 \rowcolors{2}{white}{soft}
 \begin{tabularx}{\linewidth}{L r}
 \toprule
 \textbf{Mesure} \M & \textbf{Résultat} \\
 \midrule
-Lecture des traductions d'un écran de 40 phrases & 1,9 µs \\
+Traduction d'un écran de 40 phrases & 24 µs \\
 Appel bancaire après 6 s de lecture, latence réseau de 50 ms & 52 ms \\
 Idem, latence réseau de 150 ms & 152 ms \\
-De la validation dans le studio au service & 1,2 ms en médiane, 2,7 ms au 95e centile \\
-Chargement des traductions au démarrage & 21 ms pour 229 traductions \\
+De la validation au service, réseau Docker & 1,8 ms en médiane, 3,7 ms au 95e centile \\
+Chargement au démarrage, connexions comprises & 240 ms pour 308 phrases \\
 Capacité d'un écran USSD avec lettres à tons & 182 septets \\
-Tests automatisés & 33 TypeScript, 4 Python, 1 parcours navigateur \\
+Tests automatisés & 160 TypeScript, 4 Python \\
+Tests sur la pile Docker & 11 tests de contrat, 1 parcours navigateur, 2 tests de résilience \\
 \bottomrule
 \end{tabularx}
 
@@ -425,12 +452,12 @@ Tests automatisés & 33 TypeScript, 4 Python, 1 parcours navigateur \\
 \begin{description}[leftmargin=0pt]
   \item[Jour J.] Tunnel nommé, URL secrète déclarée sur les six canaux.
   \item[Mois 1.] Langue pilote validée par 20 locuteurs, paiement mobile money des contributions.
-  \item[Mois 3.] Reconnaissance vocale pour le serveur vocal ; premier établissement partenaire.
+  \item[Mois 3.] Reconnaissance vocale pour le serveur vocal ; sessions partagées dans Redis pour faire tourner plusieurs instances du gateway ; premier établissement partenaire.
   \item[Mois 6.] Modèle de synthèse entraîné sur notre corpus de voix validées, sous licence commerciale propre (les modèles MMS actuels sont sous licence CC-BY-NC 4.0).
 \end{description}
 
 \section*{Sources}
-{\small
+{\footnotesize
 \begin{itemize}
   \item Banque mondiale, Global Findex 2025, indicateur FX.OWN.TOTL.ZS. \url{https://data.worldbank.org/indicator/FX.OWN.TOTL.ZS}
   \item BEAC, Rapport 2024 sur les services de paiement dans la CEMAC. \url{https://www.beac.int/wp-content/uploads/2026/04/RAPPORT-SUR-LES-SERVICES-DE-PAIEMENT-DANS-LA-CEMAC-2024-.pdf}
@@ -439,7 +466,7 @@ Tests automatisés & 33 TypeScript, 4 Python, 1 parcours navigateur \\
   \item SAFINUM, documentation de la sandbox (grille de frais, contrat des canaux). \url{https://safinum.cm/sandbox/docs}
 \end{itemize}}
 
-\vspace{1.5em}
+\vspace{0.4em}
 \begin{center}
 {\large\itshape\color{indigo} « Tout le monde devrait pouvoir parler le langage de l'argent. »}\\[4pt]
 {\bfseries Shun\&Co.}

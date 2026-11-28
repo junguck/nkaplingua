@@ -1,8 +1,8 @@
 flowchart TB
     I[Requête venue d'Internet] --> C1{1. URL secrète<br/>/hook/secret}
     C1 -- inconnue --> R1[404, rien n'est révélé]
-    C1 --> C2{2. Schéma zod strict}
-    C2 -- invalide --> R2[422 + champ fautif]
+    C1 --> C2{2. Contrôles du payload<br/>structure, canal, langue, 512 Ko}
+    C2 -- invalide --> R2[400, sans trace interne]
     C2 --> C3{3. Limite de débit<br/>par numéro}
     C3 -- dépassée --> R3[429]
     C3 --> C4[4. Moteur en deux tours<br/>rien n'est deviné]
