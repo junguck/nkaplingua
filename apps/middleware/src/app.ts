@@ -12,6 +12,7 @@ import type { SessionStore } from './session/store.ts';
 import type { Lexicon } from './understand.ts';
 import { handleTurn } from './channels/turn.ts';
 import { handleUi, uiKey } from './channels/ui.ts';
+import { CHANNELS, conversationLanguages, languageAvailability } from './i18n/availability.ts';
 import { isForeignBankUrl, maskPhone, secretMatches, type RateLimiter } from './security/guard.ts';
 
 export interface ReferenceSink {
@@ -39,7 +40,6 @@ export interface AppDeps {
   readonly logger?: boolean;
 }
 
-const MIN_SERVED_KEYS = 40;
 
 const envelopeSchema = z.object({ type: z.string().optional(), trace_id: z.string().optional() }).passthrough();
 
@@ -58,11 +58,9 @@ export function buildApp(deps: AppDeps): FastifyInstance {
           },
   });
 
-  const servedLanguages = (): Language[] => {
-    const out: Language[] = [];
-    for (const [lang, size] of deps.catalog.coverage()) if (size >= MIN_SERVED_KEYS) out.push(lang);
-    return out.sort((a, b) => (a === 'fr' ? -1 : b === 'fr' ? 1 : a.localeCompare(b)));
-  };
+  // Menu Langue : seules les langues qui couvrent TOUT le parcours conversationnel.
+  // (Avant, 40 clés d'écran suffisaient : le menu proposait une langue qui répondait en français.)
+  const servedLanguages = (): Language[] => [...conversationLanguages(deps.catalog)];
 
   app.addHook('onSend', async (_req, reply) => {
     reply.header('x-content-type-options', 'nosniff');
@@ -78,6 +76,12 @@ export function buildApp(deps: AppDeps): FastifyInstance {
   });
   app.get('/', health);
   app.get('/health', health);
+  /** Langues × canaux : état réel, lisible par le jury et par les écrans. */
+  app.get('/langues', async () => ({
+    canaux: CHANNELS,
+    langues: languageAvailability(deps.catalog),
+    servi: servedLanguages(),
+  }));
 
   const dispatch = async (request: FastifyRequest, reply: FastifyReply): Promise<unknown> => {
     const startedAt = performance.now();

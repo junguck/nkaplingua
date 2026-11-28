@@ -78,6 +78,11 @@ export class Catalog {
     return out;
   }
 
+  /** Clés réellement servies pour une langue (diagnostic, matrice des canaux). */
+  keysOf(lang: Language): readonly string[] {
+    return [...(this.#texts.get(lang)?.keys() ?? [])];
+  }
+
   /** Remplace le contenu d'une langue d'un bloc (rechargement complet depuis Redis). */
   replaceLanguage(lang: Language, records: Iterable<TranslationRecord>): void {
     this.#texts.delete(lang);
