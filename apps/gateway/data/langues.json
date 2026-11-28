@@ -1036,10 +1036,102 @@
       ],
       "remplace": false,
       "sources": [
-        "À compléter : locuteur, ville, date de la session"
+        "Peace Corps/Niger, An Introduction to the Hausa Language (2006) : nawa ne ? (combien), aika (envoyer), kudi (argent)",
+        "R.C. Abraham, Dictionary of the Hausa Language (1949) : kudi, kudade (frais), kudirin (facture), biya (payer)",
+        "Omniglot, Useful phrases in Hausa : nawa ne ?, taimaka (aide)",
+        "TrustAm (usage mobile money nigérian) : kudi nawa ya rage, kudina"
       ],
       "mots_outils": [],
-      "mots": {}
+      "mots": {
+        "CHECK_BALANCE": [
+          [
+            "kudi nawa ya rage",
+            3
+          ],
+          [
+            "kudina",
+            2
+          ],
+          [
+            "nawa ya rage",
+            3
+          ],
+          [
+            "balance",
+            2
+          ]
+        ],
+        "TRANSFER": [
+          [
+            "aika kudi",
+            3
+          ],
+          [
+            "aika",
+            2
+          ],
+          [
+            "tura kudi",
+            3
+          ],
+          [
+            "transfer",
+            2
+          ]
+        ],
+        "CHECK_FEES": [
+          [
+            "kudade",
+            3
+          ],
+          [
+            "nawa ne kudin",
+            2
+          ],
+          [
+            "fees",
+            2
+          ]
+        ],
+        "PAY_BILL": [
+          [
+            "biya kudin",
+            3
+          ],
+          [
+            "biya",
+            2
+          ],
+          [
+            "kudirin",
+            2
+          ]
+        ],
+        "EXPLAIN_TERM": [
+          [
+            "menene",
+            3
+          ],
+          [
+            "me ne",
+            3
+          ]
+        ],
+        "HELP": [
+          [
+            "taimaka",
+            3
+          ],
+          [
+            "agaji",
+            3
+          ],
+          [
+            "help",
+            2
+          ]
+        ]
+      }
     },
     "bum": {
       "nom": "Bulu",
@@ -1061,10 +1153,124 @@
       ],
       "remplace": false,
       "sources": [
-        "À compléter : locuteur, ville, date de la session"
+        "TrustAm (guidage mobile money en pidgin nigérian/camerounais) : how much i get, wetin remain, send money",
+        "Usage courant documenté (Kamtok) : abeg, how much e cost, pay bill, top up"
       ],
       "mots_outils": [],
-      "mots": {}
+      "mots": {
+        "CHECK_BALANCE": [
+          [
+            "how much i get",
+            3
+          ],
+          [
+            "wetin remain",
+            3
+          ],
+          [
+            "my balance",
+            3
+          ],
+          [
+            "how much i get for my account",
+            3
+          ]
+        ],
+        "TRANSFER": [
+          [
+            "send money",
+            3
+          ],
+          [
+            "send",
+            2
+          ],
+          [
+            "transfer",
+            2
+          ],
+          [
+            "push money",
+            2
+          ]
+        ],
+        "CHECK_FEES": [
+          [
+            "how much e cost",
+            3
+          ],
+          [
+            "charges",
+            2
+          ],
+          [
+            "fees",
+            2
+          ]
+        ],
+        "TX_HISTORY": [
+          [
+            "my transactions",
+            3
+          ],
+          [
+            "history",
+            2
+          ]
+        ],
+        "BUY_AIRTIME": [
+          [
+            "buy credit",
+            3
+          ],
+          [
+            "top up",
+            3
+          ],
+          [
+            "recharge",
+            2
+          ]
+        ],
+        "PAY_BILL": [
+          [
+            "pay bill",
+            3
+          ],
+          [
+            "pay light",
+            3
+          ],
+          [
+            "pay water",
+            2
+          ]
+        ],
+        "HELP": [
+          [
+            "help me",
+            3
+          ],
+          [
+            "abeg",
+            2
+          ],
+          [
+            "help",
+            2
+          ]
+        ],
+        "CANCEL": [
+          [
+            "cancel",
+            4
+          ],
+          [
+            "no",
+            1
+          ]
+        ]
+      }
     }
   }
 }
