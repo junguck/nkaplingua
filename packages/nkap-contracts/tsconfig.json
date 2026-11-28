@@ -1,0 +1,6 @@
+{
+  "extends": "../../tsconfig.legacy.json",
+  "include": [
+    "src/**/*.ts"
+  ]
+}

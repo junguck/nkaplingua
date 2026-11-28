@@ -2,11 +2,7 @@
 import http from "node:http";
 import { fileURLToPath } from "node:url";
 
-// ../../packages/safinum/src/protocol.ts
-var SAFINUM_LANGUAGES = ["fr", "en", "fub", "dua", "ewo", "bas", "bbj", "byv"];
-var SAFINUM_LANGUAGE_SET = new Set(SAFINUM_LANGUAGES);
-
-// ../../packages/safinum/src/fees.ts
+// ../../packages/nkap-safinum/src/fees.ts
 var MIN_AMOUNT = 1;
 var MAX_AMOUNT = 5e5;
 var PERCENT_FROM = 100001;
@@ -29,6 +25,10 @@ function officialFee(type, amount) {
   if ((type === "transfer" || type === "withdrawal") && amount >= PERCENT_FROM) return Math.round(amount * PERCENT);
   return FEE_BRACKETS[type].find((b) => amount >= b.min && amount <= b.max)?.fee ?? null;
 }
+
+// ../../packages/nkap-safinum/src/protocol.ts
+var SAFINUM_LANGUAGES = ["fr", "en", "fub", "dua", "ewo", "bas", "bbj", "byv"];
+var SAFINUM_LANGUAGE_SET = new Set(SAFINUM_LANGUAGES);
 
 // src/demo/demo-bank.ts
 var OPERATORS = [

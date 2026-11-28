@@ -1,8 +1,4 @@
 {
-  "extends": "../../tsconfig.base.json",
-  "compilerOptions": {
-    "types": ["node"],
-    "noEmit": true
-  },
+  "extends": "../../tsconfig.legacy.json",
   "include": ["src/**/*.ts", "test/**/*.ts"]
 }
