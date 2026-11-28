@@ -1,0 +1,11 @@
+sequenceDiagram
+    autonumber
+    actor A as Attaquant
+    participant M as Middleware NkapLingua
+    participant B as Banque SAFINUM
+    participant E as Serveur de l'attaquant
+    A->>M: tour forgé, bank_api.base_url = serveur de l'attaquant
+    Note over M: l'URL du payload est ignorée,<br/>seules les origines en liste blanche sont appelées
+    M->>B: appel avec X-Team-Key vers l'URL configurée
+    M--xE: aucun appel
+    M-->>A: réponse normale, alerte dans les journaux

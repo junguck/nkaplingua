@@ -122,8 +122,8 @@ async function main(): Promise<void> {
   const fub = legacyFulfulde();
   for (const [key, text] of fub) {
     await contributions.updateOne(
-      { key: `ui.${key}`, lang: 'fub', authorId: 'legacy-v2' },
-      { $setOnInsert: { key: `ui.${key}`, lang: 'fub', kind: 'text', text, audioId: null, authorId: 'legacy-v2', authorName: 'Gateway v2 (non relu)', status: 'pending', createdAt: now } },
+      { key: `ui.${key}`, lang: 'fub', authorId: 'import-initial' },
+      { $setOnInsert: { key: `ui.${key}`, lang: 'fub', kind: 'text', text, audioId: null, authorId: 'import-initial', authorName: 'Import initial (non relu)', status: 'pending', createdAt: now } },
       { upsert: true },
     );
   }

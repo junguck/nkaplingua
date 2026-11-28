@@ -1,7 +1,0 @@
-flowchart TB
-    A[Attaquant sur Internet] -- POST forgé<br/>bank_api.base_url = evil --> T[Tunnel public]
-    T --> K[Kit officiel]
-    K -- X-Team-Key --> EVIL[evil.example]
-    T --> N[NkapLingua v3]
-    N -- URL inconnue : 404 --> A
-    N -- URL de base fixée par la config --> BANK[(Banque SAFINUM)]

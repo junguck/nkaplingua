@@ -4,10 +4,6 @@
   "at": "2026-11-27T23:13:43.503Z",
   "results": [
     {
-      "mode": "kit (readFileSync + JSON.parse)",
-      "per_screen_us": 22.91
-    },
-    {
       "mode": "redis (HGET par clé)",
       "per_screen_us": 1864.98
     },
@@ -16,7 +12,7 @@
       "per_screen_us": 81.47
     },
     {
-      "mode": "L1 mémoire (NkapLingua v3)",
+      "mode": "catalogue en mémoire",
       "per_screen_us": 1.89
     }
   ]

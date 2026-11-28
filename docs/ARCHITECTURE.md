@@ -1,8 +1,12 @@
-# NkapLingua v3 : architecture technique
+# NkapLingua : architecture technique
 
 > Tout le monde devrait pouvoir parler le langage de l'argent.
 
-Stack : Node.js 22 (Fastify, TypeScript strict), MongoDB 7, Redis 7, PyTorch (MMS-VITS), Next.js 15 + shadcn/ui.
+Une réalisation **Shun&Co.** pour le SAFINUM Innovate Challenge 2026.
+
+NkapLingua fait parler les services financiers dans les langues du Cameroun, sur six canaux : USSD, SMS, serveur vocal (IVR), application mobile, web et guichet automatique (GAB). Les locuteurs enrichissent les langues depuis un studio web, où chaque phrase est validée par un second locuteur avant d'être servie.
+
+Stack : Node.js 22 (Fastify, TypeScript strict), MongoDB 7, Redis 7, PyTorch (MMS-VITS), Next.js 15 et shadcn/ui.
 
 ## 1. Vue d'ensemble
 
@@ -15,66 +19,74 @@ flowchart LR
     subgraph SAFINUM
         GW[Passerelle SAFINUM]
         BANK[(API bancaire)]
-        JURY[Journal du jury]
     end
     subgraph NkapLingua
-        MW[Middleware Fastify<br/>catalogue L1 en mémoire]
-        R[(Redis<br/>instantané, sessions, pub/sub)]
-        M[(MongoDB<br/>vérité, GridFS audio)]
-        TTS[Service audio PyTorch<br/>MMS-VITS, ffmpeg]
-        ST[Studio Next.js + shadcn]
+        MW[Middleware Fastify<br/>catalogue en mémoire]
+        R[(Redis<br/>diffusion, sessions)]
+        M[(MongoDB<br/>vérité, audio)]
+        TTS[Service voix<br/>PyTorch, ffmpeg]
+        ST[Studio web<br/>Next.js + shadcn]
     end
-    LOC[Locuteurs : contributeurs et relecteurs]
+    LOC[Locuteurs]
 
     U1 --> GW
     U2 --> GW
     GW -- tour + X-Trace-Id --> MW
     MW -- X-Team-Key + X-Trace-Id --> BANK
-    BANK --> JURY
     U2 -. opérations exécutées par l'appli .-> BANK
     MW <--> R
     MW -- démarrage --> M
     LOC --> ST
     ST --> M
-    ST -- HSET + PUBLISH --> R
+    ST -- publication --> R
     ST -- transcodage --> TTS
     TTS --> M
 ```
 
-Deux familles de canaux, deux régimes de sécurité :
+| Composant | Technologie | Rôle |
+| --- | --- | --- |
+| Middleware | Node.js 22, Fastify, zod | contrat SAFINUM, conversation, appels bancaires |
+| Vérité | MongoDB 7, GridFS | références, propositions, base définitive, audio |
+| Diffusion | Redis 7 | instantané du catalogue, sessions, pub/sub, limite de débit |
+| Voix | PyTorch, MMS-VITS, ffmpeg | synthèse des phrases fixes, transcodage mp3 |
+| Studio | Next.js 15, shadcn/ui | contribution texte ou voix, relecture à quatre yeux |
 
-| Canaux | Ce que voit le middleware | Appels bancaires |
+Deux familles de canaux :
+
+| Canaux | Ce que reçoit le middleware | Appels bancaires |
 | --- | --- | --- |
 | mobile, web, GAB | des gabarits (`{amount}`, `{name}`), jamais une valeur | aucun : l'appli opère elle-même |
-| USSD, SMS, IVR | la saisie de l'usager (le contrat l'impose) | oui, avec la clé d'équipe |
+| USSD, SMS, IVR | la saisie de l'usager, imposée par le contrat | oui, à chaque étape |
 
-## 2. Le middleware de l'intérieur
+## 2. Le middleware
 
 ```mermaid
 flowchart TB
     IN[POST /hook/secret] --> V{Schéma zod}
     V -- invalide --> E422[422 + champ fautif]
-    V -- ui_translation --> UI[Traduction d'écran<br/>aucune dépendance bancaire]
+    V -- ui_translation --> UI[Traduction d'écran<br/>aucun accès bancaire]
     V -- ussd, sms, ivr --> RL{Limite de débit<br/>par numéro}
     RL -- dépassée --> E429[429]
     RL --> S[Session Redis TTL 180 s]
-    S --> C[Moteur conversationnel<br/>fonction pure]
-    C --> B[Client bancaire<br/>pool chaud, budget du tour]
-    C --> RD[Rendu : langue honnête,<br/>pliage GSM-7, 182 septets]
-    L1[(Catalogue L1<br/>Map en mémoire)] --> RD
+    S --> C[Moteur conversationnel]
+    C --> B[Client bancaire<br/>connexion chaude, budget du tour]
+    C --> RD[Rendu : langue déclarée,<br/>pliage GSM-7, 182 septets]
+    L1[(Catalogue en mémoire)] --> RD
     L1 --> UI
     RD --> OUT[Réponse au contrat]
     UI --> OUT
 ```
 
-Choix structurants :
+Fonctionnalités clés :
 
-- **Catalogue L1 en mémoire.** Redis n'est jamais lu pendant un tour. Mesure : 1,9 µs par écran de 40 clés en L1 contre 1 865 µs avec un `HGET` Redis par clé (même en local).
-- **Pool HTTP chaud vers la banque.** Keep-alive 60 s et ping de maintien toutes les 20 s. Le `fetch` par défaut ferme au bout de 4 s, or un usager USSD met plus longtemps que ça à lire et taper : chaque tour repaierait la poignée TLS.
-- **Budget du tour.** Chaque appel bancaire reçoit le temps restant avant l'échéance du canal (3 s en USSD), moins une marge, et pas un délai fixe.
+- **Catalogue en mémoire.** Les traductions sont lues en 1,9 µs par écran de 40 clés, sans aucun aller-retour réseau. Redis amorce et met à jour cette copie ; il n'est pas interrogé pendant un tour.
+- **Connexion bancaire toujours chaude.** Keep-alive de 60 s et ping de maintien toutes les 20 s : quand l'usager a fini de lire et de taper, l'appel suivant ne coûte qu'un aller-retour réseau.
+- **Budget du tour.** Chaque appel bancaire reçoit le temps restant avant l'échéance du canal (3 s en USSD), moins une marge pour répondre à la passerelle.
 - **Écrans décrits par des clés.** Un écran peut être rejoué dans une autre langue sans perdre l'opération en cours.
+- **Langue déclarée honnête.** Si une seule phrase de l'écran manque dans la langue demandée, tout l'écran part en français, déclaré `fr`.
+- **Compréhension libre.** Lexique pondéré par langue, alimenté depuis la base : « envoie 5000 à Paul » est compris en un seul message.
 
-## 3. Transfert en deux tours (règle du jury)
+## 3. Transfert en deux tours
 
 ```mermaid
 sequenceDiagram
@@ -82,142 +94,171 @@ sequenceDiagram
     actor U as Usager
     participant G as Passerelle
     participant M as Middleware
-    participant R as Redis
     participant B as Banque
     U->>G: envoie 5000 a paul
-    G->>M: tour N (trace A)
-    M->>R: GET session
-    M->>B: GET /beneficiaries?q=paul (trace A)
+    G->>M: tour N
+    M->>B: GET /beneficiaries?q=paul
     B-->>M: 2 homonymes
     M-->>G: CLARIFICATION_NEEDED, 1. Paul Mbarga 2. Paul Etoa
     U->>G: 1
-    G->>M: tour N+1 (trace B)
-    M->>B: POST /transactions (trace B)
-    B-->>M: pending, frais 150, total 5150
-    M->>R: SET session (référence seulement)
-    M-->>G: TRANSFER, relecture montant, frais, total
+    G->>M: tour N+1
+    M->>B: POST /transactions
+    B-->>M: en attente, frais 150, total 5150
+    M-->>G: TRANSFER, relecture du montant, des frais et du total
     U->>G: 1 (confirmer)
-    G->>M: tour N+2 (trace C)
-    M->>B: POST /transactions/id/confirm (trace C)
-    B-->>M: confirmed
+    G->>M: tour N+2
+    M->>B: POST /transactions/id/confirm
+    B-->>M: confirmée
     M-->>G: CONFIRM, reçu, fin de session
 ```
 
-Jamais de confirmation dans le tour qui crée. Après création, les montants affichés viennent de la banque, pas de la session.
+- L'opération est créée dans un tour et confirmée dans un tour suivant, jamais dans le même.
+- Un montant ou un bénéficiaire n'est jamais deviné : la réponse est `CLARIFICATION_NEEDED`.
+- « non, plutôt 30000 » est compris comme une correction : la banque recalcule les frais, une nouvelle relecture suit.
+- L'usager peut changer de langue en pleine relecture : l'écran est rejoué, l'opération reste en attente.
+- `0` annule à n'importe quelle étape ; rien n'est débité.
 
-## 4. Studio : cycle de vie d'une traduction
+## 4. Lettres à tons et budget USSD
+
+Un seul caractère hors de l'alphabet GSM-7 fait passer un message en UCS-2 : la limite tombe alors de 182 à 70 caractères. NkapLingua plie chaque phrase une fois, à son entrée dans le catalogue.
+
+| Source | GSM-7 | Septets | Raison |
+| --- | --- | --- | --- |
+| ŋ ɓ ɗ ƙ ƴ | ng bh dh kh yh | 2 | consonnes composées |
+| ɛ ɔ | è ò | 1 | déjà dans GSM-7, distinctes de e et o |
+| ə | eu | 2 | lecture francophone de la voyelle centrale |
+| tons (á à â ǎ) | retirés | 0 | de façon uniforme |
+
+Exemples : Duálá devient Duala, Mə̀dûmbà devient Meudumba, Ghɔmálá devient Ghòmala, Ɓasaá devient Bhasaa. Les règles sont des données, modifiables langue par langue.
+
+## 5. Le studio web
+
+Décrit en détail dans [STUDIO.md](STUDIO.md).
 
 ```mermaid
 stateDiagram-v2
-    [*] --> Reference: texte source vu en production<br/>ou amorcé
+    [*] --> Reference: phrase source amorcée<br/>ou vue en production
     Reference --> Pending: un contributeur propose<br/>texte et/ou voix
     Pending --> Rejected: un AUTRE locuteur rejette<br/>(motif obligatoire)
-    Pending --> Approved: un AUTRE locuteur valide<br/>(passage atomique)
+    Pending --> Approved: un AUTRE locuteur valide
     Approved --> Published: Mongo écrit, puis Redis HSET + PUBLISH
-    Published --> Served: chaque middleware met son L1 à jour
+    Published --> Served: chaque middleware met son catalogue à jour
     Rejected --> Pending: nouvelle proposition
     Served --> Pending: proposition d'amélioration
 ```
 
-Garanties :
+- **Quatre yeux.** La requête de validation exclut l'auteur (`authorId` différent du relecteur) : la règle est tenue par la base, pas seulement par l'écran.
+- **Une seule publication.** Le passage de « en attente » à « validée » est atomique.
+- **Mêmes contrôles partout.** Emplacements, longueur maximale et 182 septets sont vérifiés par la même fonction dans le navigateur et sur le serveur.
 
-- **Quatre yeux.** Le filtre Mongo de la validation contient `authorId: { $ne: relecteur }` : l'interface ne peut pas le contourner.
-- **Pas de double publication.** Le passage `pending -> approved` est un `findOneAndUpdate` conditionnel.
-- **Mêmes contrôles partout.** Emplacements, `max_chars` et 182 septets sont vérifiés par la même fonction dans le navigateur (aperçu) et sur le serveur (refus).
-
-## 5. Pipeline de données
+## 6. Pipeline de données
 
 ```mermaid
-flowchart TB
+flowchart LR
     subgraph Collecte
-        P1[Trafic UI réel] -- textes source inconnus --> REF[(references)]
+        direction TB
+        P1[Trafic réel des écrans] --> REF[(references)]
         P2[Amorçage fr, en, lexique] --> REF
-        C1[Contributeur : texte] --> CO[(contributions)]
-        C2[Contributeur : voix webm] --> GF[(GridFS brut)]
-        GF --> CO
+        C1[Texte proposé] --> CO[(contributions)]
+        C2[Voix enregistrée] --> GF[(GridFS brut)]
     end
     subgraph Validation
-        CO --> RV{Relecteur tiers}
-        RV -- rejet --> CO
-        RV -- validation --> TC[Transcodage mp3 16 kHz]
+        direction TB
+        RV{Relecteur tiers} --> TR[(translations)]
+        RV --> TC[mp3 16 kHz]
         TC --> GF2[(GridFS mp3)]
-        RV --> TR[(translations : base définitive)]
-        GF2 --> TR
     end
     subgraph Diffusion
-        TR -- démarrage --> RS[(Redis i18n:t:lang)]
-        TR -- validation --> RS
-        RS -- PUBLISH i18n:changed --> L1[L1 de chaque instance]
-        L1 --> F[Pliage GSM-7 précalculé]
-        F --> SRV[USSD, SMS]
+        direction TB
+        RS[(Redis)] -- PUBLISH --> L1[Catalogue en mémoire]
+        L1 --> SRV[USSD, SMS : GSM-7]
         L1 --> SRV2[Écrans mobile, web, GAB]
-        GF2 --> SRV3[IVR : /voix/lang/clé.mp3]
     end
-    subgraph Synthèse
-        TR -- phrases fixes sans voix humaine --> PG[Pré-génération PyTorch]
-        PG --> GF2
+    subgraph Voix
+        direction TB
+        PG[Synthèse PyTorch] --> V[IVR : /voix/lang/cle.mp3]
     end
+    CO --> RV
+    GF --> RV
+    TR --> RS
+    TR --> PG
+    GF2 --> V
 ```
 
-| Étape | Stockage | Format | Garantie |
-| --- | --- | --- | --- |
-| Référence | `references` | texte fr, contexte, `max_chars`, canaux | découverte automatique, hors chemin critique (lot toutes les 5 s) |
-| Proposition | `contributions` + GridFS | texte, audio brut | jamais servie |
-| Validation | `translations` | texte, `audioId` mp3, auteur, relecteur, version | un tiers a relu |
-| Instantané | Redis `i18n:t:<lang>` | JSON `{t, a}` | écrit en `MULTI` : jamais à moitié |
-| Service | L1 en mémoire | texte + variante GSM-7 | O(1), aucun aller-retour réseau |
-
-Ordre au démarrage : Mongo vers Redis vers L1. Si Mongo est absent, on démarre sur l'instantané Redis. Si les deux sont absents, sur la graine embarquée (fr, en). Le service répond toujours.
-
-Une voix humaine validée n'est jamais écrasée par la synthèse : la pré-génération ne touche que les traductions sans `audioId`.
-
-## 6. Lettres à tons et USSD
-
-Un seul caractère hors GSM-7 fait passer le message en UCS-2 : la limite tombe de 182 à 70 caractères. Le pliage est calculé une fois, à l'écriture dans le L1.
-
-| Source | GSM-7 | Coût | Raison |
-| --- | --- | --- | --- |
-| ŋ ɓ ɗ ƙ ƴ | ng bh dh kh yh | 2 septets | consonnes composées, lisibles |
-| ɛ ɔ | è ò | 1 septet | déjà dans GSM-7, distinctes de e et o |
-| ə | eu | 2 septets | lecture francophone de la voyelle centrale |
-| tons (á à â ǎ) | retirés | 0 | uniformément, pour ne pas mélanger ton et voyelle |
-
-Choix discuté : un digraphe pour les voyelles (« eh », « oh ») entrerait en collision avec des suites réelles et coûterait le double. Les règles sont des données : surchargeables langue par langue (`fold_rules`).
-
-## 7. Sécurité
-
-```mermaid
-flowchart TB
-    A[Attaquant sur Internet] -- POST forgé<br/>bank_api.base_url = evil --> T[Tunnel public]
-    T --> K[Kit officiel]
-    K -- X-Team-Key --> EVIL[evil.example]
-    T --> N[NkapLingua v3]
-    N -- URL inconnue : 404 --> A
-    N -- URL de base fixée par la config --> BANK[(Banque SAFINUM)]
-```
-
-| Menace | Contre-mesure | Preuve |
+| Étape | Stockage | Garantie |
 | --- | --- | --- |
-| Vol de la clé par `bank_api.base_url` forgé | l'URL vient de la config, origine en liste blanche | `bench/exfil-demo.ts` : le kit fuit, la v3 non |
-| Appels par un tiers | URL déclarée secrète `/hook/<secret>`, comparaison à temps constant | test : 404 sur `/` et mauvais secret |
-| Abus de la banque via nous | limite de débit par numéro (Redis) | test 429 |
-| Fuite dans les journaux | numéros masqués, saisies jamais journalisées, secret masqué dans l'URL | `maskPhone` |
-| Données financières dans l'UI | gabarits seulement, module UI sans client bancaire | séparation par injection |
-| Relecture complaisante | quatre yeux imposés dans la requête Mongo | e2e : la contributrice est refusée |
-| Session du studio | JWT HS256 httpOnly, rôles relus en base à chaque requête | |
-| Clé commitée | `.env` retiré du suivi ; **à faire côté équipe : faire révoquer la clé de l'historique git** | |
+| Référence | `references` | découverte automatique sur le trafic réel, par lot, hors du chemin critique |
+| Proposition | `contributions`, GridFS | jamais servie |
+| Validation | `translations` | relue par un tiers, auteur et relecteur tracés, versionnée |
+| Instantané | Redis `i18n:t:<lang>` | écrit en transaction `MULTI` |
+| Service | catalogue en mémoire | O(1), variante GSM-7 précalculée |
 
-## 8. Déploiement
+Au démarrage : Mongo, puis Redis, puis la mémoire (229 traductions chargées en 21 ms). Si Mongo est indisponible, le middleware démarre sur l'instantané Redis ; sans les deux, sur la graine embarquée (fr, en). Le service répond toujours.
+
+## 7. Voix
+
+- Synthèse `facebook/mms-tts` (VITS) sous PyTorch, chargée à la demande, une fois par langue.
+- Cache disque par empreinte (langue, texte), écriture atomique.
+- Refus de synthétiser un gabarit à trous : les montants sont lus par la synthèse SAFINUM.
+- Une langue sans modèle est déclarée indisponible, jamais simulée.
+- Une voix humaine validée a toujours priorité et n'est jamais remplacée par la synthèse.
+- Enregistrements du studio transcodés en mp3 mono 16 kHz, 32 kb/s, servis sous `/voix/<langue>/<clé>.mp3`.
+
+## 8. Sécurité
+
+### Défense en couches
 
 ```mermaid
 flowchart TB
-    CF[cloudflared, tunnel nommé] --> MW1[middleware x N]
+    I[Requête venue d'Internet] --> C1{1. URL secrète<br/>/hook/secret}
+    C1 -- inconnue --> R1[404, rien n'est révélé]
+    C1 --> C2{2. Schéma zod strict}
+    C2 -- invalide --> R2[422 + champ fautif]
+    C2 --> C3{3. Limite de débit<br/>par numéro}
+    C3 -- dépassée --> R3[429]
+    C3 --> C4[4. Moteur en deux tours<br/>rien n'est deviné]
+    C4 --> C5[5. Client bancaire<br/>URL fixée par la configuration]
+    C5 --> BANK[(Banque SAFINUM)]
+    C4 -. journaux .-> LOG[Numéros masqués,<br/>saisies jamais écrites]
+```
+
+### Tentative de détournement de la clé d'équipe
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor A as Attaquant
+    participant M as Middleware NkapLingua
+    participant B as Banque SAFINUM
+    participant E as Serveur de l'attaquant
+    A->>M: tour forgé, bank_api.base_url = serveur de l'attaquant
+    Note over M: l'URL du payload est ignorée,<br/>seules les origines en liste blanche sont appelées
+    M->>B: appel avec X-Team-Key vers l'URL configurée
+    M--xE: aucun appel
+    M-->>A: réponse normale, alerte dans les journaux
+```
+
+| Menace | Protection |
+| --- | --- |
+| Détournement de la clé d'équipe | l'URL bancaire vient de la configuration, jamais du payload ; origines en liste blanche |
+| Appels par un tiers | URL déclarée secrète, comparaison à temps constant |
+| Abus de la banque à travers le middleware | limite de débit par numéro (Redis) |
+| Fuite dans les journaux | numéros masqués, saisies jamais journalisées, secret masqué dans l'URL |
+| Données financières côté écrans | gabarits seulement, aucun accès bancaire pour ce module |
+| Relecture complaisante | quatre yeux imposés en base |
+| Session du studio | JWT HS256 httpOnly, rôles relus en base à chaque requête |
+
+## 9. Déploiement
+
+```mermaid
+flowchart TB
+    CF[Tunnel nommé] --> MW1[Middleware x N]
     MW1 --> RD[(Redis)]
     MW1 --> MG[(MongoDB)]
-    ST[studio] --> MG
+    ST[Studio] --> MG
     ST --> RD
-    ST --> TTS[audio : torch CPU]
+    ST --> TTS[Service voix]
     TTS --> MG
 ```
 
-`infra/docker-compose.yml` lance l'ensemble. Le middleware est sans état : il se met à l'échelle derrière le tunnel, Redis porte les sessions et la diffusion.
+`infra/docker-compose.yml` lance l'ensemble. Le middleware est sans état : il se multiplie derrière le tunnel, Redis porte les sessions et la diffusion.

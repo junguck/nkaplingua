@@ -6,27 +6,25 @@ flowchart LR
     subgraph SAFINUM
         GW[Passerelle SAFINUM]
         BANK[(API bancaire)]
-        JURY[Journal du jury]
     end
     subgraph NkapLingua
-        MW[Middleware Fastify<br/>catalogue L1 en mémoire]
-        R[(Redis<br/>instantané, sessions, pub/sub)]
-        M[(MongoDB<br/>vérité, GridFS audio)]
-        TTS[Service audio PyTorch<br/>MMS-VITS, ffmpeg]
-        ST[Studio Next.js + shadcn]
+        MW[Middleware Fastify<br/>catalogue en mémoire]
+        R[(Redis<br/>diffusion, sessions)]
+        M[(MongoDB<br/>vérité, audio)]
+        TTS[Service voix<br/>PyTorch, ffmpeg]
+        ST[Studio web<br/>Next.js + shadcn]
     end
-    LOC[Locuteurs : contributeurs et relecteurs]
+    LOC[Locuteurs]
 
     U1 --> GW
     U2 --> GW
     GW -- tour + X-Trace-Id --> MW
     MW -- X-Team-Key + X-Trace-Id --> BANK
-    BANK --> JURY
     U2 -. opérations exécutées par l'appli .-> BANK
     MW <--> R
     MW -- démarrage --> M
     LOC --> ST
     ST --> M
-    ST -- HSET + PUBLISH --> R
+    ST -- publication --> R
     ST -- transcodage --> TTS
     TTS --> M

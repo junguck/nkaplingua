@@ -1,8 +1,8 @@
 /**
  * Labo keep-alive : serveur HTTPS local derrière un relais TCP qui ajoute un délai fixe
  * dans chaque sens (RTT simulé). Tours espacés de 6 s comme un utilisateur USSD qui lit.
- *   kit  : keep-alive 4 s (défaut undici / fetch global) -> reconnexion TCP + TLS à chaque tour
- *   warm : pool NkapLingua (keep-alive 60 s + ping de maintien)
+ *   short : keep-alive de 4 s (réglage par défaut d'undici) : reconnexion TCP + TLS à chaque tour
+ *   warm  : pool NkapLingua (keep-alive 60 s + ping de maintien)
  * Usage : node bench/keepalive-lab.ts <rtt_ms> <tours> <ecart_ms>
  */
 import { execFileSync } from 'node:child_process';
@@ -41,7 +41,7 @@ const relay = createTcp((client) => {
 await new Promise<void>((r) => relay.listen(9444, '127.0.0.1', () => r()));
 
 const tls = { ca: cert, servername: 'localhost' };
-const kit: Dispatcher = new Agent({ keepAliveTimeout: 4_000, connect: tls });
+const short: Dispatcher = new Agent({ keepAliveTimeout: 4_000, connect: tls });
 const warm: Dispatcher = new Agent({ keepAliveTimeout: 60_000, connect: tls });
 const URL_ = 'https://127.0.0.1:9444/api/v1/accounts/x';
 
@@ -52,20 +52,20 @@ async function once(d: Dispatcher): Promise<number> {
   return performance.now() - t;
 }
 const ping = setInterval(() => void once(warm).catch(() => undefined), 2_000);
-await once(kit);
+await once(short);
 await once(warm);
 
 const k: number[] = [];
 const w: number[] = [];
 for (let i = 0; i < turns; i += 1) {
   await new Promise((r) => setTimeout(r, gap));
-  k.push(await once(kit));
+  k.push(await once(short));
   w.push(await once(warm));
 }
 clearInterval(ping);
 const med = (a: number[]): number => [...a].sort((x, y) => x - y)[Math.floor(a.length / 2)] ?? 0;
-console.log(JSON.stringify({ rtt_ms: rtt, turns, gap_ms: gap, kit_median_ms: Math.round(med(k)), warm_median_ms: Math.round(med(w)), saved_ms: Math.round(med(k) - med(w)), kit: k.map(Math.round), warm: w.map(Math.round) }));
-await kit.close();
+console.log(JSON.stringify({ rtt_ms: rtt, turns, gap_ms: gap, short_keepalive_median_ms: Math.round(med(k)), warm_median_ms: Math.round(med(w)), saved_ms: Math.round(med(k) - med(w)), short_keepalive: k.map(Math.round), warm: w.map(Math.round) }));
+await short.close();
 await warm.close();
 relay.close();
 https.close();

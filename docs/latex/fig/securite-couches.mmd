@@ -1,0 +1,11 @@
+flowchart TB
+    I[Requête venue d'Internet] --> C1{1. URL secrète<br/>/hook/secret}
+    C1 -- inconnue --> R1[404, rien n'est révélé]
+    C1 --> C2{2. Schéma zod strict}
+    C2 -- invalide --> R2[422 + champ fautif]
+    C2 --> C3{3. Limite de débit<br/>par numéro}
+    C3 -- dépassée --> R3[429]
+    C3 --> C4[4. Moteur en deux tours<br/>rien n'est deviné]
+    C4 --> C5[5. Client bancaire<br/>URL fixée par la configuration]
+    C5 --> BANK[(Banque SAFINUM)]
+    C4 -. journaux .-> LOG[Numéros masqués,<br/>saisies jamais écrites]

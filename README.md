@@ -1,6 +1,8 @@
-# NkapLingua v3
+# NkapLingua
 
 > Tout le monde devrait pouvoir parler le langage de l'argent.
+
+Une réalisation **Shun&Co.** pour le SAFINUM Innovate Challenge 2026.
 
 Couche linguistique entre la passerelle SAFINUM et la banque, pour les langues du Cameroun, sur six canaux (USSD, SMS, IVR, mobile, web, GAB), avec un studio où les locuteurs proposent et valident les traductions à quatre yeux.
 
@@ -10,8 +12,8 @@ Couche linguistique entre la passerelle SAFINUM et la banque, pour les langues d
 | `apps/middleware` | Fastify : catalogue L1 en mémoire, pool bancaire chaud, conversation en deux tours, sécurité |
 | `apps/studio` | Next.js 15 + shadcn : contribution texte ou voix, relecture, publication à chaud |
 | `apps/tts` | PyTorch MMS-VITS + ffmpeg : synthèse des phrases fixes, transcodage mp3 pour l'IVR |
-| `apps/gateway` | v2 historique, conservée pour référence (hors workspace) |
-| `docs/` | [architecture (Mermaid)](docs/ARCHITECTURE.md), [mesures](docs/BENCHMARKS.md), [modèle économique](docs/BUSINESS-MODEL.md), [PDF LaTeX](docs/latex/nkaplingua.pdf) |
+| `apps/gateway` | code antérieur conservé pour référence (hors workspace) |
+| `docs/` | [architecture (Mermaid)](docs/ARCHITECTURE.md), [studio web](docs/STUDIO.md), [performances](docs/PERFORMANCES.md), [modèle économique](docs/BUSINESS-MODEL.md), [dossier PDF](docs/latex/nkaplingua.pdf) |
 
 ## Démarrer en local
 
@@ -34,7 +36,7 @@ Node 22.18+ exécute le TypeScript directement (suppression des types) : aucune 
 ## Brancher la vraie sandbox
 
 ```bash
-export SAFINUM_TEAM_KEY=sbx_...            # clé régénérée, jamais commitée
+export SAFINUM_TEAM_KEY=sbx_...            # clé d'équipe, jamais commitée
 export HOOK_SECRET=$(openssl rand -hex 24)
 node apps/middleware/src/main.ts
 cloudflared tunnel --url http://localhost:8080
@@ -48,6 +50,6 @@ curl -X POST https://safinum.cm/api/v1/sandbox/endpoint -H "X-Team-Key: $SAFINUM
 ```bash
 pnpm test                                   # 33 tests TypeScript
 cd apps/tts && python -m pytest -q          # 4 tests Python
-node apps/middleware/bench/lookup.ts        # L1 contre Redis contre kit
+node apps/middleware/bench/lookup.ts        # lecture du catalogue
 node apps/middleware/bench/keepalive-lab.ts 150
 ```

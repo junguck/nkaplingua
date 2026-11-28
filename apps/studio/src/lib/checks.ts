@@ -7,6 +7,7 @@ import { NATIONAL_RULES, LATIN_RULES, foldToGsm7, placeholderSignature, ussdBudg
 export interface ProposalChecks {
   readonly placeholdersOk: boolean;
   readonly expectedPlaceholders: string;
+  readonly foundPlaceholders: string;
   readonly lengthOk: boolean;
   readonly length: number;
   readonly maxChars: number | null;
@@ -24,6 +25,7 @@ export function checkProposal(source: string, proposal: string, lang: Language, 
   return {
     placeholdersOk: placeholderSignature(source) === placeholderSignature(text),
     expectedPlaceholders: placeholderSignature(source),
+    foundPlaceholders: placeholderSignature(text),
     lengthOk: maxChars === null || length <= maxChars,
     length,
     maxChars,

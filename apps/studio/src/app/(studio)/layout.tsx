@@ -2,7 +2,9 @@ import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { requireUser } from '@/lib/server/auth';
+import { requireUser, type Role } from '@/lib/server/auth';
+
+const ROLE_LABELS: Readonly<Record<Role, string>> = { contributor: 'contributeur', reviewer: 'relecteur', admin: 'admin' };
 import { logoutAction } from './actions';
 
 export default async function StudioLayout({ children }: { readonly children: ReactNode }): Promise<ReactNode> {
@@ -20,7 +22,7 @@ export default async function StudioLayout({ children }: { readonly children: Re
           </nav>
           <div className="ml-auto flex items-center gap-2 text-sm">
             <span>{user.displayName}</span>
-            {user.roles.map((role) => <Badge key={role} variant="secondary">{role}</Badge>)}
+            {user.roles.map((role) => <Badge key={role} variant="secondary">{ROLE_LABELS[role]}</Badge>)}
             <form action={logoutAction}><Button size="sm" variant="outline" type="submit">Sortir</Button></form>
           </div>
         </div>

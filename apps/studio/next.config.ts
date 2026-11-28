@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   transpilePackages: ['@nkap/lingua-core'],
   serverExternalPackages: ['mongodb', 'ioredis'],
   poweredByHeader: false,
+  devIndicators: false,
   experimental: { serverActions: { bodySizeLimit: '4mb' } },
   async headers() {
     return [

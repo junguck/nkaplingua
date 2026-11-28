@@ -1,68 +1,62 @@
-# NkapLingua : modèle économique (proposition à valider)
+# NkapLingua : modèle économique
 
 > Tout le monde devrait pouvoir parler le langage de l'argent.
 
-Convention : **[F]** = fait sourcé, **[M]** = mesuré par nous dans ce dépôt, **[H]** = hypothèse à valider.
+Une proposition **Shun&Co.** Convention : **[F]** fait sourcé, **[M]** mesuré par nous, **[H]** hypothèse à valider.
 
-## 1. Le problème, en chiffres
+## 1. Le besoin
 
-- **[F]** 60,87 % des adultes camerounais (15 ans et plus) ont un compte, en banque ou en mobile money (Banque mondiale, Global Findex, données 2024).
-- **[F]** 30,9 millions de comptes mobile money au Cameroun fin 2024, soit 65,1 % de la CEMAC ; 2,73 milliards d'opérations dans l'année (BEAC, Rapport 2024 sur les services de paiement, repris par Agence Ecofin et Investir au Cameroun).
-- **[F]** Recensement 2005 : 28,8 % des 12 ans et plus ne lisent ni le français ni l'anglais. C'est la population que l'USSD en français exclut (donnée ancienne, aucun recensement plus récent trouvé).
-- **[M]** Un écran USSD qui contient une seule lettre ɛ, ɔ ou ŋ tombe de 182 à 70 caractères. Le pliage NkapLingua garde les 182 : 2,6 fois plus de contenu par écran.
+- **[F]** 60,87 % des adultes camerounais ont un compte, en banque ou en mobile money (Banque mondiale, Global Findex, données 2024).
+- **[F]** 30,9 millions de comptes mobile money au Cameroun fin 2024, soit 65,1 % de la CEMAC, et 2,73 milliards d'opérations dans l'année (BEAC).
+- **[F]** Recensement 2005 : 28,8 % des 12 ans et plus ne lisent ni le français ni l'anglais.
 
-## 2. Quatre modèles possibles
+## 2. Trois modèles évalués
 
-| | A. Licence SaaS B2B | B. Place de marché des locuteurs | C. Licence de corpus | D. Subventions inclusion |
-| --- | --- | --- | --- | --- |
-| Client | banques, EMF, opérateurs mobile money | (moteur de A) | opérateurs, labos IA, universités | bailleurs, régulateur |
-| Ce qu'il paie | abonnement + prix par session localisée | | jeux de données texte et voix validés | pilotes par langue |
-| Force | revenu récurrent, aligné sur l'usage | coût d'une langue quasi nul, emplois locaux | forte marge | finance le démarrage |
-| Risque | cycle de vente bancaire long | qualité (couverte par les quatre yeux) | consentement, licence des modèles | non récurrent |
-
-## 3. Recommandation : A + B, puis C
-
-1. **A, licence SaaS** : 2 FCFA par session localisée **[H]**, plus un abonnement d'intégration par établissement.
-2. **B, locuteurs payés en mobile money** : 25 FCFA par traduction validée, 15 FCFA par relecture, 50 FCFA par enregistrement validé **[H]**. 20 % du revenu A reversé au fonds des contributeurs **[H]**. Le slogan devient littéral : les locuteurs gagnent de l'argent en apprenant aux services financiers à parler leur langue.
-3. **C, plus tard** : licence du corpus validé (texte et voix), avec consentement explicite à la contribution et partage de revenu.
-
-Point d'attention : les modèles `facebook/mms-tts` sont sous licence CC-BY-NC 4.0. Un usage commercial de la synthèse exige une autre licence ou un modèle entraîné sur notre propre corpus de voix validées, que B produit justement. C'est un argument de plus pour B.
-
-## 4. Économie unitaire
-
-### Coût d'une langue (calcul à partir du dépôt)
-
-| Poste | Volume **[M]** | Tarif **[H]** | Coût |
+| | Licence SaaS à l'usage | Licence du corpus | Subventions |
 | --- | --- | --- | --- |
-| Traduction + relecture | 144 phrases | 25 + 15 FCFA | 5 760 FCFA |
-| Voix + relecture | 45 phrases fixes | 50 + 15 FCFA | 2 925 FCFA |
-| **Total par langue** | | | **8 685 FCFA, soit 13,24 €** |
-| 10 langues nationales | | | 86 850 FCFA, soit 132,40 € |
+| Client | banques, EMF, opérateurs | laboratoires, opérateurs | bailleurs, régulateur |
+| Revenu | récurrent, suit l'usage | ponctuel, par jeu de données | ponctuel, par projet |
+| Aligné sur la valeur créée | oui | partiellement | non |
+| Risque principal | cycle de vente bancaire | consentement et licences | dépendance |
 
-(Parité fixe : 1 € = 655,957 FCFA.)
+**Choix : la licence SaaS à l'usage.** C'est le seul modèle où notre revenu grandit exactement quand la banque gagne de nouveaux clients actifs. Le corpus validé pourra être licencié plus tard ; les subventions peuvent financer les pilotes de langue.
 
-### Revenu, selon la part d'opérations localisées
+## 3. L'offre
 
-Base **[F]** : 2,73 milliards d'opérations mobile money par an au Cameroun.
+- Abonnement : 500 000 FCFA par mois et par établissement **[H]** (6 M FCFA par an : intégration, hébergement, studio).
+- Usage : 2 FCFA par session servie dans une langue nationale **[H]** ; les sessions en français ne sont pas facturées.
+- Langues construites par des locuteurs payés en mobile money : 25 FCFA par traduction validée, 15 par relecture, 50 par voix validée **[H]**. Une langue complète (144 phrases dont 45 enregistrées **[M]**) coûte 8 685 FCFA, soit 13,24 €.
 
-| Part localisée **[H]** | Prix par session **[H]** | Revenu annuel | Fonds contributeurs (20 %) |
+## 4. Ce que gagne une banque partenaire
+
+Banque ou EMF de 500 000 clients mobiles **[H]**. 28,8 % freinés par la langue **[F]**, dont 10 %, 20 % puis 30 % deviennent actifs grâce à NkapLingua **[H]**. Chacun fait 4 transferts par mois d'environ 10 000 FCFA, soit 150 FCFA de frais par transfert selon la grille publiée de la sandbox **[F]**, et ouvre 6 sessions par mois **[H]**.
+
+| | Année 1 | Année 2 | Année 3 |
 | --- | --- | --- | --- |
-| 0,5 % | 2 FCFA | 27,3 M FCFA (41 600 €) | 5,5 M FCFA |
-| 1 % | 2 FCFA | 54,6 M FCFA (83 200 €) | 10,9 M FCFA |
-| 2 % | 3 FCFA | 163,8 M FCFA (249 700 €) | 32,8 M FCFA |
+| Nouveaux usagers actifs | 14 400 | 28 800 | 43 200 |
+| Frais de transfert encaissés | 103,7 M FCFA | 207,4 M FCFA | 311,0 M FCFA |
+| Coût NkapLingua (usage et abonnement) | 8,1 M FCFA | 10,1 M FCFA | 12,2 M FCFA |
+| **Revenu net pour la banque** | **95,6 M FCFA** | **197,2 M FCFA** | **298,8 M FCFA** |
+| En euros | 145 751 € | 300 649 € | 455 547 € |
+| Retour sur coût | 12,8 fois | 20,4 fois | 25,5 fois |
 
-Lecture : même dans le scénario prudent, le coût de construction d'une langue (8 685 FCFA) est remboursé par moins de 4 400 sessions localisées.
+Un usager actif rapporte 7 200 FCFA de frais par an et coûte 144 FCFA d'usage : l'abonnement est remboursé dès 851 usagers actifs, soit 0,17 % du parc. Non compté : dépôts supplémentaires, baisse des appels au service client, nouveaux produits rendus compréhensibles.
 
-## 5. Ce qu'il faut valider ensemble
+## 5. Ce que gagne Shun&Co.
 
-- Le prix par session : faut-il plutôt une part des frais de transaction ?
-- Les tarifs des locuteurs : à tester sur une langue pilote (ewondo ou fulfulde) avec 20 locuteurs.
-- Le client de lancement : un EMF régional est plus rapide à signer qu'une banque.
+| | Année 1 | Année 2 | Année 3 |
+| --- | --- | --- | --- |
+| Banques partenaires **[H]** | 2 | 5 | 10 |
+| Revenu par banque | 8,1 M FCFA | 10,1 M FCFA | 12,2 M FCFA |
+| **Revenu total** | **16,1 M FCFA** | **50,7 M FCFA** | **122,2 M FCFA** |
+| En euros | 24 616 € | 77 347 € | 186 305 € |
+
+Parité fixe : 1 € = 655,957 FCFA.
 
 ## Sources
 
-- Banque mondiale, Global Findex 2025, indicateur FX.OWN.TOTL.ZS : https://data.worldbank.org/indicator/FX.OWN.TOTL.ZS
+- Banque mondiale, Global Findex 2025 : https://data.worldbank.org/indicator/FX.OWN.TOTL.ZS
 - BEAC, Rapport 2024 sur les services de paiement dans la CEMAC : https://www.beac.int/wp-content/uploads/2026/04/RAPPORT-SUR-LES-SERVICES-DE-PAIEMENT-DANS-LA-CEMAC-2024-.pdf
 - Agence Ecofin : https://www.agenceecofin.com/actualites/0705-138200-mobile-money-le-cameroun-domine-l-espace-cemac-avec-65-des-comptes-en-2024
-- Investir au Cameroun : https://www.investiraucameroun.com/finance/0405-23354-cemac-le-cameroun-reste-roi-du-mobile-money-en-2024-avec-65-1-des-comptes-et-57-de-la-valeur-des-transactions
 - Langues du Cameroun, recensement 2005 : https://en.wikipedia.org/wiki/Languages_of_Cameroon
+- SAFINUM, documentation de la sandbox (grille de frais) : https://safinum.cm/sandbox/docs

@@ -69,7 +69,11 @@ export function ContributeForm({ lang, reference, skip }: { readonly lang: Langu
         </div>
         {text.trim() !== '' && (
           <ul className="space-y-1 text-sm">
-            <Check ok={checks.placeholdersOk}>{checks.expectedPlaceholders === '' ? 'Aucun emplacement à conserver' : `Emplacements ${checks.expectedPlaceholders} conservés`}</Check>
+            <Check ok={checks.placeholdersOk}>
+              {checks.placeholdersOk
+                ? checks.expectedPlaceholders === '' ? 'Aucun emplacement requis' : `Emplacements ${checks.expectedPlaceholders} conservés`
+                : `Emplacements attendus : ${checks.expectedPlaceholders || 'aucun'}, trouvés : ${checks.foundPlaceholders || 'aucun'}`}
+            </Check>
             <Check ok={checks.lengthOk}>{checks.length} caractères{checks.maxChars !== null ? ` / ${checks.maxChars}` : ''}</Check>
             {conversational && <Check ok={checks.ussdFits}>USSD : {checks.ussdSeptets} septets / 182</Check>}
             {checks.identicalToSource && <li className="text-amber-600">Identique au français : est-ce vraiment traduit ?</li>}
