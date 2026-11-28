@@ -1,0 +1,15 @@
+{
+  "at": "2026-11-27T23:14:20.870Z",
+  "report": [
+    {
+      "target": "kit officiel",
+      "cle_recue_par_attaquant": "sbx_loca…",
+      "fuite": true
+    },
+    {
+      "target": "NkapLingua v3",
+      "cle_recue_par_attaquant": null,
+      "fuite": false
+    }
+  ]
+}

@@ -1,0 +1,5 @@
+# apps/gateway est la v2 historique (extraite d'un autre monorepo, dépendances absentes) : hors workspace.
+packages:
+  - packages/*
+  - apps/middleware
+  - apps/studio

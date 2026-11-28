@@ -1,0 +1,43 @@
+# Pile complète NkapLingua v3. Secrets dans infra/.env (jamais commité) :
+#   SAFINUM_TEAM_KEY, HOOK_SECRET, STUDIO_SECRET
+services:
+  mongo:
+    image: mongo:7
+    volumes: [mongo:/data/db]
+    restart: unless-stopped
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--save", "60", "1", "--appendonly", "yes"]
+    volumes: [redis:/data]
+    restart: unless-stopped
+  middleware:
+    build: { context: .., dockerfile: infra/middleware.Dockerfile }
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 8080
+      MONGO_URL: mongodb://mongo:27017
+      REDIS_URL: redis://redis:6379
+      SAFINUM_TEAM_KEY: ${SAFINUM_TEAM_KEY:?clé requise}
+      HOOK_SECRET: ${HOOK_SECRET:?secret requis}
+    ports: ["8080:8080"]
+    depends_on: [mongo, redis]
+    restart: unless-stopped
+  studio:
+    build: { context: .., dockerfile: infra/studio.Dockerfile }
+    environment:
+      MONGO_URL: mongodb://mongo:27017
+      REDIS_URL: redis://redis:6379
+      STUDIO_SECRET: ${STUDIO_SECRET:?secret requis}
+      TTS_URL: http://tts:8800
+    ports: ["3000:3000"]
+    depends_on: [mongo, redis, tts]
+    restart: unless-stopped
+  tts:
+    build: { context: ../apps/tts }
+    environment:
+      MONGO_URL: mongodb://mongo:27017
+      REDIS_URL: redis://redis:6379
+    volumes: [tts:/data]
+    restart: unless-stopped
+volumes: { mongo: {}, redis: {}, tts: {} }

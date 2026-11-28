@@ -1,0 +1,9 @@
+stateDiagram-v2
+    [*] --> Reference: texte source vu en production<br/>ou amorcé
+    Reference --> Pending: un contributeur propose<br/>texte et/ou voix
+    Pending --> Rejected: un AUTRE locuteur rejette<br/>(motif obligatoire)
+    Pending --> Approved: un AUTRE locuteur valide<br/>(passage atomique)
+    Approved --> Published: Mongo écrit, puis Redis HSET + PUBLISH
+    Published --> Served: chaque middleware met son L1 à jour
+    Rejected --> Pending: nouvelle proposition
+    Served --> Pending: proposition d'amélioration

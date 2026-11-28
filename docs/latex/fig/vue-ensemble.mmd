@@ -1,0 +1,32 @@
+flowchart LR
+    subgraph Usagers
+        U1[Téléphone basique<br/>USSD, SMS, appel]
+        U2[Appli mobile, web, GAB]
+    end
+    subgraph SAFINUM
+        GW[Passerelle SAFINUM]
+        BANK[(API bancaire)]
+        JURY[Journal du jury]
+    end
+    subgraph NkapLingua
+        MW[Middleware Fastify<br/>catalogue L1 en mémoire]
+        R[(Redis<br/>instantané, sessions, pub/sub)]
+        M[(MongoDB<br/>vérité, GridFS audio)]
+        TTS[Service audio PyTorch<br/>MMS-VITS, ffmpeg]
+        ST[Studio Next.js + shadcn]
+    end
+    LOC[Locuteurs : contributeurs et relecteurs]
+
+    U1 --> GW
+    U2 --> GW
+    GW -- tour + X-Trace-Id --> MW
+    MW -- X-Team-Key + X-Trace-Id --> BANK
+    BANK --> JURY
+    U2 -. opérations exécutées par l'appli .-> BANK
+    MW <--> R
+    MW -- démarrage --> M
+    LOC --> ST
+    ST --> M
+    ST -- HSET + PUBLISH --> R
+    ST -- transcodage --> TTS
+    TTS --> M
