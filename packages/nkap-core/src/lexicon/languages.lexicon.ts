@@ -7,12 +7,13 @@ export const LANGUAGE_NAMES: Readonly<Record<LanguageCode, readonly string[]>> =
   fub: ['fulfulde', 'foulfouldé', 'foulfoulde', 'peul', 'fulani', 'fula', 'pulaar'],
   wes: ['pidgin', 'pidjin', 'kamtok', 'pigin'],
   ewo: ['ewondo'],
-  bul: ['bulu'],
+  bum: ['bulu'],
   hau: ['haoussa', 'hausa', 'haussa', 'houssa'],
   dua: ['duala', 'douala', 'dualla'],
   bas: ['basaa', 'bassa', 'basa'],
   bbj: ['ghomala', 'ghomálá', 'bandjoun'],
   byv: ['medumba', 'bangangte'],
+  ybb: ['yemba', 'dschang'],
 };
 
 /** Verbes de changement de langue. */
@@ -37,7 +38,7 @@ export const FUNCTION_WORDS: Readonly<Record<LanguageCode, ReadonlyArray<readonl
   // Aucun mot-outil attesté dans ewo.json / bul.json : liste vide plutôt qu'inventée.
   // Ces langues sont reconnues par leurs indices d'intention ou choisies au menu de langue.
   ewo: [],
-  bul: [],
+  bum: [],
   // Duala : pas de mot-outil fiable relevé (« na » est aussi pidgin) ; reconnu par ses indices d'intention.
   dua: [],
   // Basaa, medumba : aucune source primaire lisible depuis l'environnement (SIL sous connexion, Kemelang
@@ -45,6 +46,8 @@ export const FUNCTION_WORDS: Readonly<Record<LanguageCode, ReadonlyArray<readonl
   bas: [],
   bbj: [],
   byv: [],
+  // Yemba : aucun mot-outil attesté, rien d'inventé.
+  ybb: [],
 };
 
 /** « Mon solde », « my balance », « ma balans », « ceede am » : l'utilisateur parle de SES valeurs. */

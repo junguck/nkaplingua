@@ -22529,6 +22529,7 @@ function install(rows) {
 }
 async function startStudioSync(options) {
   const { log } = options;
+  const started = performance.now();
   const closers = [];
   let source = "none";
   const mongo = options.mongoUrl ? await import("mongodb").then((m) => new m.MongoClient(options.mongoUrl ?? "", { serverSelectionTimeoutMS: 2e3 })) : null;
@@ -22576,7 +22577,7 @@ async function startStudioSync(options) {
     install(rows);
     source = rows.length > 0 ? "redis" : "none";
   }
-  log(`studio : ${studioSize()} phrase(s) valid\xE9e(s) charg\xE9e(s) depuis ${source}`);
+  log(`studio : ${studioSize()} phrase(s) valid\xE9e(s) charg\xE9e(s) depuis ${source} en ${Math.round(performance.now() - started)} ms`);
   if (redis !== null && redisOk) {
     const subscriber = redis.duplicate();
     await subscriber.subscribe(REDIS.channel);
@@ -22715,7 +22716,7 @@ function toSafinumIntent(intent) {
 }
 
 // ../../packages/nkap-safinum/src/protocol.ts
-var SAFINUM_LANGUAGES = ["fr", "en", "fub", "dua", "ewo", "bas", "bbj", "byv"];
+var SAFINUM_LANGUAGES = ["fr", "en", "fub", "dua", "ewo", "bas", "bbj", "byv", "hau", "bum", "wes", "ybb"];
 var SAFINUM_LANGUAGE_SET = new Set(SAFINUM_LANGUAGES);
 function isSafinumLanguage(value) {
   return typeof value === "string" && SAFINUM_LANGUAGE_SET.has(value);
@@ -22973,7 +22974,7 @@ var INTENT_CUES = {
     dua: [["loma*", 3]],
     bbj: [["shyaa*", 3]],
     ewo: [["lom", 3], ["lom moni", 3]],
-    bul: [["lom*", 3], ["lom mone", 3]]
+    bum: [["lom*", 3], ["lom mone", 3]]
   },
   CHECK_FEES: {
     fr: [["frais", 3], ["commission", 3], ["tarif*", 2], ["combien ca coute", 3], ["ca coute", 2]],
@@ -23001,7 +23002,7 @@ var INTENT_CUES = {
     fub: [["fakture", 3], ["yo\u0253*", 1]],
     bbj: [["joa", 2]],
     ewo: [["yan\u0259r", 1]],
-    bul: [["ya'ane", 1]]
+    bum: [["ya'ane", 1]]
   },
   WITHDRAW: {
     fr: [["retir*", 3], ["retrait", 3], ["sortir de l argent", 3], ["cash out", 3]],
@@ -23093,12 +23094,13 @@ var LANGUAGE_NAMES = {
   fub: ["fulfulde", "foulfould\xE9", "foulfoulde", "peul", "fulani", "fula", "pulaar"],
   wes: ["pidgin", "pidjin", "kamtok", "pigin"],
   ewo: ["ewondo"],
-  bul: ["bulu"],
+  bum: ["bulu"],
   hau: ["haoussa", "hausa", "haussa", "houssa"],
   dua: ["duala", "douala", "dualla"],
   bas: ["basaa", "bassa", "basa"],
   bbj: ["ghomala", "ghom\xE1l\xE1", "bandjoun"],
-  byv: ["medumba", "bangangte"]
+  byv: ["medumba", "bangangte"],
+  ybb: ["yemba", "dschang"]
 };
 var SWITCH_CUES = [
   "parle",
@@ -23127,14 +23129,16 @@ var FUNCTION_WORDS = {
   // Aucun mot-outil attesté dans ewo.json / bul.json : liste vide plutôt qu'inventée.
   // Ces langues sont reconnues par leurs indices d'intention ou choisies au menu de langue.
   ewo: [],
-  bul: [],
+  bum: [],
   // Duala : pas de mot-outil fiable relevé (« na » est aussi pidgin) ; reconnu par ses indices d'intention.
   dua: [],
   // Basaa, medumba : aucune source primaire lisible depuis l'environnement (SIL sous connexion, Kemelang
   // refuse les robots) — rien d'inventé, à remplir avec des locuteurs (docs/LANGUES.md).
   bas: [],
   bbj: [],
-  byv: []
+  byv: [],
+  // Yemba : aucun mot-outil attesté, rien d'inventé.
+  ybb: []
 };
 var POSSESSIVES = ["mon", "ma", "mes", "my", "am"];
 
@@ -23177,20 +23181,21 @@ var TERMS = [
 var BILLERS = ["ENEO", "CAMWATER", "CANAL"];
 
 // ../../packages/nkap-contracts/src/language.ts
-var LANGUAGES = ["fr", "en", "fub", "wes", "ewo", "bul", "hau", "dua", "bas", "bbj", "byv"];
+var LANGUAGES = ["fr", "en", "fub", "wes", "ewo", "bum", "hau", "dua", "bas", "bbj", "byv", "ybb"];
 var LANGUAGE_INFO = {
   fr: { code: "fr", name: "Fran\xE7ais", nativeName: "Fran\xE7ais", isNational: false, ttsLocale: "fr-FR", sttLocale: "fr-FR" },
   en: { code: "en", name: "Anglais", nativeName: "English", isNational: false, ttsLocale: "en-GB", sttLocale: "en-GB" },
   fub: { code: "fub", name: "Fulfulde (Adamaoua)", nativeName: "Fulfulde", isNational: true, ttsLocale: "fr-FR", sttLocale: null },
   wes: { code: "wes", name: "Pidgin camerounais", nativeName: "Kamtok", isNational: true, ttsLocale: "en-GB", sttLocale: "en-NG" },
   ewo: { code: "ewo", name: "Ewondo", nativeName: "Ewondo", isNational: true, ttsLocale: "fr-FR", sttLocale: null },
-  bul: { code: "bul", name: "Bulu", nativeName: "Bulu", isNational: true, ttsLocale: "fr-FR", sttLocale: null },
+  bum: { code: "bum", name: "Bulu", nativeName: "Bulu", isNational: true, ttsLocale: "fr-FR", sttLocale: null },
   hau: { code: "hau", name: "Haoussa", nativeName: "Hausa", isNational: true, ttsLocale: "fr-FR", sttLocale: null },
   // Noms natifs : ceux de la documentation de la sandbox SAFINUM.
   dua: { code: "dua", name: "Duala", nativeName: "Du\xE1l\xE1", isNational: true, ttsLocale: "fr-FR", sttLocale: null },
   bas: { code: "bas", name: "Basaa", nativeName: "\u0181asa\xE1", isNational: true, ttsLocale: "fr-FR", sttLocale: null },
   bbj: { code: "bbj", name: "Ghomala", nativeName: "Gh\u0254m\xE1l\xE1", isNational: true, ttsLocale: "fr-FR", sttLocale: null },
-  byv: { code: "byv", name: "Medumba", nativeName: "M\u0259\u0300d\xFBmb\xE0", isNational: true, ttsLocale: "fr-FR", sttLocale: null }
+  byv: { code: "byv", name: "Medumba", nativeName: "M\u0259\u0300d\xFBmb\xE0", isNational: true, ttsLocale: "fr-FR", sttLocale: null },
+  ybb: { code: "ybb", name: "Yemba", nativeName: "Y\u025Bmba", isNational: true, ttsLocale: "fr-FR", sttLocale: null }
 };
 
 // ../../packages/nkap-core/src/text/normalize.ts
@@ -23408,7 +23413,7 @@ var TERMS_LEXICON = {
   },
   beneficiary: {
     cues: ["beneficiaire", "destinataire", "beneficiary", "recipient", "mo he\u0253ata", "mod a n\u0254\u014B m\u0254ni", "mote a bi mone"],
-    label: { fr: "B\xE9n\xE9ficiaire", en: "Beneficiary", fub: "Mo he\u0253ata ceede", wes: "Pesin wey go receive", ewo: "\xCD m\xF3d \xE1 n\u0254\u0301\u014B m\u0254\u0304n\xED", bul: "Mote a bi mon\xE9" },
+    label: { fr: "B\xE9n\xE9ficiaire", en: "Beneficiary", fub: "Mo he\u0253ata ceede", wes: "Pesin wey go receive", ewo: "\xCD m\xF3d \xE1 n\u0254\u0301\u014B m\u0254\u0304n\xED", bum: "Mote a bi mon\xE9" },
     explanation: {
       fr: "Le b\xE9n\xE9ficiaire, c'est la personne qui re\xE7oit l'argent. V\xE9rifiez toujours son nom et son num\xE9ro.",
       en: "The beneficiary is the person who receives the money. Always check their name and number.",
@@ -26571,11 +26576,11 @@ function read(file) {
 // src/security.ts
 import { createHash, timingSafeEqual } from "node:crypto";
 var SAFINUM_ORIGIN = "https://safinum.cm";
-function isAllowedBankUrl(raw) {
+function isAllowedBankUrl(raw, extraHosts = []) {
   try {
     const url = new URL(raw);
     if (url.origin === SAFINUM_ORIGIN) return true;
-    return url.protocol.startsWith("http") && ["127.0.0.1", "localhost", "[::1]"].includes(url.hostname);
+    return url.protocol.startsWith("http") && ["127.0.0.1", "localhost", "[::1]", ...extraHosts].includes(url.hostname);
   } catch {
     return false;
   }
@@ -26976,7 +26981,8 @@ async function startMiddleware(port = Number(process.env.PORT ?? 8080), host = p
 }
 function defaultOptions() {
   const bankUrl = process.env.SAFINUM_BANK_URL || "https://safinum.cm/api/v1";
-  if (!isAllowedBankUrl(bankUrl)) {
+  const extraHosts = (process.env.BANK_ALLOWED_HOSTS ?? "").split(",").map((h) => h.trim()).filter((h) => h !== "");
+  if (!isAllowedBankUrl(bankUrl, extraHosts)) {
     throw new Error(`SAFINUM_BANK_URL refus\xE9e (${bankUrl}) : seule la sandbox SAFINUM ou la boucle locale re\xE7oivent la cl\xE9 d'\xE9quipe.`);
   }
   const hookSecret = process.env.HOOK_SECRET?.trim() || null;

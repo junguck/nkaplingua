@@ -83,6 +83,22 @@ class MmsEngine:
         return Speech(samples=samples, sample_rate=int(model.config.sampling_rate))  # type: ignore[attr-defined]
 
 
+class NullEngine:
+    """Image sans PyTorch : aucune synthèse, jamais de voix inventée. Le transcodage reste disponible."""
+
+    def __init__(self, reason: str) -> None:
+        self._reason = reason
+
+    def languages(self) -> list[str]:
+        return []
+
+    def failures(self) -> dict[str, str]:
+        return {"*": self._reason}
+
+    def synthesize(self, lang: str, text: str) -> Speech:
+        raise LookupError(f"synthèse indisponible : {self._reason}")
+
+
 class ToneEngine:
     """Moteur de test : un bip par mot. Ne sert jamais en production."""
 

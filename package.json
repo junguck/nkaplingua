@@ -2,12 +2,15 @@
   "name": "nkaplingua",
   "private": true,
   "packageManager": "pnpm@10.28.0",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
-    "build": "pnpm -r --filter ./packages/** --filter ./apps/middleware run build",
+    "build": "pnpm --filter @nkap/gateway build && pnpm --filter @nkap/studio build",
     "typecheck": "pnpm -r run typecheck",
     "test": "vitest run",
-    "bench": "pnpm --filter @nkap/middleware bench"
+    "seed": "pnpm --filter @nkap/gateway studio:seed",
+    "up": "docker compose -f infra/docker-compose.yml up -d --build"
   },
   "devDependencies": {
     "@types/node": "22.15.30",

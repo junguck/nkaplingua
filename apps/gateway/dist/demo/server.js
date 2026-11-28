@@ -29,7 +29,7 @@ function officialFee(type, amount) {
 }
 
 // ../../packages/nkap-safinum/src/protocol.ts
-var SAFINUM_LANGUAGES = ["fr", "en", "fub", "dua", "ewo", "bas", "bbj", "byv"];
+var SAFINUM_LANGUAGES = ["fr", "en", "fub", "dua", "ewo", "bas", "bbj", "byv", "hau", "bum", "wes", "ybb"];
 var SAFINUM_LANGUAGE_SET = new Set(SAFINUM_LANGUAGES);
 
 // src/demo/demo-bank.ts
@@ -314,7 +314,7 @@ function send(res, status, body, headers = {}) {
 }
 async function startDemoServer(port = Number(process.env.DEMO_PORT ?? 8788)) {
   const { server } = createDemoServer();
-  await new Promise((resolve) => server.listen(port, "127.0.0.1", resolve));
+  await new Promise((resolve) => server.listen(port, process.env.DEMO_HOST ?? "127.0.0.1", resolve));
   const address = server.address();
   return {
     url: `http://127.0.0.1:${address.port}/api/v1`,

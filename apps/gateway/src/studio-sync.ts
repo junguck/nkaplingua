@@ -57,6 +57,7 @@ function install(rows: readonly Row[]): void {
 
 export async function startStudioSync(options: StudioSyncOptions): Promise<StudioSync> {
   const { log } = options;
+  const started = performance.now();
   const closers: Array<() => Promise<void>> = [];
   let source: StudioSync['source'] = 'none';
 
@@ -110,7 +111,7 @@ export async function startStudioSync(options: StudioSyncOptions): Promise<Studi
     install(rows);
     source = rows.length > 0 ? 'redis' : 'none';
   }
-  log(`studio : ${studioSize()} phrase(s) validée(s) chargée(s) depuis ${source}`);
+  log(`studio : ${studioSize()} phrase(s) validée(s) chargée(s) depuis ${source} en ${Math.round(performance.now() - started)} ms`);
 
   // 3. Mises à jour à chaud publiées par le studio.
   if (redis !== null && redisOk) {

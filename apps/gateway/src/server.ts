@@ -494,7 +494,8 @@ export async function startMiddleware(
 
 export function defaultOptions(): ServerOptions {
   const bankUrl = process.env.SAFINUM_BANK_URL || 'https://safinum.cm/api/v1';
-  if (!isAllowedBankUrl(bankUrl)) {
+  const extraHosts = (process.env.BANK_ALLOWED_HOSTS ?? '').split(',').map((h) => h.trim()).filter((h) => h !== '');
+  if (!isAllowedBankUrl(bankUrl, extraHosts)) {
     throw new Error(`SAFINUM_BANK_URL refusée (${bankUrl}) : seule la sandbox SAFINUM ou la boucle locale reçoivent la clé d'équipe.`);
   }
   const hookSecret = process.env.HOOK_SECRET?.trim() || null;

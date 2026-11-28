@@ -1,43 +1,94 @@
-# Pile complète NkapLingua v3. Secrets dans infra/.env (jamais commité) :
-#   SAFINUM_TEAM_KEY, HOOK_SECRET, STUDIO_SECRET
+# NkapLingua, pile complète.
+#   cp infra/.env.example infra/.env   (puis remplir les secrets)
+#   docker compose -f infra/docker-compose.yml up -d --build
+#   avec la banque de démonstration : ... --profile demo up -d --build
+name: nkaplingua
+
+x-data: &data
+  MONGO_URL: mongodb://mongo:27017
+  MONGO_DB: nkaplingua
+  REDIS_URL: redis://redis:6379
+
 services:
   mongo:
     image: mongo:7
     volumes: [mongo:/data/db]
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 5s
+      retries: 12
     restart: unless-stopped
+
   redis:
     image: redis:7-alpine
-    command: ["redis-server", "--save", "60", "1", "--appendonly", "yes"]
+    command: ["redis-server", "--appendonly", "yes"]
     volumes: [redis:/data]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 12
     restart: unless-stopped
-  middleware:
-    build: { context: .., dockerfile: infra/middleware.Dockerfile }
+
+  # Amorçage idempotent de la base du studio (phrases de référence, comptes), avant tout le reste.
+  seed:
+    image: nkaplingua/gateway:latest
+    build: { context: .., dockerfile: infra/gateway.Dockerfile }
+    command: ["node", "scripts/studio-seed.mjs"]
     environment:
-      NODE_ENV: production
-      HOST: 0.0.0.0
-      PORT: 8080
-      MONGO_URL: mongodb://mongo:27017
-      REDIS_URL: redis://redis:6379
-      SAFINUM_TEAM_KEY: ${SAFINUM_TEAM_KEY:?clé requise}
-      HOOK_SECRET: ${HOOK_SECRET:?secret requis}
+      <<: *data
+      SEED_PASSWORD: ${SEED_PASSWORD:?mot de passe des comptes de démonstration requis}
+    depends_on:
+      mongo: { condition: service_healthy }
+    restart: "no"
+
+  gateway:
+    image: nkaplingua/gateway:latest
+    environment:
+      <<: *data
+      SAFINUM_TEAM_KEY: ${SAFINUM_TEAM_KEY:?clé d'équipe requise}
+      SAFINUM_BANK_URL: ${SAFINUM_BANK_URL:-https://safinum.cm/api/v1}
+      BANK_ALLOWED_HOSTS: ${BANK_ALLOWED_HOSTS:-}
+      HOOK_SECRET: ${HOOK_SECRET:?secret de l'URL déclarée requis}
+      RATE_LIMIT_PER_MIN: ${RATE_LIMIT_PER_MIN:-60}
     ports: ["8080:8080"]
-    depends_on: [mongo, redis]
+    depends_on:
+      mongo: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      seed: { condition: service_completed_successfully }
     restart: unless-stopped
+
   studio:
+    image: nkaplingua/studio:latest
     build: { context: .., dockerfile: infra/studio.Dockerfile }
     environment:
-      MONGO_URL: mongodb://mongo:27017
-      REDIS_URL: redis://redis:6379
-      STUDIO_SECRET: ${STUDIO_SECRET:?secret requis}
+      <<: *data
+      STUDIO_SECRET: ${STUDIO_SECRET:?secret de session du studio requis}
       TTS_URL: http://tts:8800
     ports: ["3000:3000"]
-    depends_on: [mongo, redis, tts]
+    depends_on:
+      mongo: { condition: service_healthy }
+      redis: { condition: service_healthy }
+      seed: { condition: service_completed_successfully }
     restart: unless-stopped
+
   tts:
-    build: { context: ../apps/tts }
-    environment:
-      MONGO_URL: mongodb://mongo:27017
-      REDIS_URL: redis://redis:6379
+    image: nkaplingua/tts:latest
+    build:
+      context: ../apps/tts
+      args: { TORCH: "${TTS_TORCH:-1}" }
+    environment: *data
     volumes: [tts:/data]
     restart: unless-stopped
+
+  # Banque simulée (mêmes règles que la sandbox) pour tester sans clé : profil « demo ».
+  demo-bank:
+    image: nkaplingua/gateway:latest
+    profiles: ["demo"]
+    command: ["node", "dist/demo/server.js"]
+    environment:
+      DEMO_HOST: 0.0.0.0
+      DEMO_PORT: "8788"
+    healthcheck: { disable: true }
+    restart: unless-stopped
+
 volumes: { mongo: {}, redis: {}, tts: {} }

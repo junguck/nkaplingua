@@ -31,7 +31,7 @@ export const SAFINUM_INTENTS = [
 export type SafinumIntent = (typeof SAFINUM_INTENTS)[number];
 
 /** Langues de la sandbox. Le pidgin n'en fait pas partie. */
-export const SAFINUM_LANGUAGES = ['fr', 'en', 'fub', 'dua', 'ewo', 'bas', 'bbj', 'byv'] as const;
+export const SAFINUM_LANGUAGES = ['fr', 'en', 'fub', 'dua', 'ewo', 'bas', 'bbj', 'byv', 'hau', 'bum', 'wes', 'ybb'] as const;
 
 export type SafinumLanguage = (typeof SAFINUM_LANGUAGES)[number];
 

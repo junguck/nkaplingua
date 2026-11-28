@@ -7,12 +7,15 @@ import { createHash, timingSafeEqual } from 'node:crypto';
 
 export const SAFINUM_ORIGIN = 'https://safinum.cm';
 
-/** Seules la sandbox SAFINUM et la boucle locale (banque de démonstration) reçoivent notre clé. */
-export function isAllowedBankUrl(raw: string): boolean {
+/**
+ * Seules la sandbox SAFINUM, la boucle locale et les hôtes nommés explicitement par l'exploitant
+ * (`BANK_ALLOWED_HOSTS`, ex. la banque de démonstration d'un réseau Docker) reçoivent notre clé.
+ */
+export function isAllowedBankUrl(raw: string, extraHosts: readonly string[] = []): boolean {
   try {
     const url = new URL(raw);
     if (url.origin === SAFINUM_ORIGIN) return true;
-    return url.protocol.startsWith('http') && ['127.0.0.1', 'localhost', '[::1]'].includes(url.hostname);
+    return url.protocol.startsWith('http') && ['127.0.0.1', 'localhost', '[::1]', ...extraHosts].includes(url.hostname);
   } catch {
     return false;
   }

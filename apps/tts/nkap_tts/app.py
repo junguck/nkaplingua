@@ -65,7 +65,12 @@ def build() -> FastAPI:
 
         engine: Engine = ToneEngine()
     else:
-        from .engine import MmsEngine
+        try:
+            from .engine import MmsEngine
 
-        engine = MmsEngine()
+            engine = MmsEngine()
+        except ImportError as error:
+            from .engine import NullEngine
+
+            engine = NullEngine(f"PyTorch absent de l'image ({error.name})")
     return create_app(engine, Path(os.environ.get("TTS_CACHE", ".cache/tts")))

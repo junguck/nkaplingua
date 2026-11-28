@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import shutil
 import subprocess
+from functools import cache
 
 import numpy as np
 
@@ -12,9 +14,20 @@ from .engine import Speech
 MP3_ARGS = ["-ac", "1", "-ar", "16000", "-b:a", "32k", "-f", "mp3"]
 
 
+@cache
+def ffmpeg_exe() -> str:
+    """ffmpeg du système, sinon le binaire statique fourni par le paquet imageio-ffmpeg."""
+    found = shutil.which("ffmpeg")
+    if found is not None:
+        return found
+    import imageio_ffmpeg
+
+    return imageio_ffmpeg.get_ffmpeg_exe()
+
+
 def _ffmpeg(input_args: list[str], data: bytes, timeout: float = 20.0) -> bytes:
     proc = subprocess.run(
-        ["ffmpeg", "-hide_banner", "-loglevel", "error", *input_args, "-i", "pipe:0", *MP3_ARGS, "pipe:1"],
+        [ffmpeg_exe(), "-hide_banner", "-loglevel", "error", *input_args, "-i", "pipe:0", *MP3_ARGS, "pipe:1"],
         input=data,
         capture_output=True,
         timeout=timeout,

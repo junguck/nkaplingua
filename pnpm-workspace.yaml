@@ -1,5 +1,4 @@
 packages:
   - packages/*
   - apps/gateway
-  - apps/middleware
   - apps/studio

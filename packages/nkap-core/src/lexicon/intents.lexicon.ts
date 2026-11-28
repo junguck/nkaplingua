@@ -5,7 +5,7 @@ import type { CueSpec, IntentLexicon } from './types';
  * Les formes fulfulde et pidgin sont des PROPOSITIONS à faire valider par des locuteurs :
  * elles s'appuient sur le glossaire de présélection (neldugo, njoɓdi, kerdii, yaltingo…).
  *
- * Ewondo (`ewo`) et bulu (`bul`) : indices tirés UNIQUEMENT des glossaires ewo.json / bul.json
+ * Ewondo (`ewo`) et bulu (`bum`) : indices tirés UNIQUEMENT des glossaires ewo.json / bul.json
  * (statut « proposé », jamais relus par un locuteur). Une intention absente pour ces langues
  * veut dire « aucun mot attesté », pas « aucun mot n'existe » : à compléter avec des locuteurs.
  * Les indices sont comparés après repli (ɔ→o, ə→e, ŋ→ng, tons et apostrophes supprimés).
@@ -39,7 +39,7 @@ export const INTENT_CUES: IntentLexicon = {
     dua: [['loma*', 3]],
     bbj: [['shyaa*', 3]],
     ewo: [['lom', 3], ['lom moni', 3]],
-    bul: [['lom*', 3], ['lom mone', 3]],
+    bum: [['lom*', 3], ['lom mone', 3]],
   },
   CHECK_FEES: {
     fr: [['frais', 3], ['commission', 3], ['tarif*', 2], ['combien ca coute', 3], ['ca coute', 2]],
@@ -67,7 +67,7 @@ export const INTENT_CUES: IntentLexicon = {
     fub: [['fakture', 3], ['yoɓ*', 1]],
     bbj: [['joa', 2]],
     ewo: [['yanər', 1]],
-    bul: [["ya'ane", 1]],
+    bum: [["ya'ane", 1]],
   },
   WITHDRAW: {
     fr: [['retir*', 3], ['retrait', 3], ['sortir de l argent', 3], ['cash out', 3]],

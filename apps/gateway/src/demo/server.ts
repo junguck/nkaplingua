@@ -165,7 +165,7 @@ function send(
 
 export async function startDemoServer(port = Number(process.env.DEMO_PORT ?? 8788)): Promise<{ url: string; close: () => Promise<void> }> {
   const { server } = createDemoServer();
-  await new Promise<void>((resolve) => server.listen(port, '127.0.0.1', resolve));
+  await new Promise<void>((resolve) => server.listen(port, process.env.DEMO_HOST ?? '127.0.0.1', resolve));
   const address = server.address() as AddressInfo;
   return {
     url: `http://127.0.0.1:${address.port}/api/v1`,

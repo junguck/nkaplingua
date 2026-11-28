@@ -75,11 +75,22 @@ describe('sécurité du gateway', () => {
     expect((await post(`${base}/`, turn(''))).status).toBe(429);
   });
 
+  it('les douze langues de la sandbox sont acceptées sur les écrans (repli fr honnête)', async () => {
+    const base = await middleware();
+    for (const language of ['fr', 'en', 'fub', 'dua', 'ewo', 'bas', 'bbj', 'byv', 'hau', 'bum', 'wes', 'ybb']) {
+      const screen = JSON.stringify({ trace_id: 'l', channel: 'mobile', type: 'ui_translation', screen: 'home', language, source_language: 'fr', strings: { 'nav.home': { text: 'Accueil', context: 'Onglet', max_chars: 12 } } });
+      const res = await post(`${base}/`, screen);
+      expect(res.status, language).toBe(200);
+    }
+  });
+
   it('seules la sandbox et la boucle locale peuvent recevoir la clé', () => {
     expect(isAllowedBankUrl('https://safinum.cm/api/v1')).toBe(true);
     expect(isAllowedBankUrl('http://127.0.0.1:8788/api/v1')).toBe(true);
     expect(isAllowedBankUrl('https://safinum.cm.evil.example/api')).toBe(false);
     expect(isAllowedBankUrl('pas une url')).toBe(false);
+    expect(isAllowedBankUrl('http://demo-bank:8788/api/v1')).toBe(false);
+    expect(isAllowedBankUrl('http://demo-bank:8788/api/v1', ['demo-bank'])).toBe(true);
   });
 
   it('routage du secret', () => {

@@ -6,7 +6,6 @@ dist/
 .env.local
 coverage/
 apps/tts/.cache/
-apps/middleware/.audio-cache/
 docs/latex/*.aux
 docs/latex/*.log
 docs/latex/*.out
@@ -15,3 +14,8 @@ docs/latex/*.fls
 docs/latex/*.fdb_latexmk
 __pycache__/
 .pytest_cache/
+apps/gateway/.seed-*/
+apps/gateway/.lang-*/
+infra/.env
+infra/certs/*.crt
+apps/tts/certs/*.crt

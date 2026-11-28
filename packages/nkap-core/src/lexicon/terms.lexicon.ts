@@ -13,7 +13,7 @@ export interface TermEntry {
  * de présélection (statut « proposé ») ; les phrases d'explication composées pour la finale
  * sont marquées « draft » tant qu'un locuteur ne les a pas relues.
  *
- * Ewondo (`ewo`) et bulu (`bul`) : LIBELLÉS recopiés tels quels de ewo.json / bul.json (statut « proposé »,
+ * Ewondo (`ewo`) et bulu (`bum`) : LIBELLÉS recopiés tels quels de ewo.json / bul.json (statut « proposé »,
  * jamais relus par un locuteur). Aucune explication n'est rédigée dans ces langues : elle retombe sur le
  * français avec le repli signalé. Un terme sans libellé ewo/bul n'a simplement pas encore été fourni.
  */
@@ -50,7 +50,7 @@ export const TERMS_LEXICON: Readonly<Record<TermId, TermEntry>> = {
   },
   beneficiary: {
     cues: ['beneficiaire', 'destinataire', 'beneficiary', 'recipient', 'mo heɓata', 'mod a nɔŋ mɔni', 'mote a bi mone'],
-    label: { fr: 'Bénéficiaire', en: 'Beneficiary', fub: 'Mo heɓata ceede', wes: 'Pesin wey go receive', ewo: 'Í mód á nɔ́ŋ mɔ̄ní', bul: 'Mote a bi moné' },
+    label: { fr: 'Bénéficiaire', en: 'Beneficiary', fub: 'Mo heɓata ceede', wes: 'Pesin wey go receive', ewo: 'Í mód á nɔ́ŋ mɔ̄ní', bum: 'Mote a bi moné' },
     explanation: {
       fr: "Le bénéficiaire, c'est la personne qui reçoit l'argent. Vérifiez toujours son nom et son numéro.",
       en: 'The beneficiary is the person who receives the money. Always check their name and number.',
